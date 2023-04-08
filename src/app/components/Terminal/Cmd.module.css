@@ -1,0 +1,6 @@
+.text {
+	min-width: calc(100% - 360px);
+}
+.text::placeholder {
+	color: #7b7c81;
+}
