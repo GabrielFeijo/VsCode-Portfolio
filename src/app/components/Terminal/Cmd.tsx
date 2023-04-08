@@ -82,9 +82,9 @@ const Cmd = ({ language, setRanking, setDarkMode, setLanguage }: Props) => {
 						console.log(data);
 						data.forEach((rate: any) => {
 							const created: Date = new Date(rate['created_at']);
-							const date = created.toISOString();
+							const date = created.toLocaleString();
 							response.push(
-								`${date.replace(/T|Z/g, ' ')} - [${rate.username}] ${
+								`${date.replace(/,/g, ' ')} - [${rate.username}] ${
 									rate.comment
 								} ${info[language as keyof typeof info].feedback}: ${
 									rate.stars

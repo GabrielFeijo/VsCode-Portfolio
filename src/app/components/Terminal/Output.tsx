@@ -117,7 +117,7 @@ const info = {
 
 const Output = ({ language }: Props) => {
 	const timeElapsed = Date.now();
-	let today = new Date(timeElapsed).toISOString();
+	let today = new Date(timeElapsed).toLocaleString();
 	return (
 		<Box>
 			{info[language as keyof typeof info].map(({ id, message }) => (
@@ -128,7 +128,7 @@ const Output = ({ language }: Props) => {
 					gap={1}
 				>
 					<Typography sx={{ fontSize: '.8rem', color: '#5e6c9e' }}>
-						{today.replace(/T|Z/g, ' ')}
+						{today.replace(/,/g, ' ')}
 					</Typography>
 					<Typography sx={{ fontSize: '.8rem', color: '#32d97b' }}>
 						[info]
