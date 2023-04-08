@@ -34,7 +34,7 @@ export const contact = [
 	{
 		index: 4,
 		title: 'Find me on Whatsapp',
-		href: 'https://wa.me/+55819841979',
+		href: 'https://wa.me/+5581984197937',
 		icon: <FaWhatsapp />,
 	},
 ];
@@ -67,7 +67,7 @@ export const contato = [
 	{
 		index: 4,
 		title: 'Encontre-me no Whatsapp',
-		href: 'https://wa.me/+55819841979',
+		href: 'https://wa.me/+5581984197937',
 		icon: <FaWhatsapp />,
 	},
 ];
