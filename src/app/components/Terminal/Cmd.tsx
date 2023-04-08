@@ -98,7 +98,7 @@ const Cmd = ({ language, setRanking, setDarkMode, setLanguage }: Props) => {
 
 						result(response, color);
 						break;
-					case 'review':
+					case 'evaluate':
 					case 'avaliar':
 						setRanking(true);
 						result(response, color);
