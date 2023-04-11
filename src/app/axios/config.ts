@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiFetch = axios.create({
-	baseURL: 'https://portfolio.gabrielfeijo.repl.co',
+	baseURL: 'https://api-vscodeportfolio.vercel.app',
 	headers: {
 		'Content-Type': 'application/json',
 	},
