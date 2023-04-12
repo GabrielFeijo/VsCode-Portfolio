@@ -181,11 +181,8 @@ const Cmd = ({ language, setRanking, setDarkMode, setLanguage }: Props) => {
 							>
 								{resultado.response.length > 0 &&
 									resultado.response.map((res: [string], index: number) => (
-										<>
-											<Typography key={index}>{res}</Typography>
-											<br />
-										</>
-									))}
+										<Typography key={index}>{res}</Typography>
+									)) && <br />}
 							</Box>
 						</Box>
 					))
