@@ -5,6 +5,7 @@ export const pagesen = [
 	{ index: 3, name: 'experience.html', route: 'experience' },
 	{ index: 4, name: 'accomplishments.html', route: 'accomplishments' },
 	{ index: 5, name: 'certificates.html', route: 'certificates' },
+	{ index: 6, name: 'myvideo.html', route: 'myvideo' },
 ];
 
 export const paginas = [
