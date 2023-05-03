@@ -78,10 +78,10 @@ const BoxRating = ({ language, setRanking }: Props) => {
 					comment: review.comment,
 					stars: star,
 				});
-				setRanking(false);
 			} catch (error) {
 				console.log(error);
 			}
+			setRanking(false);
 		} else {
 			setError(info[language as keyof typeof info].error);
 			setTimeout(() => {
