@@ -72,6 +72,7 @@ const BoxRating = ({ language, setRanking }: Props) => {
 
 	const sendReview = async () => {
 		if (review.username !== '' && review.comment !== '' && star !== 0) {
+			setRanking(false);
 			try {
 				await apiFetch.post('/api/createReview', {
 					username: review.username,
@@ -81,7 +82,6 @@ const BoxRating = ({ language, setRanking }: Props) => {
 			} catch (error) {
 				console.log(error);
 			}
-			setRanking(false);
 		} else {
 			setError(info[language as keyof typeof info].error);
 			setTimeout(() => {
