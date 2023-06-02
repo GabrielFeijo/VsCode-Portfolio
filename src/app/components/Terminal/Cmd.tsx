@@ -17,7 +17,7 @@ const info = {
 		allRightsReserved: 'Todos os direitos reservados',
 		placeholder: 'Digite um comando (ajuda para ver todos os comandos)',
 		error:
-			'Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite "help" para obter uma lista de comandos disponíveis.',
+			'Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite "ajuda" para obter uma lista de comandos disponíveis.',
 		theme: 'Tema alterado com sucesso!',
 		language: 'Idioma alterado com sucesso!',
 		feedback: 'Opinião',
