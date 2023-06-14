@@ -38,7 +38,7 @@ function initVisiblePageIndexs(pages: Page[]) {
 }
 
 export default function App() {
-	const [language, setLanguage] = useState('en');
+	const [language, setLanguage] = useState('pt-BR');
 	const pages = language === 'pt-BR' ? paginas : pagesen;
 	const navigate = useNavigate();
 
