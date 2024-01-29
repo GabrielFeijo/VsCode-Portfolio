@@ -1,10 +1,4 @@
-import {
-	FaGithub,
-	FaLinkedin,
-	FaEnvelope,
-	FaInstagram,
-	FaWhatsapp,
-} from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 export const contact = [
 	{
@@ -24,18 +18,6 @@ export const contact = [
 		title: 'Contact me via email',
 		href: 'mailto:feijo6622@gmail.com',
 		icon: <FaEnvelope />,
-	},
-	{
-		index: 3,
-		title: 'Find me on Instagram',
-		href: 'https://www.instagram.com/gabriel.sfeijo/',
-		icon: <FaInstagram />,
-	},
-	{
-		index: 4,
-		title: 'Find me on Whatsapp',
-		href: 'https://wa.me/+5581984197937',
-		icon: <FaWhatsapp />,
 	},
 ];
 
@@ -57,17 +39,5 @@ export const contato = [
 		title: 'Contate-me por e-mail',
 		href: 'mailto:feijo6622@gmail.com',
 		icon: <FaEnvelope />,
-	},
-	{
-		index: 3,
-		title: 'Encontre-me no Instagram',
-		href: 'https://www.instagram.com/gabriel.sfeijo/',
-		icon: <FaInstagram />,
-	},
-	{
-		index: 4,
-		title: 'Encontre-me no Whatsapp',
-		href: 'https://wa.me/+5581984197937',
-		icon: <FaWhatsapp />,
 	},
 ];
