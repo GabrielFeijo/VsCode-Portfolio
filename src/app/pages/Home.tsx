@@ -27,7 +27,8 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 	const getConnection = async () => {
 		setTimeout(() => {
 			setLoading(false);
-		}, 4500);
+		}, 2500);
+
 		const response = await apiFetch.get('/');
 		console.log(response);
 	};
