@@ -38,7 +38,7 @@ function initVisiblePageIndexs(pages: Page[]) {
 }
 
 export default function App() {
-	const [language, setLanguage] = useState('pt-BR');
+	const [language, setLanguage] = useState<string>();
 	const pages = language === 'pt-BR' ? paginas : pagesen;
 	const navigate = useNavigate();
 
@@ -98,8 +98,21 @@ export default function App() {
 
 	useEffect(() => {
 		const currentTheme = localStorage.getItem('theme');
+		const currentLanguage = localStorage.getItem('language');
 		if (!currentTheme) setDarkMode(true);
 		else setDarkMode(currentTheme === 'dark');
+
+		if (currentLanguage) {
+			if (currentLanguage === 'en') {
+				setLanguage('pt-BR');
+				localStorage.setItem('language', 'pt-BR');
+			} else {
+				setLanguage('en');
+				localStorage.setItem('language', 'en');
+			}
+		} else {
+			setLanguage('pt-BR');
+		}
 	}, []);
 
 	const deletedIndex = visiblePages.find(
@@ -141,176 +154,182 @@ export default function App() {
 	}, [visiblePageIndexs, navigate, deletedIndex, selectedIndex]);
 
 	return (
-		<ThemeProvider theme={theme}>
-			<CssBaseline enableColorScheme />
-			{ranking && (
-				<Rating
-					language={language}
-					setRanking={setRanking}
-				></Rating>
-			)}
-			<Container
-				sx={{ m: 0, p: 0, overflowY: 'hidden' }}
-				maxWidth={false}
-				disableGutters
-			>
-				<Grid
-					container
-					sx={{ overflow: 'auto', overflowY: 'hidden' }}
-				>
-					<Grid
-						container
-						sx={{ overflow: 'auto' }}
+		<>
+			{language && (
+				<ThemeProvider theme={theme}>
+					<CssBaseline enableColorScheme />
+					{ranking && (
+						<Rating
+							language={language}
+							setRanking={setRanking}
+						></Rating>
+					)}
+					<Container
+						sx={{ m: 0, p: 0, overflowY: 'hidden' }}
+						maxWidth={false}
+						disableGutters
 					>
 						<Grid
-							item
-							sx={{ width: 50 }}
+							container
+							sx={{ overflow: 'auto', overflowY: 'hidden' }}
 						>
-							<Sidebar
-								setExpanded={setExpanded}
-								expanded={expanded}
-								terminal={terminal}
-								setTerminal={setTerminal}
-								darkMode={darkMode}
-								handleThemeChange={handleThemeChange}
-								language={language}
-								changeLanguage={changeLanguage}
-							/>
-						</Grid>
-						{expanded && (
+							<Grid
+								container
+								sx={{ overflow: 'auto' }}
+							>
+								<Grid
+									item
+									sx={{ width: 50 }}
+								>
+									<Sidebar
+										setExpanded={setExpanded}
+										expanded={expanded}
+										terminal={terminal}
+										setTerminal={setTerminal}
+										darkMode={darkMode}
+										handleThemeChange={handleThemeChange}
+										language={language}
+										changeLanguage={changeLanguage}
+									/>
+								</Grid>
+								{expanded && (
+									<Grid
+										item
+										sx={{
+											backgroundColor: darkMode ? '#21222c' : '#f3f3f3',
+											width: 220,
+										}}
+									>
+										<Stack sx={{ mt: 1 }}>
+											<Typography
+												variant='caption'
+												color='text.secondary'
+												sx={{ ml: 4 }}
+											>
+												{language === 'pt-BR' ? 'EXPLORADOR' : 'EXPLORER'}
+											</Typography>
+											<AppTree
+												pages={pages}
+												selectedIndex={selectedIndex}
+												setSelectedIndex={setSelectedIndex}
+												currentComponent={currentComponent}
+												setCurrentComponent={setCurrentComponent}
+												visiblePageIndexs={visiblePageIndexs}
+												setVisiblePageIndexs={setVisiblePageIndexs}
+												language={language}
+											/>
+										</Stack>
+									</Grid>
+								)}
+								<Grid
+									item
+									xs
+									zeroMinWidth
+								>
+									<Grid
+										sx={{
+											height: '33px',
+										}}
+									>
+										<AppButtons
+											// pages={pages}
+											pages={visiblePages}
+											selectedIndex={selectedIndex}
+											setSelectedIndex={setSelectedIndex}
+											currentComponent={currentComponent}
+											setCurrentComponent={setCurrentComponent}
+											visiblePageIndexs={visiblePageIndexs}
+											setVisiblePageIndexs={setVisiblePageIndexs}
+										/>
+									</Grid>
+									<Grid
+										sx={{
+											scrollBehavior: 'smooth',
+											// overflow: 'scroll',
+											overflowY: 'auto',
+											height: `calc(100vh - 20px - 33px - ${
+												terminal ? '300px' : '0px'
+											})`,
+										}}
+									>
+										<Routes>
+											<Route
+												path='/'
+												element={
+													<Home
+														setSelectedIndex={setSelectedIndex}
+														language={language}
+														terminal={terminal}
+													/>
+												}
+											/>
+											{language === 'pt-BR'
+												? paginas.map(({ index, name, route }) => (
+														<Route
+															key={index}
+															path={`/${route}`}
+															element={
+																<MDContainer path={`./pages/pt-br/${name}`} />
+															}
+														/>
+												  ))
+												: pagesen.map(({ index, name, route }) => (
+														<Route
+															key={index}
+															path={`/${route}`}
+															element={
+																<MDContainer path={`./pages/en/${name}`} />
+															}
+														/>
+												  ))}
+											<Route
+												path='*'
+												element={
+													<Navigate
+														to='/'
+														replace
+													/>
+												}
+											/>
+										</Routes>
+									</Grid>
+									<Grid
+										sx={{
+											scrollBehavior: 'smooth',
+											// overflow: 'scroll',
+											overflowY: 'auto',
+											width: '100%',
+											height: `${terminal ? '300px' : '0px'}`,
+										}}
+									>
+										<Terminal
+											darkMode={darkMode}
+											language={language}
+											selectedTerminalIndex={selectedTerminalIndex}
+											setSelectedTerminalIndex={setSelectedTerminalIndex}
+											setTerminal={setTerminal}
+											setRanking={setRanking}
+											setDarkMode={setDarkMode}
+											setLanguage={setLanguage}
+										/>
+									</Grid>
+								</Grid>
+							</Grid>
+
 							<Grid
 								item
-								sx={{
-									backgroundColor: darkMode ? '#21222c' : '#f3f3f3',
-									width: 220,
-								}}
+								lg={12}
+								md={12}
+								sm={12}
+								xs={12}
 							>
-								<Stack sx={{ mt: 1 }}>
-									<Typography
-										variant='caption'
-										color='text.secondary'
-										sx={{ ml: 4 }}
-									>
-										{language === 'pt-BR' ? 'EXPLORADOR' : 'EXPLORER'}
-									</Typography>
-									<AppTree
-										pages={pages}
-										selectedIndex={selectedIndex}
-										setSelectedIndex={setSelectedIndex}
-										currentComponent={currentComponent}
-										setCurrentComponent={setCurrentComponent}
-										visiblePageIndexs={visiblePageIndexs}
-										setVisiblePageIndexs={setVisiblePageIndexs}
-										language={language}
-									/>
-								</Stack>
-							</Grid>
-						)}
-						<Grid
-							item
-							xs
-							zeroMinWidth
-						>
-							<Grid
-								sx={{
-									height: '33px',
-								}}
-							>
-								<AppButtons
-									// pages={pages}
-									pages={visiblePages}
-									selectedIndex={selectedIndex}
-									setSelectedIndex={setSelectedIndex}
-									currentComponent={currentComponent}
-									setCurrentComponent={setCurrentComponent}
-									visiblePageIndexs={visiblePageIndexs}
-									setVisiblePageIndexs={setVisiblePageIndexs}
-								/>
-							</Grid>
-							<Grid
-								sx={{
-									scrollBehavior: 'smooth',
-									// overflow: 'scroll',
-									overflowY: 'auto',
-									height: `calc(100vh - 20px - 33px - ${
-										terminal ? '300px' : '0px'
-									})`,
-								}}
-							>
-								<Routes>
-									<Route
-										path='/'
-										element={
-											<Home
-												setSelectedIndex={setSelectedIndex}
-												language={language}
-												terminal={terminal}
-											/>
-										}
-									/>
-									{language === 'pt-BR'
-										? paginas.map(({ index, name, route }) => (
-												<Route
-													key={index}
-													path={`/${route}`}
-													element={
-														<MDContainer path={`./pages/pt-br/${name}`} />
-													}
-												/>
-										  ))
-										: pagesen.map(({ index, name, route }) => (
-												<Route
-													key={index}
-													path={`/${route}`}
-													element={<MDContainer path={`./pages/en/${name}`} />}
-												/>
-										  ))}
-									<Route
-										path='*'
-										element={
-											<Navigate
-												to='/'
-												replace
-											/>
-										}
-									/>
-								</Routes>
-							</Grid>
-							<Grid
-								sx={{
-									scrollBehavior: 'smooth',
-									// overflow: 'scroll',
-									overflowY: 'auto',
-									width: '100%',
-									height: `${terminal ? '300px' : '0px'}`,
-								}}
-							>
-								<Terminal
-									darkMode={darkMode}
-									language={language}
-									selectedTerminalIndex={selectedTerminalIndex}
-									setSelectedTerminalIndex={setSelectedTerminalIndex}
-									setTerminal={setTerminal}
-									setRanking={setRanking}
-									setDarkMode={setDarkMode}
-									setLanguage={setLanguage}
-								/>
+								<Footer />
 							</Grid>
 						</Grid>
-					</Grid>
-
-					<Grid
-						item
-						lg={12}
-						md={12}
-						sm={12}
-						xs={12}
-					>
-						<Footer />
-					</Grid>
-				</Grid>
-			</Container>
-			{/* </Router> */}
-		</ThemeProvider>
+					</Container>
+					{/* </Router> */}
+				</ThemeProvider>
+			)}
+		</>
 	);
 }

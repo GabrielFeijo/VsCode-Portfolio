@@ -8,7 +8,7 @@ interface Props {
 	language: string;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-	setLanguage: React.Dispatch<React.SetStateAction<string>>;
+	setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const info = {

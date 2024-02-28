@@ -23,7 +23,7 @@ interface Props {
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-	setLanguage: React.Dispatch<React.SetStateAction<string>>;
+	setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const Terminal = ({
