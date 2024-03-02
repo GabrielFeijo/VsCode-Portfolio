@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { VscClose } from 'react-icons/vsc';
 import './Rating.css';
-import apiFetch from '../../axios/config';
+import { ReviewService } from '../../../services/api/review/ReviewService';
 
 const info = {
 	'pt-BR': {
@@ -61,7 +61,7 @@ const labelsEN: { [index: string]: string } = {
 const BoxRating = ({ language, setRanking }: Props) => {
 	const theme = useTheme();
 	const [error, setError] = useState('');
-	const [star, setStar] = useState<number | null>(0);
+	const [star, setStar] = useState<number>(0);
 	const [review, setReview] = useState({ username: '', comment: '' });
 
 	function handleChange(e: {
@@ -73,14 +73,15 @@ const BoxRating = ({ language, setRanking }: Props) => {
 	const sendReview = async () => {
 		if (review.username !== '' && review.comment !== '' && star !== 0) {
 			setRanking(false);
-			try {
-				await apiFetch.post('/api/createReview', {
-					username: review.username,
-					comment: review.comment,
-					stars: star,
-				});
-			} catch (error) {
-				console.log(error);
+
+			const response = await ReviewService.create({
+				username: review.username,
+				comment: review.comment,
+				stars: star,
+			});
+
+			if (response instanceof Error) {
+				console.log(response.message);
 			}
 		} else {
 			setError(info[language as keyof typeof info].error);
@@ -158,7 +159,9 @@ const BoxRating = ({ language, setRanking }: Props) => {
 						value={star}
 						precision={0.5}
 						onChange={(event, newValue) => {
-							setStar(newValue);
+							if (newValue) {
+								setStar(newValue);
+							}
 						}}
 					/>
 					<Box>

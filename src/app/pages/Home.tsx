@@ -12,7 +12,7 @@ import logo from '../../static/favicon.png';
 import { useLocation } from 'react-router-dom';
 import { contact, contato } from './links';
 import Loading from '../components/Loading/Loading';
-import apiFetch from '../axios/config';
+import { HomeService } from '../../services/api/home/HomeService';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -29,8 +29,7 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 			setLoading(false);
 		}, 2500);
 
-		const response = await apiFetch.get('/');
-		console.log(response);
+		await HomeService.getResponse();
 	};
 
 	useEffect(() => {
@@ -96,14 +95,6 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 									{language === 'pt-BR'
 										? 'Desenvolvendo soluções tecnológicas para mudar o mundo de forma positiva.'
 										: 'Developing technological solutions to change the world in a positive way.'}
-									{/* Better an{' '}
-<Box fontWeight="fontWeightMedium" display="inline">
-oops
-</Box>{' '}
-than a{' '}
-<Box fontWeight="fontWeightMedium" display="inline">
-what if
-</Box> */}
 								</Typography>
 							</Grid>
 							<Grid

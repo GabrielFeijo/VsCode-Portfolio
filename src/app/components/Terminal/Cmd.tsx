@@ -2,7 +2,11 @@ import { Box, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import styles from './Cmd.module.css';
 import { useNavigate } from 'react-router-dom';
-import apiFetch from '../../axios/config';
+import {
+	IRate,
+	ReviewService,
+} from '../../../services/api/review/ReviewService';
+import { CommandService } from '../../../services/api/command/CommandService';
 
 interface Props {
 	language: 'pt-BR' | 'en';
@@ -73,15 +77,6 @@ const labels = {
 	},
 };
 
-interface IRate {
-	_id: string;
-	username: string;
-	comment: string;
-	stars: Stars;
-	created_at: string;
-	updatedAt: string;
-}
-
 const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 	const theme = useTheme();
 	const navigate = useNavigate();
@@ -106,37 +101,43 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 				switch (command) {
 					case 'reviews':
 					case 'avaliacoes':
-						const request = await apiFetch.get('/api/reviews');
-						const data = request.data;
-						data.forEach((rate: IRate) => {
-							const created: Date = new Date(rate['created_at']);
-							const date = created.toLocaleString();
-							response.push(
-								`${date.replace(/,/g, ' ')} - [${rate.username}] ${
-									rate.comment
-								} ${info[language].feedback}: ${rate.stars} - 
-								${labels[language][String(rate.stars) as Stars]}`
-							);
-						});
+						const responseData = await ReviewService.findAll();
 
-						result(response, color);
+						if (responseData instanceof Error) {
+							console.log(responseData.message);
+						} else {
+							responseData.forEach((rate: IRate) => {
+								const created: Date = new Date(rate['created_at']);
+								const date = created.toLocaleString();
+
+								response.push(
+									`${date.replace(/,/g, ' ')} - [${rate.username}] ${
+										rate.comment
+									} ${info[language].feedback}: ${rate.stars} - 
+									${labels[language][String(rate.stars) as Stars]}`
+								);
+							});
+
+							saveResult(response, color);
+						}
+
 						break;
 					case 'evaluate':
 					case 'avaliar':
 						setRanking(true);
-						result(response, color);
+						saveResult(response, color);
 						break;
 					case 'changetheme':
 					case 'mudartema':
 						setDarkMode(theme.palette.mode === 'dark' ? false : true);
 						response.push(info[language as keyof typeof info].theme);
-						result(response, color);
+						saveResult(response, color);
 						break;
 					case 'changelanguage':
 					case 'mudaridioma':
 						changeLanguage();
 						response.push(info[language as keyof typeof info].language);
-						result(response, color);
+						saveResult(response, color);
 						break;
 					case 'clear':
 					case 'limpar':
@@ -149,21 +150,20 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 							case 'rota':
 								const route = command.replace(`${cmd} `, '');
 								navigate(`/${route}`);
-								result(response, color);
+								saveResult(response, color);
 								break;
 							default:
-								const request = await apiFetch.get('/api/command', {
-									params: {
-										command: command,
-									},
-								});
-								if (request.data !== '') {
-									response = request.data.response;
-								} else {
+								const responseData = await CommandService.getResponse(command);
+
+								if (responseData instanceof Error) {
+									console.log(responseData.message);
+
 									response.push(info[language as keyof typeof info].error);
 									color = '#ed4337';
+								} else {
+									response = responseData.response;
 								}
-								result(response, color);
+								saveResult(response, color);
 						}
 				}
 
@@ -173,12 +173,10 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 		setCommand(e.target.value);
 	};
 
-	const result = (response: [string], color: string) => {
-		setResults([
-			...results,
-			{ command: command, response: response, color: color },
-		]);
+	const saveResult = (response: [string], color: string) => {
+		setResults((prevState) => [...prevState, { command, response, color }]);
 	};
+
 	return (
 		<Box id='teste'>
 			<Box>
