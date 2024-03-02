@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { VscMarkdown } from 'react-icons/vsc';
+import { convertFileName } from '../utils/convertFileName';
 
 interface Page {
 	index: number;
@@ -93,7 +94,7 @@ export default function AppTree({
 					<TreeItem
 						key={index}
 						nodeId={index.toString()}
-						label={`${route}.md`}
+						label={convertFileName(name)}
 						sx={{
 							color: renderTreeItemColor(index),
 							backgroundColor: renderTreeItemBgColor(index),

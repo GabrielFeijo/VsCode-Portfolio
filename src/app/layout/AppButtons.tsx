@@ -4,6 +4,7 @@ import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { Container } from '@mui/system';
+import { convertFileName } from '../utils/convertFileName';
 
 interface Props {
 	pages: {
@@ -117,7 +118,7 @@ export default function AppButtons({
 					>
 						<VscMarkdown />
 					</Box>
-					{route}.md
+					{convertFileName(name)}
 					<Box
 						component={Paper}
 						sx={{

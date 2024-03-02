@@ -23,7 +23,7 @@ interface Props {
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-	setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
+	changeLanguage: () => void;
 }
 
 const Terminal = ({
@@ -34,7 +34,7 @@ const Terminal = ({
 	setTerminal,
 	setRanking,
 	setDarkMode,
-	setLanguage,
+	changeLanguage,
 }: Props) => {
 	const theme = useTheme();
 	function renderTerminalBgColor(index: number) {
@@ -67,7 +67,7 @@ const Terminal = ({
 					language={language}
 					setRanking={setRanking}
 					setDarkMode={setDarkMode}
-					setLanguage={setLanguage}
+					changeLanguage={changeLanguage}
 				/>
 			),
 		},

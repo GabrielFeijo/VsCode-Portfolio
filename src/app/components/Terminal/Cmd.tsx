@@ -8,7 +8,7 @@ interface Props {
 	language: string;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-	setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
+	changeLanguage: () => void;
 }
 
 const info = {
@@ -59,7 +59,7 @@ const labelsEN: { [index: string]: string } = {
 	5: 'Excellent+',
 };
 
-const Cmd = ({ language, setRanking, setDarkMode, setLanguage }: Props) => {
+const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 	const theme = useTheme();
 	const navigate = useNavigate();
 	const [command, setCommand] = useState('');
@@ -111,7 +111,7 @@ const Cmd = ({ language, setRanking, setDarkMode, setLanguage }: Props) => {
 						break;
 					case 'changelanguage':
 					case 'mudaridioma':
-						setLanguage(language === 'pt-BR' ? 'en' : 'pt-BR');
+						changeLanguage();
 						response.push(info[language as keyof typeof info].language);
 						result(response, color);
 						break;

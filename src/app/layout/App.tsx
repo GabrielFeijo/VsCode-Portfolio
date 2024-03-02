@@ -16,11 +16,11 @@ import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import AppButtons from './AppButtons';
 import MDContainer from '../components/MDContainer';
 import Home from '../pages/Home';
-import { pagesen, paginas } from '../pages/pages';
 
 import { isBrowser } from 'react-device-detect';
 import Terminal from './Terminal';
 import Rating from '../components/Rating/Rating';
+import { allPages } from '../pages/pages';
 
 interface Page {
 	index: number;
@@ -38,8 +38,8 @@ function initVisiblePageIndexs(pages: Page[]) {
 }
 
 export default function App() {
-	const [language, setLanguage] = useState<string>();
-	const pages = language === 'pt-BR' ? paginas : pagesen;
+	const [language, setLanguage] = useState<string>('pt-BR');
+	const pages = language === 'pt-BR' ? allPages['pt-BR'] : allPages['en'];
 	const navigate = useNavigate();
 
 	const [expanded, setExpanded] = useState(isBrowser);
@@ -85,15 +85,18 @@ export default function App() {
 	}
 
 	function changeLanguage() {
-		if (language === 'en') {
-			setLanguage('pt-BR');
-			localStorage.setItem('language', 'pt-BR');
-		} else {
-			setLanguage('en');
-			localStorage.setItem('language', 'en');
+		const newLanguage = language === 'pt-BR' ? 'en' : 'pt-BR';
+
+		setLanguage(newLanguage);
+		localStorage.setItem('language', newLanguage);
+
+		const newPages = [];
+
+		for (const index of visiblePageIndexs) {
+			const page = allPages[newLanguage].find((x) => x.index === index);
+			if (page) newPages.push(page);
 		}
-		setSelectedIndex(-1);
-		navigate('/');
+		setVisiblePages(newPages);
 	}
 
 	useEffect(() => {
@@ -104,14 +107,8 @@ export default function App() {
 
 		if (currentLanguage) {
 			if (currentLanguage === 'en') {
-				setLanguage('pt-BR');
-				localStorage.setItem('language', 'pt-BR');
-			} else {
 				setLanguage('en');
-				localStorage.setItem('language', 'en');
 			}
-		} else {
-			setLanguage('pt-BR');
 		}
 	}, []);
 
@@ -149,7 +146,6 @@ export default function App() {
 				(x) => x.index === Math.min(...visiblePageIndexs)
 			);
 			if (page) navigate('/' + page.route);
-		} else {
 		}
 	}, [visiblePageIndexs, navigate, deletedIndex, selectedIndex]);
 
@@ -232,7 +228,6 @@ export default function App() {
 										}}
 									>
 										<AppButtons
-											// pages={pages}
 											pages={visiblePages}
 											selectedIndex={selectedIndex}
 											setSelectedIndex={setSelectedIndex}
@@ -263,25 +258,15 @@ export default function App() {
 													/>
 												}
 											/>
-											{language === 'pt-BR'
-												? paginas.map(({ index, name, route }) => (
-														<Route
-															key={index}
-															path={`/${route}`}
-															element={
-																<MDContainer path={`./pages/pt-br/${name}`} />
-															}
-														/>
-												  ))
-												: pagesen.map(({ index, name, route }) => (
-														<Route
-															key={index}
-															path={`/${route}`}
-															element={
-																<MDContainer path={`./pages/en/${name}`} />
-															}
-														/>
-												  ))}
+											{pages.map(({ index, name, route }) => (
+												<Route
+													key={index}
+													path={`/${route}`}
+													element={
+														<MDContainer path={`./pages/${language}/${name}`} />
+													}
+												/>
+											))}
 											<Route
 												path='*'
 												element={
@@ -310,7 +295,7 @@ export default function App() {
 											setTerminal={setTerminal}
 											setRanking={setRanking}
 											setDarkMode={setDarkMode}
-											setLanguage={setLanguage}
+											changeLanguage={changeLanguage}
 										/>
 									</Grid>
 								</Grid>
