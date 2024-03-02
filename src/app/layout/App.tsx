@@ -38,7 +38,7 @@ function initVisiblePageIndexs(pages: Page[]) {
 }
 
 export default function App() {
-	const [language, setLanguage] = useState<string>('pt-BR');
+	const [language, setLanguage] = useState<'pt-BR' | 'en'>('pt-BR');
 	const pages = language === 'pt-BR' ? allPages['pt-BR'] : allPages['en'];
 	const navigate = useNavigate();
 
@@ -89,14 +89,6 @@ export default function App() {
 
 		setLanguage(newLanguage);
 		localStorage.setItem('language', newLanguage);
-
-		const newPages = [];
-
-		for (const index of visiblePageIndexs) {
-			const page = allPages[newLanguage].find((x) => x.index === index);
-			if (page) newPages.push(page);
-		}
-		setVisiblePages(newPages);
 	}
 
 	useEffect(() => {
@@ -147,7 +139,7 @@ export default function App() {
 			);
 			if (page) navigate('/' + page.route);
 		}
-	}, [visiblePageIndexs, navigate, deletedIndex, selectedIndex]);
+	}, [visiblePageIndexs, navigate, deletedIndex, selectedIndex, pages]);
 
 	return (
 		<>

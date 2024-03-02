@@ -5,11 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import apiFetch from '../../axios/config';
 
 interface Props {
-	language: string;
+	language: 'pt-BR' | 'en';
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
 }
+
+type Stars =
+	| '0.5'
+	| '1'
+	| '1.5'
+	| '2'
+	| '2.5'
+	| '3'
+	| '3.5'
+	| '4'
+	| '4.5'
+	| '5';
 
 const info = {
 	'pt-BR': {
@@ -34,36 +46,53 @@ const info = {
 	},
 };
 
-const labelsPT: { [index: string]: string } = {
-	0.5: 'Inútil',
-	1: 'Inútil+',
-	1.5: 'Ruim',
-	2: 'Ruim+',
-	2.5: 'Ok',
-	3: 'Ok+',
-	3.5: 'Bom',
-	4: 'Bom+',
-	4.5: 'Excelente',
-	5: 'Excelente+',
+const labels = {
+	'pt-BR': {
+		'0.5': 'Inútil',
+		'1': 'Inútil+',
+		'1.5': 'Ruim',
+		'2': 'Ruim+',
+		'2.5': 'Ok',
+		'3': 'Ok+',
+		'3.5': 'Bom',
+		'4': 'Bom+',
+		'4.5': 'Excelente',
+		'5': 'Excelente+',
+	},
+	en: {
+		'0.5': 'Useless',
+		'1': 'Useless+',
+		'1.5': 'Poor',
+		'2': 'Poor+',
+		'2.5': 'Ok',
+		'3': 'Ok+',
+		'3.5': 'Good',
+		'4': 'Good+',
+		'4.5': 'Excellent',
+		'5': 'Excellent+',
+	},
 };
-const labelsEN: { [index: string]: string } = {
-	0.5: 'Useless',
-	1: 'Useless+',
-	1.5: 'Poor',
-	2: 'Poor+',
-	2.5: 'Ok',
-	3: 'Ok+',
-	3.5: 'Good',
-	4: 'Good+',
-	4.5: 'Excellent',
-	5: 'Excellent+',
-};
+
+interface IRate {
+	_id: string;
+	username: string;
+	comment: string;
+	stars: Stars;
+	created_at: string;
+	updatedAt: string;
+}
 
 const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 	const theme = useTheme();
 	const navigate = useNavigate();
 	const [command, setCommand] = useState('');
-	const [results, setResults]: any = useState([]);
+	const [results, setResults] = useState<
+		{
+			command: string;
+			response: [string];
+			color: string;
+		}[]
+	>([]);
 	const verifyCommand = async (e: any) => {
 		if (
 			e.nativeEvent.inputType === 'insertLineBreak' ||
@@ -79,20 +108,14 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 					case 'avaliacoes':
 						const request = await apiFetch.get('/api/reviews');
 						const data = request.data;
-						console.log(data);
-						data.forEach((rate: any) => {
+						data.forEach((rate: IRate) => {
 							const created: Date = new Date(rate['created_at']);
 							const date = created.toLocaleString();
 							response.push(
 								`${date.replace(/,/g, ' ')} - [${rate.username}] ${
 									rate.comment
-								} ${info[language as keyof typeof info].feedback}: ${
-									rate.stars
-								} - ${
-									language === 'pt-BR'
-										? labelsPT[rate.stars]
-										: labelsEN[rate.stars]
-								}`
+								} ${info[language].feedback}: ${rate.stars} - 
+								${labels[language][String(rate.stars) as Stars]}`
 							);
 						});
 

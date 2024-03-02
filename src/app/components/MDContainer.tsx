@@ -109,44 +109,6 @@ function MarkdownH2(props: { children: ReactNode }) {
 	);
 }
 
-// function MarkdownParagraph(props: { children: ReactNode }) {
-//   if (!props.children) return <Typography>{props.children}</Typography>;
-
-//   const element: any = props.children;
-//   let result = [];
-
-//   let anyInlineElement = false;
-//   for (let e of element) {
-//     if (e.type) {
-//       anyInlineElement = true;
-//     }
-//   }
-
-//   if (anyInlineElement) {
-//     for (let e of element) {
-//       if (e.type) {
-//         result.push({ ...e });
-//       } else {
-//         result.push(
-//           <Typography key={e} display="inline">
-//             {e}
-//           </Typography>
-//         );
-//       }
-//     }
-//   } else {
-//     for (let e of element) {
-//       if (e.type) {
-//         result.push({ ...e });
-//       } else {
-//         result.push(<Typography key={e}>{e}</Typography>);
-//       }
-//     }
-//   }
-
-//   return <>{result}</>;
-// }
-
 export default function MDContainer({ path }: Props) {
 	const [content, setContent] = useState('');
 	const { pathname } = useLocation();

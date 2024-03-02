@@ -17,7 +17,7 @@ import Cmd from '../components/Terminal/Cmd';
 
 interface Props {
 	darkMode: boolean;
-	language: string;
+	language: 'pt-BR' | 'en';
 	selectedTerminalIndex: number;
 	setSelectedTerminalIndex: React.Dispatch<React.SetStateAction<number>>;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
