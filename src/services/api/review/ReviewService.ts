@@ -14,7 +14,7 @@ export const MENSAGEM_ERRO_PADRAO = 'Ocorreu um erro interno no servidor';
 
 const findAll = async (): Promise<IRate[] | Error> => {
 	try {
-		const { data } = await apiFetch.get(`/reviews`);
+		const { data } = await apiFetch.get(`/review`);
 
 		if (data) {
 			return data;
@@ -36,7 +36,7 @@ const create = async (review: {
 	stars: number;
 }): Promise<IRate | Error> => {
 	try {
-		const { data } = await apiFetch.post(`/createReview`, review);
+		const { data } = await apiFetch.post(`/review`, review);
 
 		if (data) {
 			return data;

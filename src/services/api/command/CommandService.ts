@@ -12,7 +12,7 @@ export interface ICommand {
 
 const getResponse = async (command: string): Promise<ICommand | Error> => {
 	try {
-		const { data } = await apiFetch.get(`/command`, { params: { command } });
+		const { data } = await apiFetch.get(`/command/${command}`);
 
 		if (data) {
 			return data;

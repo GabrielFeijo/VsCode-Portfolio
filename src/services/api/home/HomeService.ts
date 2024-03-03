@@ -4,7 +4,7 @@ import { MENSAGEM_ERRO_PADRAO } from '../review/ReviewService';
 
 const getResponse = async () => {
 	try {
-		const { data } = await apiFetch.get(`/home`);
+		const { data } = await apiFetch.get(`/`);
 
 		if (data) {
 			return data;
