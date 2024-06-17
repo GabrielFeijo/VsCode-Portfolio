@@ -255,7 +255,9 @@ export default function App() {
 													key={index}
 													path={`/${route}`}
 													element={
-														<MDContainer path={`./pages/${language}/${name}`} />
+														<MDContainer
+															path={`./pages/${language.toLowerCase()}/${name}`}
+														/>
 													}
 												/>
 											))}
