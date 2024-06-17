@@ -1,0 +1,22 @@
+.flex {
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.flex iframe {
+	width: 560px;
+}
+
+.flex p {
+	width: 260px;
+	text-align: justify;
+}
+
+@media screen and (max-width: 940px) {
+	.flex p {
+		width: auto;
+	}
+}

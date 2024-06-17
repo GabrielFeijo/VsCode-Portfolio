@@ -1,0 +1,27 @@
+.flex {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+}
+
+.line {
+	height: 35px;
+	width: 2px;
+	background-color: white;
+}
+
+.svg-icon {
+	width: 30px;
+	height: 30px;
+}
+
+.icons {
+	font-size: 35px;
+	list-style: none;
+	cursor: pointer;
+}
+
+.icons span {
+	font-size: 16px;
+	font-weight: 500;
+}
