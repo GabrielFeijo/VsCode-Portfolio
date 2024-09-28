@@ -85,10 +85,6 @@ export default function AppTree({
 				nodeId='-1'
 				label={language === 'pt-BR' ? 'Início' : 'Home'}
 				color='#bdc3cf'
-				onClick={() => {
-					navigate('/');
-					setSelectedIndex(-1);
-				}}
 			>
 				{pages.map(({ index, name, route }) => (
 					<TreeItem
