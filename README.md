@@ -33,7 +33,7 @@ As páginas do projeto incluem:
 
 ## Versão Online
 
-A versão online deste projeto pode ser acessada através do link <https://dev-gg.netlify.app>.
+A versão online deste projeto pode ser acessada através do link <https://gabrielfeijo.netlify.app/>.
 
 Os usuários são encorajados a explorar as diferentes funcionalidades do projeto e dar sua avaliação. Para dar uma avaliação, basta abrir o terminal e digitar o comando 'evaluate' ou 'avaliar'. Seu feedback é muito importante para o desenvolvimento contínuo deste projeto.
 
