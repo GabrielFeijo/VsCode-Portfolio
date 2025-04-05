@@ -1,0 +1,171 @@
+.modalContainer {
+	position: fixed;
+	bottom: 44px;
+	right: 24px;
+	z-index: 1000;
+	animation: fadeIn 0.3s ease forwards;
+}
+
+.modal {
+	width: 320px;
+	background-color: #ffffff;
+	color: #1a1a1a;
+	border-radius: 12px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+	overflow: hidden;
+	border: 1px solid #e5e7eb;
+}
+
+.modalHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 20px;
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.title {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.closeButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	cursor: pointer;
+	color: #64748b;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.closeButton:hover {
+	background-color: #f1f5f9;
+	color: #0f172a;
+}
+
+.modalContent {
+	padding: 8px;
+}
+
+.shortcutItem {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 12px;
+	border-radius: 8px;
+	margin-bottom: 4px;
+	transition: background-color 0.2s;
+}
+
+.shortcutItem:hover {
+	background-color: #f8fafc;
+}
+
+.shortcutInfo {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.iconContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	background-color: #f1f5f9;
+	border-radius: 8px;
+	color: #475569;
+}
+
+.icon {
+	width: 16px;
+	height: 16px;
+}
+
+.shortcutLabel {
+	font-size: 14px;
+	color: #334155;
+}
+
+.keyBadge {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 4px 8px;
+	background-color: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 4px;
+	color: #475569;
+	white-space: nowrap;
+}
+
+:global(.dark) .modal {
+	background-color: #1e293b;
+	color: #f8fafc;
+	border-color: #334155;
+}
+
+:global(.dark) .modalHeader {
+	border-bottom-color: #334155;
+}
+
+:global(.dark) .shortcutItem:hover {
+	background-color: #1e293b;
+}
+
+:global(.dark) .iconContainer {
+	background-color: #334155;
+	color: #e2e8f0;
+}
+
+:global(.dark) .shortcutLabel {
+	color: #e2e8f0;
+}
+
+:global(.dark) .closeButton {
+	color: #94a3b8;
+}
+
+:global(.dark) .closeButton:hover {
+	background-color: #334155;
+	color: #f8fafc;
+}
+
+:global(.dark) .keyBadge {
+	background-color: #334155;
+	border-color: #475569;
+	color: #e2e8f0;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 640px) {
+	.modalContainer {
+		bottom: 16px;
+		right: 16px;
+		left: 16px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.modal {
+		width: 100%;
+		max-width: 320px;
+	}
+}
