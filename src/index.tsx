@@ -1,19 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./app/layout/App";
-import reportWebVitals from "./reportWebVitals";
-// import { BrowserRouter } from 'react-router-dom';
-import { HashRouter } from "react-router-dom";
+import './i18n';
+import './theme.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './app/layout/App';
+import reportWebVitals from './reportWebVitals';
+import { HashRouter } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+	document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
-  </React.StrictMode>
+	<React.StrictMode>
+		<ThemeProvider>
+			<HashRouter>
+				<App />
+			</HashRouter>
+		</ThemeProvider>
+	</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
