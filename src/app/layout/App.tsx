@@ -24,6 +24,7 @@ import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/Keyboar
 import i18n from '../../i18n';
 import { useTheme } from '../../contexts/ThemeContext';
 import { pageRoutes } from '../pages/pages';
+import { useTranslation } from 'react-i18next';
 
 interface Page {
 	index: number;
@@ -43,6 +44,7 @@ function initVisiblePageIndexs(pages: Page[]) {
 export default function App() {
 	const [language, setLanguage] = useState(i18n.language as 'pt' | 'en');
 	const { theme: paletteType, toggleTheme } = useTheme();
+	const { t } = useTranslation();
 	const isDarkMode = paletteType === 'dark';
 	const pages = pageRoutes[language];
 	const navigate = useNavigate();
@@ -210,7 +212,7 @@ export default function App() {
 												color='text.secondary'
 												sx={{ ml: 4 }}
 											>
-												{language === 'pt' ? 'EXPLORADOR' : 'EXPLORER'}
+												{t('sidebar.explorer')}
 											</Typography>
 											<AppTree
 												pages={pages}

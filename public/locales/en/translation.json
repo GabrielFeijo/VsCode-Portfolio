@@ -77,6 +77,7 @@
         "email": "Contact me by email"
     },
     "sidebar": {
+        "explorer": "EXPLORER",
         "terminal": {
             "open": "Open Terminal",
             "close": "Close Terminal"
