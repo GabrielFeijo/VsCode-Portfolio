@@ -20,7 +20,10 @@ import Home from '../pages/Home';
 import { isBrowser } from 'react-device-detect';
 import Terminal from './Terminal';
 import Rating from '../components/Rating/Rating';
-import { allPages } from '../pages/pages';
+import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
+import i18n from '../../i18n';
+import { useTheme } from '../../contexts/ThemeContext';
+import { pageRoutes } from '../pages/pages';
 
 interface Page {
 	index: number;
@@ -38,8 +41,10 @@ function initVisiblePageIndexs(pages: Page[]) {
 }
 
 export default function App() {
-	const [language, setLanguage] = useState<'pt-BR' | 'en'>('pt-BR');
-	const pages = language === 'pt-BR' ? allPages['pt-BR'] : allPages['en'];
+	const [language, setLanguage] = useState(i18n.language as 'pt' | 'en');
+	const { theme: paletteType, toggleTheme } = useTheme();
+	const isDarkMode = paletteType === 'dark';
+	const pages = pageRoutes[language];
 	const navigate = useNavigate();
 
 	const [expanded, setExpanded] = useState(isBrowser);
@@ -50,17 +55,15 @@ export default function App() {
 	const [visiblePageIndexs, setVisiblePageIndexs] = useState(
 		initVisiblePageIndexs(pages)
 	);
-	const [darkMode, setDarkMode] = useState(false);
 	const [ranking, setRanking] = useState(false);
 
 	const [visiblePages, setVisiblePages] = useState(pages);
-	const paletteType = darkMode ? 'dark' : 'light';
 
 	const theme = createTheme({
 		palette: {
 			mode: paletteType,
 			background: {
-				default: paletteType === 'light' ? '#FFFFFF' : '#282a36',
+				default: paletteType === 'light' ? '#FFFFFF' : '#282A36',
 			},
 		},
 		components: {
@@ -79,30 +82,11 @@ export default function App() {
 		},
 	});
 
-	function handleThemeChange() {
-		setDarkMode(!darkMode);
-		localStorage.setItem('theme', darkMode ? 'light' : 'dark');
-	}
-
 	function changeLanguage() {
-		const newLanguage = language === 'pt-BR' ? 'en' : 'pt-BR';
-
+		const newLanguage = language === 'pt' ? 'en' : 'pt';
 		setLanguage(newLanguage);
-		localStorage.setItem('language', newLanguage);
+		i18n.changeLanguage(newLanguage);
 	}
-
-	useEffect(() => {
-		const currentTheme = localStorage.getItem('theme');
-		const currentLanguage = localStorage.getItem('language');
-		if (!currentTheme) setDarkMode(true);
-		else setDarkMode(currentTheme === 'dark');
-
-		if (currentLanguage) {
-			if (currentLanguage === 'en') {
-				setLanguage('en');
-			}
-		}
-	}, []);
 
 	const deletedIndex = visiblePages.find(
 		(x) => !visiblePageIndexs.includes(x.index)
@@ -141,8 +125,42 @@ export default function App() {
 		}
 	}, [visiblePageIndexs, navigate, deletedIndex, selectedIndex, pages]);
 
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.ctrlKey && e.key === 'j') {
+				e.preventDefault();
+				setTerminal((prev) => !prev);
+			}
+
+			if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+				e.preventDefault();
+				toggleTheme();
+			}
+
+			if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+				e.preventDefault();
+				changeLanguage();
+			}
+
+			if (e.ctrlKey && e.key.toLowerCase() === 'b') {
+				e.preventDefault();
+				setExpanded((prev) => !prev);
+			}
+
+			if (e.ctrlKey && e.key.toLowerCase() === 'h') {
+				e.preventDefault();
+				navigate('/');
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [language]);
+
 	return (
 		<>
+			<KeyboardShortcutsModal visible={true} />
 			{language && (
 				<ThemeProvider theme={theme}>
 					<CssBaseline enableColorScheme />
@@ -174,8 +192,6 @@ export default function App() {
 										expanded={expanded}
 										terminal={terminal}
 										setTerminal={setTerminal}
-										darkMode={darkMode}
-										handleThemeChange={handleThemeChange}
 										language={language}
 										changeLanguage={changeLanguage}
 									/>
@@ -184,7 +200,7 @@ export default function App() {
 									<Grid
 										item
 										sx={{
-											backgroundColor: darkMode ? '#21222c' : '#f3f3f3',
+											backgroundColor: isDarkMode ? '#21222c' : '#f3f3f3',
 											width: 220,
 										}}
 									>
@@ -194,7 +210,7 @@ export default function App() {
 												color='text.secondary'
 												sx={{ ml: 4 }}
 											>
-												{language === 'pt-BR' ? 'EXPLORADOR' : 'EXPLORER'}
+												{language === 'pt' ? 'EXPLORADOR' : 'EXPLORER'}
 											</Typography>
 											<AppTree
 												pages={pages}
@@ -234,9 +250,8 @@ export default function App() {
 											scrollBehavior: 'smooth',
 											// overflow: 'scroll',
 											overflowY: 'auto',
-											height: `calc(100vh - 20px - 33px - ${
-												terminal ? '300px' : '0px'
-											})`,
+											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
+												})`,
 										}}
 									>
 										<Routes>
@@ -282,13 +297,11 @@ export default function App() {
 										}}
 									>
 										<Terminal
-											darkMode={darkMode}
 											language={language}
 											selectedTerminalIndex={selectedTerminalIndex}
 											setSelectedTerminalIndex={setSelectedTerminalIndex}
 											setTerminal={setTerminal}
 											setRanking={setRanking}
-											setDarkMode={setDarkMode}
 											changeLanguage={changeLanguage}
 										/>
 									</Grid>

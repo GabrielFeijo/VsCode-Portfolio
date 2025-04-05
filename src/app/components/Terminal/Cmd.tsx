@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import styles from './Cmd.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -7,78 +7,18 @@ import {
 	ReviewService,
 } from '../../../services/api/review/ReviewService';
 import { CommandService } from '../../../services/api/command/CommandService';
+import { useTheme } from '../../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-	language: 'pt-BR' | 'en';
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
-	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
 }
 
-type Stars =
-	| '0.5'
-	| '1'
-	| '1.5'
-	| '2'
-	| '2.5'
-	| '3'
-	| '3.5'
-	| '4'
-	| '4.5'
-	| '5';
 
-const info = {
-	'pt-BR': {
-		version: 'Versão',
-		allRightsReserved: 'Todos os direitos reservados',
-		placeholder: 'Digite um comando (ajuda para ver todos os comandos)',
-		error:
-			'Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite "ajuda" para obter uma lista de comandos disponíveis.',
-		theme: 'Tema alterado com sucesso!',
-		language: 'Idioma alterado com sucesso!',
-		feedback: 'Opinião',
-	},
-	en: {
-		version: 'Version',
-		allRightsReserved: 'All rights reserved.',
-		placeholder: 'Type a command (help to see all commands)',
-		error:
-			"Sorry, we couldn't complete your request. The command you entered was not recognized by the system. Please check if the command is correct and try again. If you need help, type 'help' to get a list of available commands.",
-		theme: 'Theme successfully updated!',
-		language: 'Language changed successfully!',
-		feedback: 'Feedback',
-	},
-};
-
-const labels = {
-	'pt-BR': {
-		'0.5': 'Inútil',
-		'1': 'Inútil+',
-		'1.5': 'Ruim',
-		'2': 'Ruim+',
-		'2.5': 'Ok',
-		'3': 'Ok+',
-		'3.5': 'Bom',
-		'4': 'Bom+',
-		'4.5': 'Excelente',
-		'5': 'Excelente+',
-	},
-	en: {
-		'0.5': 'Useless',
-		'1': 'Useless+',
-		'1.5': 'Poor',
-		'2': 'Poor+',
-		'2.5': 'Ok',
-		'3': 'Ok+',
-		'3.5': 'Good',
-		'4': 'Good+',
-		'4.5': 'Excellent',
-		'5': 'Excellent+',
-	},
-};
-
-const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
-	const theme = useTheme();
+const Cmd = ({ setRanking, changeLanguage }: Props) => {
+	const { t } = useTranslation();
+	const { toggleTheme } = useTheme();
 	const navigate = useNavigate();
 	const [command, setCommand] = useState('');
 	const [results, setResults] = useState<
@@ -88,6 +28,7 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 			color: string;
 		}[]
 	>([]);
+
 	const verifyCommand = async (e: any) => {
 		if (
 			e.nativeEvent.inputType === 'insertLineBreak' ||
@@ -111,10 +52,9 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 								const date = created.toLocaleString();
 
 								response.push(
-									`${date.replace(/,/g, ' ')} - [${rate.username}] ${
-										rate.comment
-									} ${info[language].feedback}: ${rate.stars} - 
-									${labels[language][String(rate.stars) as Stars]}`
+									`${date.replace(/,/g, ' ')} - [${rate.username}] ${rate.comment
+									} ${t('terminal.info.feedback')}: ${rate.stars} - 
+									${t(`terminal.rating.${String(rate.stars)}`)}`
 								);
 							});
 
@@ -129,14 +69,14 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 						break;
 					case 'changetheme':
 					case 'mudartema':
-						setDarkMode(theme.palette.mode === 'dark' ? false : true);
-						response.push(info[language as keyof typeof info].theme);
+						toggleTheme();
+						response.push(t('terminal.info.theme'));
 						saveResult(response, color);
 						break;
 					case 'changelanguage':
 					case 'mudaridioma':
 						changeLanguage();
-						response.push(info[language as keyof typeof info].language);
+						response.push(t('terminal.info.language'));
 						saveResult(response, color);
 						break;
 					case 'clear':
@@ -158,7 +98,7 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 								if (responseData instanceof Error) {
 									console.log(responseData.message);
 
-									response.push(info[language as keyof typeof info].error);
+									response.push(t('terminal.info.error'));
 									color = '#ed4337';
 								} else {
 									response = responseData.response;
@@ -181,12 +121,12 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 		<Box id='teste'>
 			<Box>
 				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
-					GG Console [{info[language as keyof typeof info].version}{' '}
+					GG Console [{t('terminal.info.version')}{' '}
 					1.0.0.19045.2728]
 				</Typography>
 				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
 					(c) Feijó Corporation.{' '}
-					{info[language as keyof typeof info].allRightsReserved}
+					{t('terminal.info.allRightsReserved')}
 				</Typography>
 			</Box>
 			<Box sx={{ wordBreak: 'break-word', mt: 1 }}>
@@ -221,7 +161,7 @@ const Cmd = ({ language, setRanking, setDarkMode, changeLanguage }: Props) => {
 						D:\GG\Desktop\workspace\React\react-vscode{'>'}
 					</Typography>
 					<textarea
-						placeholder={info[language as keyof typeof info].placeholder}
+						placeholder={t('terminal.info.placeholder')}
 						className={styles.text}
 						rows={1}
 						style={{

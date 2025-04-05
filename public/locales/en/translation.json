@@ -1,0 +1,93 @@
+{
+    "header": {
+        "title": "Gabriel Feijó",
+        "subtitle": "Developing technological solutions to change the world in a positive way."
+    },
+    "shortcuts": {
+        "title": "Keyboard Shortcuts",
+        "terminal": "Open/Close Terminal",
+        "theme": "Toggle Theme",
+        "language": "Switch Language",
+        "sidebar": "Toggle Sidebar",
+        "home": "Go to Home"
+    },
+    "terminal": {
+        "tabs": {
+            "problems": "Problems",
+            "output": "Output",
+            "debug": "Debug Console",
+            "terminal": "Terminal"
+        },
+        "info": {
+            "version": "Version",
+            "allRightsReserved": "All rights reserved",
+            "placeholder": "Type a command (help to see all commands)",
+            "error": "Sorry, we couldn't complete your request. The command you entered was not recognized by the system. Please check if the command is correct and try again. If you need help, type 'help' to get a list of available commands.",
+            "theme": "Theme successfully updated!",
+            "language": "Language changed successfully!",
+            "feedback": "Feedback"
+        },
+        "problems": "No problems were detected in the workspace.",
+        "debug": "Please start a debug session to evaluate expressions",
+        "output": [
+            "Sometimes I feel like I spend more time fixing bugs than interacting with people.",
+            "I'm like Batman, but instead of fighting crime, I fight syntax errors.",
+            "I'm not a tech wizard, but I once made a program print 'Hello World' without any errors!",
+            "Working with technology is like playing with Lego: building amazing things from small pieces.",
+            "I think I was programmed to love technology since birth!",
+            "Bugs are not defects, they are undocumented features",
+            "Programming is easy, except when it's not",
+            "Don't worry if it doesn't work right the first time",
+            "The ideal programmer is the one who looks both ways before crossing a one-way street",
+            "Good code is code that works. Bad code is code that still works, but you don't know how.",
+            "When you think you have found the answer to all the questions, life changes the questions."
+        ],
+        "rating": {
+            "0.5": "Useless",
+            "1": "Useless+",
+            "1.5": "Poor",
+            "2": "Poor+",
+            "2.5": "Ok",
+            "3": "Ok+",
+            "3.5": "Good",
+            "4": "Good+",
+            "4.5": "Excellent",
+            "5": "Excellent+"
+        }
+    },
+    "rating": {
+        "evaluate": "Evaluate this portfolio",
+        "name": "Your name",
+        "comment": "Your comment",
+        "submit": "Send review",
+        "error": "Please fill in all the information"
+    },
+    "pages": {
+        "home": "Home",
+        "about-me": "About Me",
+        "skills": "Skills",
+        "projects": "Projects",
+        "experience": "Experience",
+        "accomplishments": "Accomplishments",
+        "certificates": "Certificates"
+    },
+    "links": {
+        "github": "Find me on Github",
+        "linkedin": "Find me on LinkedIn",
+        "email": "Contact me by email"
+    },
+    "sidebar": {
+        "terminal": {
+            "open": "Open Terminal",
+            "close": "Close Terminal"
+        },
+        "language": {
+            "toEnglish": "Change to English",
+            "toPortuguese": "Change to Portuguese"
+        },
+        "theme": {
+            "light": "Turn on the light",
+            "dark": "Turn off the light"
+        }
+    }
+}

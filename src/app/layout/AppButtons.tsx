@@ -34,7 +34,7 @@ export default function AppButtons({
 	// const [selectedIndex, setSelectedIndex] = useState(-1);
 	function renderButtonBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282a36' : '#21222c';
+			return selectedIndex === index ? '#282A36' : '#21222c';
 		} else {
 			return selectedIndex === index ? '#ffffff' : '#ececec';
 		}
@@ -50,7 +50,7 @@ export default function AppButtons({
 
 	function renderCloseButtonBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282a36' : '#21222c';
+			return selectedIndex === index ? '#282A36' : '#21222c';
 		} else {
 			return selectedIndex === index ? '#ffffff' : '#ececec';
 		}

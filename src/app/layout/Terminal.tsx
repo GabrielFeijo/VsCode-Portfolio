@@ -14,59 +14,56 @@ import Problems from '../components/Terminal/Problems';
 import Output from '../components/Terminal/Output';
 import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-	darkMode: boolean;
-	language: 'pt-BR' | 'en';
+	language: 'pt' | 'en';
 	selectedTerminalIndex: number;
 	setSelectedTerminalIndex: React.Dispatch<React.SetStateAction<number>>;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
-	setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
 }
 
 const Terminal = ({
-	darkMode,
 	language,
 	selectedTerminalIndex,
 	setSelectedTerminalIndex,
 	setTerminal,
 	setRanking,
-	setDarkMode,
 	changeLanguage,
 }: Props) => {
 	const theme = useTheme();
+	const { t } = useTranslation();
+	const isDarkMode = theme.palette.mode === 'dark';
 	function renderTerminalBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
+		if (isDarkMode) {
 			return selectedTerminalIndex === index ? '#ff79c6' : 'transparent';
 		} else {
 			return selectedTerminalIndex === index ? '#000' : 'transparent';
 		}
 	}
 	function renderTerminalColor(index: number) {
-		if (theme.palette.mode === 'dark') {
+		if (isDarkMode) {
 			return selectedTerminalIndex === index ? '#fff' : '#6272a4';
 		} else {
 			return selectedTerminalIndex === index ? '#000' : 'gray';
 		}
 	}
 	const opc = [
-		{ index: 0, name: 'Problemas', element: <Problems language={language} /> },
-		{ index: 1, name: 'Saída', element: <Output language={language} /> },
+		{ index: 0, name: t('terminal.tabs.problems'), element: <Problems language={language} /> },
+		{ index: 1, name: t('terminal.tabs.output'), element: <Output language={language} /> },
 		{
 			index: 2,
-			name: 'Console de Depuração',
+			name: t('terminal.tabs.debug'),
 			element: <Debug language={language} />,
 		},
 		{
 			index: 3,
-			name: 'Terminal',
+			name: t('terminal.tabs.terminal'),
 			element: (
 				<Cmd
-					language={language}
 					setRanking={setRanking}
-					setDarkMode={setDarkMode}
 					changeLanguage={changeLanguage}
 				/>
 			),
@@ -78,9 +75,9 @@ const Terminal = ({
 			sx={{
 				height: `100%`,
 				width: `100%`,
-				backgroundColor: darkMode ? '#282a36' : '#fff',
+				backgroundColor: isDarkMode ? '#282A36' : '#fff',
 				borderTop: `1px solid transparent`,
-				borderColor: darkMode ? '#bd93f9' : '#000',
+				borderColor: isDarkMode ? '#bd93f9' : '#000',
 			}}
 			component={Paper}
 			square
@@ -109,7 +106,7 @@ const Terminal = ({
 								color: renderTerminalColor(index),
 								cursor: 'pointer',
 								'&:hover': {
-									color: darkMode ? 'white' : '#000',
+									color: isDarkMode ? 'white' : '#000',
 								},
 								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 								p: 0.8,

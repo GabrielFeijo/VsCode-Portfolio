@@ -1,0 +1,93 @@
+{
+    "header": {
+        "title": "Gabriel Feijó",
+        "subtitle": "Desenvolvendo soluções tecnológicas para mudar o mundo de forma positiva."
+    },
+    "shortcuts": {
+        "title": "Atalhos de Teclado",
+        "terminal": "Abrir/Fechar Terminal",
+        "theme": "Alternar Tema",
+        "language": "Alternar Idioma",
+        "sidebar": "Expandir Sidebar",
+        "home": "Página Inicial"
+    },
+    "terminal": {
+        "tabs": {
+            "problems": "Problemas",
+            "output": "Saída",
+            "debug": "Console de Depuração",
+            "terminal": "Terminal"
+        },
+        "info": {
+            "version": "Versão",
+            "allRightsReserved": "Todos os direitos reservados",
+            "placeholder": "Digite um comando (ajuda para ver todos os comandos)",
+            "error": "Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite 'ajuda' para obter uma lista de comandos disponíveis.",
+            "theme": "Tema alterado com sucesso!",
+            "language": "Idioma alterado com sucesso!",
+            "feedback": "Opinião"
+        },
+        "problems": "Não foi detectado nenhum problema no workspace.",
+        "debug": "Inicie uma sessão de depuração para avaliar as expressões",
+        "output": [
+            "Às vezes sinto que passo mais tempo resolvendo bugs do que interagindo com pessoas.",
+            "Sou como o Batman, mas ao invés de lutar contra o crime, luto contra erros de sintaxe.",
+            "Não sou um mago da tecnologia, mas já fiz um programa imprimir 'Hello World' sem nenhum erro!",
+            "Trabalhar com tecnologia é como brincar de Lego: construir coisas incríveis a partir de pequenas peças.",
+            "Acho que fui programado para gostar a tecnologia desde o berço!",
+            "Os bugs não são defeitos, são recursos não documentados",
+            "Programar é fácil, exceto quando não é",
+            "Não se preocupe se não funciona direito na primeira tentativa",
+            "O programador ideal é aquele que olha duas vezes para atravessar uma rua de sentido único",
+            "Código bom é aquele que funciona. Código ruim é aquele que ainda funciona, mas você não sabe como",
+            "Quando você acha que encontrou a resposta para todas as perguntas, a vida muda as perguntas"
+        ],
+        "rating": {
+            "0.5": "Inútil",
+            "1": "Inútil+",
+            "1.5": "Ruim",
+            "2": "Ruim+",
+            "2.5": "Ok",
+            "3": "Ok+",
+            "3.5": "Bom",
+            "4": "Bom+",
+            "4.5": "Excelente",
+            "5": "Excelente+"
+        }
+    },
+    "rating": {
+        "evaluate": "Avalie este portfólio",
+        "name": "Seu nome",
+        "comment": "Seu comentário",
+        "submit": "Enviar avaliação",
+        "error": "Preencha todas as informações"
+    },
+    "pages": {
+        "home": "Início",
+        "about-me": "Sobre Mim",
+        "skills": "Habilidades",
+        "projects": "Projetos",
+        "experience": "Experiência",
+        "accomplishments": "Conquistas",
+        "certificates": "Certificados"
+    },
+    "links": {
+        "github": "Encontre-me no Github",
+        "linkedin": "Encontre-me no LinkedIn",
+        "email": "Contate-me por e-mail"
+    },
+    "sidebar": {
+        "terminal": {
+            "open": "Abrir Terminal",
+            "close": "Fechar Terminal"
+        },
+        "language": {
+            "toEnglish": "Alterar para o inglês",
+            "toPortuguese": "Alterar para o português"
+        },
+        "theme": {
+            "light": "Modo Claro",
+            "dark": "Modo Escuro"
+        }
+    }
+}

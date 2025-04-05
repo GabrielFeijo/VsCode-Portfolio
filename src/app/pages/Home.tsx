@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import { contact, contato } from './links';
 import Loading from '../components/Loading/Loading';
 import { HomeService } from '../../services/api/home/HomeService';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -21,9 +22,10 @@ interface Props {
 }
 
 export default function Home({ setSelectedIndex, language, terminal }: Props) {
+	const { t } = useTranslation();
 	const { pathname } = useLocation();
 	const [loading, setLoading] = useState(true);
-	const links = language === 'pt-BR' ? contato : contact;
+	const links = language === 'pt' ? contato : contact;
 	const getConnection = async () => {
 		setTimeout(() => {
 			setLoading(false);
@@ -51,9 +53,8 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 				alignItems='center'
 				justifyContent='center'
 				sx={{
-					minHeight: `calc(100vh - 20px - 33px - ${
-						terminal ? '300px' : '0px'
-					})`,
+					minHeight: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
+						})`,
 				}}
 			>
 				<Grid
@@ -80,7 +81,7 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 								justifyContent={{ xs: 'center', sm: 'center' }}
 							>
 								<Typography variant='h3'>
-									{process.env.REACT_APP_NAME}
+									{t('header.title')}
 								</Typography>
 							</Grid>
 							<Grid
@@ -92,9 +93,7 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 									gutterBottom
 									style={{ width: 300, textAlign: 'center' }}
 								>
-									{language === 'pt-BR'
-										? 'Desenvolvendo soluções tecnológicas para mudar o mundo de forma positiva.'
-										: 'Developing technological solutions to change the world in a positive way.'}
+									{t('header.subtitle')}
 								</Typography>
 							</Grid>
 							<Grid
@@ -108,7 +107,7 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 									{links.map((link) => (
 										<Tooltip
 											key={link.index}
-											title={link.title}
+											title={t(`links.${link.title.toLowerCase().split(' ')[0]}`)}
 											arrow
 										>
 											<Link

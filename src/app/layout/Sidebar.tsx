@@ -8,14 +8,14 @@ import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
 import { BiGitBranch } from 'react-icons/bi';
 import Divider from '@mui/material/Divider';
 import { contact, contato } from '../pages/links';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	expanded: boolean;
 	setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 	terminal: boolean;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
-	darkMode: boolean;
-	handleThemeChange: () => void;
 	language: string;
 	changeLanguage: () => void;
 }
@@ -25,17 +25,18 @@ export default function Sidebar({
 	setExpanded,
 	terminal,
 	setTerminal,
-	darkMode,
-	handleThemeChange,
 	language,
 	changeLanguage,
 }: Props) {
-	const links = language === 'pt-BR' ? contato : contact;
+	const { theme, toggleTheme } = useTheme();
+	const isDarkMode = theme === 'dark';
+	const links = language === 'pt' ? contato : contact;
+	const { t } = useTranslation();
 	return (
 		<Box
 			sx={{
 				height: `calc(100vh - 20px)`,
-				backgroundColor: darkMode ? '#343746' : '#2c2c2c',
+				backgroundColor: isDarkMode ? '#343746' : '#2c2c2c',
 			}}
 			justifyContent='space-between'
 			display='flex'
@@ -54,9 +55,9 @@ export default function Sidebar({
 					sx={{
 						borderLeft: expanded
 							? 'solid 0.12em white'
-							: darkMode
-							? 'solid 0.12em #343746'
-							: 'solid 0.12em #2c2c2c',
+							: isDarkMode
+								? 'solid 0.12em #343746'
+								: 'solid 0.12em #2c2c2c',
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 					}}
@@ -81,7 +82,7 @@ export default function Sidebar({
 				</Box>
 				<Tooltip
 					title={
-						language === 'pt-BR'
+						language === 'pt'
 							? 'Código deste projeto'
 							: 'Source of this project'
 					}
@@ -160,13 +161,13 @@ export default function Sidebar({
 			>
 				<Tooltip
 					title={
-						language === 'pt-BR'
+						language === 'pt'
 							? terminal
-								? 'Fechar Terminal'
-								: 'Abrir Terminal'
+								? t('sidebar.terminal.close')
+								: t('sidebar.terminal.open')
 							: terminal
-							? 'Close Terminal'
-							: 'Open Terminal'
+								? t('sidebar.terminal.close')
+								: t('sidebar.terminal.open')
 					}
 					placement='right'
 					arrow
@@ -183,9 +184,9 @@ export default function Sidebar({
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							borderLeft: terminal
 								? 'solid 0.12em white'
-								: darkMode
-								? 'solid 0.12em #343746'
-								: 'solid 0.12em #2c2c2c',
+								: isDarkMode
+									? 'solid 0.12em #343746'
+									: 'solid 0.12em #2c2c2c',
 						}}
 						onClick={() => setTerminal(!terminal)}
 						display='flex'
@@ -198,9 +199,7 @@ export default function Sidebar({
 				</Tooltip>
 				<Tooltip
 					title={
-						language === 'pt-BR'
-							? 'Alterar para o inglês'
-							: 'Change to portuguese'
+						language === 'pt' ? t('sidebar.language.toEnglish') : t('sidebar.language.toPortuguese')
 					}
 					placement='right'
 					arrow
@@ -227,13 +226,13 @@ export default function Sidebar({
 				</Tooltip>
 				<Tooltip
 					title={
-						language === 'pt-BR'
-							? darkMode
-								? 'Modo Claro'
-								: 'Modo Escuro'
-							: darkMode
-							? 'Turn on the light'
-							: 'Turn off the light'
+						language === 'pt'
+							? isDarkMode
+								? t('sidebar.theme.light')
+								: t('sidebar.theme.dark')
+							: isDarkMode
+								? t('sidebar.theme.light')
+								: t('sidebar.theme.dark')
 					}
 					placement='right'
 					arrow
@@ -251,9 +250,9 @@ export default function Sidebar({
 						}}
 						display='flex'
 						justifyContent='center'
-						onClick={handleThemeChange}
+						onClick={toggleTheme}
 					>
-						{!darkMode ? (
+						{!isDarkMode ? (
 							<Box>
 								<DarkModeOutlinedIcon />
 							</Box>

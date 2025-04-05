@@ -1,16 +1,13 @@
 import { Box, Typography } from '@mui/material';
 import { VscChevronRight } from 'react-icons/vsc';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	language: string;
 }
 
-const info = {
-	'pt-BR': 'Inicie uma sessão de depuração para avaliar as expressões',
-	en: 'No problems were detected in the workspace.',
-};
-
 const Debug = ({ language }: Props) => {
+	const { t } = useTranslation();
 	return (
 		<Box
 			position={'absolute'}
@@ -26,7 +23,7 @@ const Debug = ({ language }: Props) => {
 				sx={{ fontFamily: 'Monospace', fontSize: '.9rem', fontWeight: 'bold' }}
 				color={'#7b7c81'}
 			>
-				{info[language as keyof typeof info]}
+				{t('terminal.debug')}
 			</Typography>
 		</Box>
 	);

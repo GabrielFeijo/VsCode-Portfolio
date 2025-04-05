@@ -10,55 +10,15 @@ import {
 import { VscClose } from 'react-icons/vsc';
 import './Rating.css';
 import { ReviewService } from '../../../services/api/review/ReviewService';
-
-const info = {
-	'pt-BR': {
-		evaluate: 'Avalie este portfólio',
-		name: 'Seu nome',
-		comment: 'Seu comentário',
-		submit: 'Enviar avaliação',
-		error: 'Preencha todas as informações',
-	},
-	en: {
-		evaluate: 'Evaluate this portfolio.',
-		name: 'Your name',
-		comment: 'Your comment',
-		submit: 'Send review',
-		error: 'Please fill in all the information',
-	},
-};
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	language: string;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const labelsPT: { [index: string]: string } = {
-	0.5: 'Inútil',
-	1: 'Inútil+',
-	1.5: 'Ruim',
-	2: 'Ruim+',
-	2.5: 'Ok',
-	3: 'Ok+',
-	3.5: 'Bom',
-	4: 'Bom+',
-	4.5: 'Excelente',
-	5: 'Excelente+',
-};
-const labelsEN: { [index: string]: string } = {
-	0.5: 'Useless',
-	1: 'Useless+',
-	1.5: 'Poor',
-	2: 'Poor+',
-	2.5: 'Ok',
-	3: 'Ok+',
-	3.5: 'Good',
-	4: 'Good+',
-	4.5: 'Excellent',
-	5: 'Excellent+',
-};
-
 const BoxRating = ({ language, setRanking }: Props) => {
+	const { t } = useTranslation();
 	const theme = useTheme();
 	const [error, setError] = useState('');
 	const [star, setStar] = useState<number>(0);
@@ -84,7 +44,7 @@ const BoxRating = ({ language, setRanking }: Props) => {
 				console.log(response.message);
 			}
 		} else {
-			setError(info[language as keyof typeof info].error);
+			setError(t('rating.error'));
 			setTimeout(() => {
 				setError('');
 			}, 1500);
@@ -111,7 +71,7 @@ const BoxRating = ({ language, setRanking }: Props) => {
 				>
 					<Box></Box>
 					<Typography sx={{ fontWeight: 'bold' }}>
-						{info[language as keyof typeof info].evaluate}
+						{t('rating.evaluate')}
 					</Typography>
 					<VscClose
 						style={{
@@ -123,7 +83,7 @@ const BoxRating = ({ language, setRanking }: Props) => {
 					/>
 				</Box>
 				<TextField
-					label={info[language as keyof typeof info].name}
+					label={t('rating.name')}
 					error={review.username ? false : true}
 					type='text'
 					name='username'
@@ -134,7 +94,7 @@ const BoxRating = ({ language, setRanking }: Props) => {
 					autoComplete='off'
 				/>
 				<TextField
-					label={info[language as keyof typeof info].comment}
+					label={t('rating.comment')}
 					error={review.comment ? false : true}
 					name='comment'
 					type='text'
@@ -164,18 +124,14 @@ const BoxRating = ({ language, setRanking }: Props) => {
 							}
 						}}
 					/>
-					<Box>
-						{language === 'pt-BR'
-							? labelsPT[star !== null ? star : 0]
-							: labelsEN[star !== null ? star : 0]}
-					</Box>
+					<Box>{t(`terminal.rating.${star !== null ? star : 0}`)}</Box>
 				</Box>
 				<Button
 					variant='outlined'
 					fullWidth
 					onClick={sendReview}
 				>
-					{info[language as keyof typeof info].submit}
+					{t('rating.submit')}
 				</Button>
 				{error.length > 0 ? (
 					<Typography sx={{ m: 1, color: '#ed4337' }}>{error}</Typography>

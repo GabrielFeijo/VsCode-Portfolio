@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { VscMarkdown } from 'react-icons/vsc';
 import { convertFileName } from '../utils/convertFileName';
+import { useTranslation } from 'react-i18next';
 
 interface Page {
 	index: number;
@@ -42,6 +43,7 @@ export default function AppTree({
 }: Props) {
 	const navigate = useNavigate();
 	const theme = useTheme();
+	const { t } = useTranslation();
 	// const [selectedIndex, setSelectedIndex] = useState(-1);
 	let { pathname } = useLocation();
 
@@ -79,11 +81,11 @@ export default function AppTree({
 			sx={{ minWidth: 220 }}
 			defaultExpanded={['-1']}
 
-			// sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+		// sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
 		>
 			<TreeItem
 				nodeId='-1'
-				label={language === 'pt-BR' ? 'Início' : 'Home'}
+				label={t('pages.home')}
 				color='#bdc3cf'
 			>
 				{pages.map(({ index, name, route }) => (

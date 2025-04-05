@@ -1,20 +1,16 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react';
-
-const info = {
-	'pt-BR': 'Não foi detectado nenhum problema no workspace.',
-	en: 'No problems were detected in the workspace.',
-};
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	language: string;
 }
 
 const Problems = ({ language }: Props) => {
+	const { t } = useTranslation();
 	return (
 		<Box>
 			<Typography sx={{ fontSize: '.8rem' }}>
-				{info[language as keyof typeof info]}
+				{t('terminal.problems')}
 			</Typography>
 		</Box>
 	);
