@@ -14,13 +14,14 @@ import Loading from '../components/Loading/Loading';
 import { HomeService } from '../../services/api/home/HomeService';
 import { useTranslation } from 'react-i18next';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { CacheService } from '../../services/cacheService';
+import dayjs from 'dayjs';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	terminal: boolean;
 }
 
-export default function Home({ setSelectedIndex, terminal }: Props) {
+export default function Home({ setSelectedIndex }: Props) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
 	const [loading, setLoading] = useState(true);
@@ -47,12 +48,22 @@ export default function Home({ setSelectedIndex, terminal }: Props) {
 	];
 
 	const getConnection = async () => {
-		setTimeout(() => {
+		if (!CacheService.has24HoursPassed()) {
 			setLoading(false);
-		}, 2500);
+			return;
+		}
 
-		await HomeService.getResponse();
+		try {
+			setTimeout(() => {
+				setLoading(false);
+			}, 2500);
+			await HomeService.getResponse();
+			CacheService.setCache({ lastFetch: dayjs().toISOString() });
+		} catch (e) {
+			console.error('Erro ao buscar dados do HomeService:', e);
+		}
 	};
+
 
 	useEffect(() => {
 		setSelectedIndex(-1);

@@ -14,7 +14,7 @@ import {
 	TableRow,
 	Typography,
 } from '@mui/material';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useLocation } from 'react-router-dom';
 import rehypeRaw from 'rehype-raw';

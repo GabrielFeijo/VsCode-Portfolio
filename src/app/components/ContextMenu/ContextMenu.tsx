@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { VscGithub, VscPlay, VscTrash } from 'react-icons/vsc';
+import { VscGithub, VscTrash } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ContextMenu.module.css';
 import { useTheme } from '../../../contexts/ThemeContext';

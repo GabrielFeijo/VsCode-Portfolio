@@ -164,6 +164,7 @@ export default function App() {
 		setPages([
 			...defaultPages,
 			...pages]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
@@ -292,10 +293,7 @@ export default function App() {
 											<Route
 												path='/'
 												element={
-													<Home
-														setSelectedIndex={setSelectedIndex}
-														terminal={terminal}
-													/>
+													<Home setSelectedIndex={setSelectedIndex} />
 												}
 											/>
 											{pages.map(({ index, name, route }) => (
