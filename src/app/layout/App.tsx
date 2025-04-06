@@ -77,6 +77,11 @@ export default function App() {
 
 	function changeLanguage() {
 		const newLanguage = language === 'pt' ? 'en' : 'pt';
+		const defaultPages = pageRoutes[newLanguage];
+		const pages = StorageService.getData() || [];
+		setPages([
+			...defaultPages,
+			...pages]);
 		setLanguage(newLanguage);
 		i18n.changeLanguage(newLanguage);
 	}
@@ -153,9 +158,12 @@ export default function App() {
 
 
 	useEffect(() => {
-		const pages = StorageService.getData()
-		if (pages.length === 0) return
-		setPages(pages);
+		const defaultPages = pageRoutes[language];
+		const pages = StorageService.getData() || [];
+		if (pages.length === 0) return;
+		setPages([
+			...defaultPages,
+			...pages]);
 	}, []);
 
 	return (
@@ -338,7 +346,7 @@ export default function App() {
 									minHeight: '300px',
 									overflow: 'hidden',
 									position: 'absolute',
-									width: `calc(100% - 50px)`,
+									width: `calc(100% - 50px - ${expanded ? '220px' : '0px'})`,
 									bottom: 20,
 									right: 0
 								}}

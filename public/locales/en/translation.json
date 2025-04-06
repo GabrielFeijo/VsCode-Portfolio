@@ -110,5 +110,10 @@
     "prompts": {
         "enter_filename": "Enter file name (without extension):",
         "enter_foldername": "Enter folder name:"
+    },
+    "contextMenu": {
+        "open": "Open",
+        "delete": "Delete",
+        "openOnGithub": "Open on GitHub"
     }
 }

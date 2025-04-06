@@ -16,8 +16,19 @@ export const StorageService = {
 		return data ? JSON.parse(data) : [];
 	},
 
-	saveData: (data: Page[]) => {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+	saveOrUpdateData: (data: Page) => {
+		const storageData = localStorage.getItem(STORAGE_KEY);
+		const parsedData = storageData ? JSON.parse(storageData) : [];
+
+		const updatedData = parsedData.some(
+			(page: Page) => page.index === data.index
+		)
+			? parsedData.map((page: Page) =>
+					page.index === data.index ? data : page
+			  )
+			: [...parsedData, data];
+
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},
 
 	createFile: (name: string, content: string = '', parentId?: number): Page => {
@@ -42,5 +53,17 @@ export const StorageService = {
 			isFolder: true,
 			children: [],
 		};
+	},
+
+	deleteFile: (identifier: number | string) => {
+		const data = StorageService.getData();
+		const updatedData = data.filter((page) => {
+			if (typeof identifier === 'number') {
+				return page.index !== identifier;
+			} else {
+				return page.name !== identifier;
+			}
+		});
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},
 };

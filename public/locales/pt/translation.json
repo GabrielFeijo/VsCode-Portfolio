@@ -110,5 +110,10 @@
     "prompts": {
         "enter_filename": "Digite o nome do arquivo (sem extensão):",
         "enter_foldername": "Digite o nome da pasta:"
+    },
+    "contextMenu": {
+        "open": "Abrir",
+        "delete": "Excluir",
+        "openOnGithub": "Abrir no GitHub"
     }
 }

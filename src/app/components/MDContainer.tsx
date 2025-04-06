@@ -131,7 +131,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 	useEffect(() => {
 		if (page && page.hasOwnProperty('content')) {
-			setContent(page.content || '');
+			setContent(page?.content || '');
 			setEditMode(true);
 			inputRef.current?.focus();
 		} else {
@@ -160,11 +160,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.ctrlKey && e.key.toLowerCase() === 's') {
 				e.preventDefault();
-				if (page) {
+				if (page && page.hasOwnProperty('content')) {
 					const updatedPage = { ...page, content, isSaved: true };
-					console.log(updatedPage);
-					const pages = StorageService.getData();
-					StorageService.saveData(pages.map(p => p.index === page.index ? updatedPage : p));
+					StorageService.saveOrUpdateData(updatedPage);
 					setPages((prev) => prev.map(p => p.index === page.index ? updatedPage : p));
 				}
 			}
