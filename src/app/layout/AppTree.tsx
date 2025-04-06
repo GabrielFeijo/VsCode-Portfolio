@@ -13,6 +13,7 @@ import { Box, IconButton } from '@mui/material';
 import { Page, StorageService } from '../../services/storageService';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
 import i18n from '../../i18n';
+import { normalizeFileName } from '../../utils/normalizeFileName';
 
 interface Props {
 	pages: Page[];
@@ -71,15 +72,17 @@ export default function AppTree({
 		e.stopPropagation();
 		const fileName = prompt(t('prompts.enter_filename'));
 		if (fileName) {
+			const normalizedName = normalizeFileName(fileName);
+			const fullFileName = `${normalizedName}.md`;
 			const existingPage = pages.find(
-				(x) => x.route === `${fileName}.md`.toLowerCase().replace(/\s+/g, '-')
+				(x) => x.route === `${fullFileName}.md`
 			);
 
 			if (existingPage) {
 				return existingPage;
 			}
 
-			const newFile = StorageService.createFile(`${fileName}.md`);
+			const newFile = StorageService.createFile(`${fullFileName}.md`);
 			StorageService.saveOrUpdateData(newFile);
 			const updatedPages = [...pages, newFile];
 			setPages(updatedPages);

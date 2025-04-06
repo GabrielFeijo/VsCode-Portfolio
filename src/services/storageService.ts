@@ -32,24 +32,20 @@ export const StorageService = {
 	},
 
 	createFile: (name: string, content: string = '', parentId?: number): Page => {
-		const formattedName = name.toLowerCase().replace(/\s+/g, '-');
-
 		return {
 			index: Date.now(),
-			name: formattedName,
-			route: formattedName,
+			name,
+			route: name,
 			content,
 			isFolder: false,
 		};
 	},
 
 	createFolder: (name: string): Page => {
-		const formattedName = name.toLowerCase().replace(/\s+/g, '-');
-
 		return {
 			index: Date.now(),
-			name: formattedName,
-			route: formattedName,
+			name,
+			route: name,
 			isFolder: true,
 			children: [],
 		};
