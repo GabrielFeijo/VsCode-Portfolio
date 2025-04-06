@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTheme } from '@mui/material/styles';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import {
 	VscAdd,
@@ -15,6 +14,7 @@ import Output from '../components/Terminal/Output';
 import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface Props {
 	language: 'pt' | 'en';
@@ -33,9 +33,10 @@ const Terminal = ({
 	setRanking,
 	changeLanguage,
 }: Props) => {
-	const theme = useTheme();
 	const { t } = useTranslation();
-	const isDarkMode = theme.palette.mode === 'dark';
+	const { theme } = useTheme();
+	const isDarkMode = theme === 'dark';
+
 	function renderTerminalBgColor(index: number) {
 		if (isDarkMode) {
 			return selectedTerminalIndex === index ? '#ff79c6' : 'transparent';

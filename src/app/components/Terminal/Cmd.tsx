@@ -9,6 +9,7 @@ import {
 import { CommandService } from '../../../services/api/command/CommandService';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 
 interface Props {
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,11 +46,10 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 						const responseData = await ReviewService.findAll();
 
 						if (responseData instanceof Error) {
-							console.log(responseData.message);
+							console.error(responseData.message);
 						} else {
 							responseData.forEach((rate: IRate) => {
-								const created: Date = new Date(rate['created_at']);
-								const date = created.toLocaleString();
+								const date = dayjs(rate['createdAt']).format('DD/MM/YYYY HH:mm:ss');
 
 								response.push(
 									`${date.replace(/,/g, ' ')} - [${rate.username}] ${rate.comment
@@ -96,7 +96,7 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 								const responseData = await CommandService.getResponse(command);
 
 								if (responseData instanceof Error) {
-									console.log(responseData.message);
+									console.error(responseData.message);
 
 									response.push(t('terminal.info.error'));
 									color = '#ed4337';

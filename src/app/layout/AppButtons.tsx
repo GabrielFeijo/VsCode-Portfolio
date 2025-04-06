@@ -16,8 +16,8 @@ interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 	currentComponent: string;
 	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-	visiblePageIndexs: number[];
-	setVisiblePageIndexs: React.Dispatch<React.SetStateAction<number[]>>;
+	visiblePageIndexes: number[];
+	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export default function AppButtons({
@@ -26,8 +26,8 @@ export default function AppButtons({
 	setSelectedIndex,
 	currentComponent,
 	setCurrentComponent,
-	visiblePageIndexs,
-	setVisiblePageIndexs,
+	visiblePageIndexes,
+	setVisiblePageIndexes,
 }: Props) {
 	const navigate = useNavigate();
 	const theme = useTheme();
@@ -137,8 +137,8 @@ export default function AppButtons({
 						elevation={0}
 						onClick={(e: any) => {
 							e.stopPropagation();
-							setVisiblePageIndexs(
-								visiblePageIndexs.filter((x) => x !== index)
+							setVisiblePageIndexes(
+								visiblePageIndexes.filter((x) => x !== index)
 							);
 						}}
 					>

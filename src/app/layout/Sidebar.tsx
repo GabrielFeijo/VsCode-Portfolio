@@ -5,9 +5,8 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import TerminalIcon from '@mui/icons-material/TerminalOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
 import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
-import { BiGitBranch } from 'react-icons/bi';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 import Divider from '@mui/material/Divider';
-import { contact, contato } from '../pages/links';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
@@ -30,8 +29,29 @@ export default function Sidebar({
 }: Props) {
 	const { theme, toggleTheme } = useTheme();
 	const isDarkMode = theme === 'dark';
-	const links = language === 'pt' ? contato : contact;
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+
+	const contactLinks = [
+		{
+			index: 0,
+			icon: <FaGithub />,
+			title: t('contact.github.title'),
+			href: t('contact.github.href')
+		},
+		{
+			index: 1,
+			icon: <FaLinkedin />,
+			title: t('contact.linkedin.title'),
+			href: t('contact.linkedin.href')
+		},
+		{
+			index: 2,
+			icon: <FaEnvelope />,
+			title: t('contact.email.title'),
+			href: t('contact.email.href')
+		}
+	];
+
 	return (
 		<Box
 			sx={{
@@ -80,45 +100,10 @@ export default function Sidebar({
 						<VscFiles />
 					</Box>
 				</Box>
-				<Tooltip
-					title={
-						language === 'pt'
-							? 'Código deste projeto'
-							: 'Source of this project'
-					}
-					arrow
-					placement='right'
-				>
-					<Link
-						target='_blank'
-						href={'https://github.com/GabrielFeijo'}
-						underline='none'
-						color='inherit'
-						sx={{ WebkitTapHighlightColor: 'rgba(0,0,0,0)' }}
-					>
-						<Box
-							sx={{
-								flexGrow: 0,
-								cursor: 'pointer',
-								color: '#6272a4',
-								fontSize: 24,
-								'&:hover': {
-									color: 'white',
-								},
-							}}
-							display='flex'
-							justifyContent='center'
-						>
-							<Box mt={0.7}>
-								<BiGitBranch />
-							</Box>
-						</Box>
-					</Link>
-				</Tooltip>
 
 				<Divider sx={{ m: 0.5 }} />
 
-				{links.map((link) => (
+				{contactLinks.map((link) => (
 					<Tooltip
 						title={link.title}
 						arrow
@@ -160,15 +145,7 @@ export default function Sidebar({
 				flexDirection='column'
 			>
 				<Tooltip
-					title={
-						language === 'pt'
-							? terminal
-								? t('sidebar.terminal.close')
-								: t('sidebar.terminal.open')
-							: terminal
-								? t('sidebar.terminal.close')
-								: t('sidebar.terminal.open')
-					}
+					title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')}
 					placement='right'
 					arrow
 				>
@@ -198,9 +175,7 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Tooltip
-					title={
-						language === 'pt' ? t('sidebar.language.toEnglish') : t('sidebar.language.toPortuguese')
-					}
+					title={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`)}
 					placement='right'
 					arrow
 				>
@@ -225,15 +200,7 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Tooltip
-					title={
-						language === 'pt'
-							? isDarkMode
-								? t('sidebar.theme.light')
-								: t('sidebar.theme.dark')
-							: isDarkMode
-								? t('sidebar.theme.light')
-								: t('sidebar.theme.dark')
-					}
+					title={isDarkMode ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
 					placement='right'
 					arrow
 				>
