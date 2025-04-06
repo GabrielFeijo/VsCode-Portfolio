@@ -9,7 +9,8 @@
         "theme": "Toggle Theme",
         "language": "Switch Language",
         "sidebar": "Toggle Sidebar",
-        "home": "Go to Home"
+        "home": "Go to Home",
+        "save": "Save"
     },
     "terminal": {
         "tabs": {
@@ -43,15 +44,16 @@
             "When you think you have found the answer to all the questions, life changes the questions."
         ],
         "rating": {
-            "0.5": "Useless",
+            "0": "",
+            "0_5": "Useless",
             "1": "Useless+",
-            "1.5": "Poor",
+            "1_5": "Poor",
             "2": "Poor+",
-            "2.5": "Ok",
+            "2_5": "Ok",
             "3": "Ok+",
-            "3.5": "Good",
+            "3_5": "Good",
             "4": "Good+",
-            "4.5": "Excellent",
+            "4_5": "Excellent",
             "5": "Excellent+"
         }
     },
@@ -76,6 +78,20 @@
         "linkedin": "Find me on LinkedIn",
         "email": "Contact me by email"
     },
+    "contact": {
+        "github": {
+            "title": "Source of this project",
+            "href": "https://github.com/GabrielFeijo"
+        },
+        "linkedin": {
+            "title": "Find me on LinkedIn",
+            "href": "https://www.linkedin.com/in/gabriel-feijo"
+        },
+        "email": {
+            "title": "Contact me by email",
+            "href": "mailto:gabriel.feijo@outlook.com"
+        }
+    },
     "sidebar": {
         "explorer": "EXPLORER",
         "terminal": {
@@ -90,5 +106,9 @@
             "light": "Turn on the light",
             "dark": "Turn off the light"
         }
+    },
+    "prompts": {
+        "enter_filename": "Enter file name (without extension):",
+        "enter_foldername": "Enter folder name:"
     }
 }
