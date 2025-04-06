@@ -127,20 +127,18 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	const [content, setContent] = useState('');
 	const [editMode, setEditMode] = useState(false);
 	const { pathname } = useLocation();
-	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (page && page.hasOwnProperty('content')) {
 			setContent(page?.content || '');
 			setEditMode(true);
-			inputRef.current?.focus();
 		} else {
 			setEditMode(false);
 			fetch(path)
 				.then((res) => res.text())
 				.then((text) => setContent(text));
 		}
-	}, [path, page, inputRef]);
+	}, [path, page]);
 
 	useEffect(() => {
 		let title = pathname.substring(1, pathname.length);
