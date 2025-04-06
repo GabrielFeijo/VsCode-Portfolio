@@ -6,7 +6,7 @@ export interface IRate {
 	username: string;
 	comment: string;
 	stars: number;
-	created_at: string;
+	createdAt?: string;
 	updatedAt: string;
 }
 

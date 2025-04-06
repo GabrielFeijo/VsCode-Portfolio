@@ -10,22 +10,42 @@ import {
 import React, { useState, useEffect } from 'react';
 import logo from '../../static/favicon.png';
 import { useLocation } from 'react-router-dom';
-import { contact, contato } from './links';
 import Loading from '../components/Loading/Loading';
 import { HomeService } from '../../services/api/home/HomeService';
 import { useTranslation } from 'react-i18next';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	language: string;
 	terminal: boolean;
 }
 
-export default function Home({ setSelectedIndex, language, terminal }: Props) {
+export default function Home({ setSelectedIndex, terminal }: Props) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
 	const [loading, setLoading] = useState(true);
-	const links = language === 'pt' ? contato : contact;
+
+	const contactLinks = [
+		{
+			index: 0,
+			icon: <FaGithub />,
+			title: t('contact.github.title'),
+			href: t('contact.github.href')
+		},
+		{
+			index: 1,
+			icon: <FaLinkedin />,
+			title: t('contact.linkedin.title'),
+			href: t('contact.linkedin.href')
+		},
+		{
+			index: 2,
+			icon: <FaEnvelope />,
+			title: t('contact.email.title'),
+			href: t('contact.email.href')
+		}
+	];
+
 	const getConnection = async () => {
 		setTimeout(() => {
 			setLoading(false);
@@ -52,10 +72,7 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 				direction='column'
 				alignItems='center'
 				justifyContent='center'
-				sx={{
-					minHeight: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
-						})`,
-				}}
+				style={{ minHeight: '100%' }}
 			>
 				<Grid
 					item
@@ -104,22 +121,24 @@ export default function Home({ setSelectedIndex, language, terminal }: Props) {
 									direction='row'
 									spacing={0.4}
 								>
-									{links.map((link) => (
-										<Tooltip
-											key={link.index}
-											title={t(`links.${link.title.toLowerCase().split(' ')[0]}`)}
-											arrow
-										>
-											<Link
-												target='_blank'
-												href={link.href}
-												underline='none'
-												color='inherit'
+									{contactLinks.map((link) => {
+										return (
+											<Tooltip
+												key={link.index}
+												title={link.title}
+												arrow
 											>
-												<IconButton color='inherit'>{link.icon}</IconButton>
-											</Link>
-										</Tooltip>
-									))}
+												<Link
+													target='_blank'
+													href={link.href}
+													underline='none'
+													color='inherit'
+												>
+													<IconButton color='inherit'>{link.icon}</IconButton>
+												</Link>
+											</Tooltip>
+										)
+									})}
 								</Stack>
 							</Grid>
 						</Box>
