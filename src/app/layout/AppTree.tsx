@@ -265,10 +265,19 @@ export default function AppTree({
 										alignItems: 'center',
 										justifyContent: 'space-between',
 										width: '100%',
+										maxWidth: '10rem',
 										gap: 1,
 									}}
 								>
-									{convertFileName(name)}
+									<span
+										style={{
+											whiteSpace: 'nowrap',
+											overflow: 'hidden',
+											textOverflow: 'ellipsis',
+										}}
+									>
+										{convertFileName(name)}
+									</span>
 									{isSaved !== undefined && !isSaved && (
 										<Box
 											sx={{
