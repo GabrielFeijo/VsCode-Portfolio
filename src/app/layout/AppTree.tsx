@@ -4,17 +4,19 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TreeItem from '@mui/lab/TreeItem';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
 	VscMarkdown,
 	VscNewFile,
 	VscNewFolder,
 	VscRefresh,
+	VscCheck,
+	VscClose,
 } from 'react-icons/vsc';
 import { convertFileName } from '../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, InputBase } from '@mui/material';
 import { Page, StorageService } from '../../services/storageService';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
 import i18n from '../../i18n';
@@ -46,6 +48,9 @@ export default function AppTree({
 	const theme = useTheme();
 	const { t } = useTranslation();
 	let { pathname } = useLocation();
+	const [isCreatingFile, setIsCreatingFile] = useState(false);
+	const [newFileName, setNewFileName] = useState('');
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const page: Page = pages.find((x) => x.route === pathname)!;
 
@@ -54,6 +59,12 @@ export default function AppTree({
 			setSelectedIndex(page.index);
 		}
 	}, [page, setSelectedIndex]);
+
+	useEffect(() => {
+		if (isCreatingFile && fileInputRef.current) {
+			fileInputRef.current.focus();
+		}
+	}, [isCreatingFile]);
 
 	function renderTreeItemBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
@@ -75,16 +86,29 @@ export default function AppTree({
 
 	function handleCreateFile(e: React.MouseEvent) {
 		e.stopPropagation();
-		const fileName = prompt(t('prompts.enter_filename'));
-		if (fileName) {
-			const normalizedName = normalizeFileName(fileName);
-			const fullFileName = `${normalizedName}.md`;
-			const existingPage = pages.find((x) => x.route === fullFileName);
+		setIsCreatingFile(true);
+	}
 
-			if (existingPage) {
-				return existingPage;
-			}
+	function handleCancelCreateFile() {
+		setIsCreatingFile(false);
+		setNewFileName('');
+	}
 
+	function createNewFile() {
+		if (newFileName.trim() === '') {
+			setIsCreatingFile(false);
+			return;
+		}
+
+		const normalizedName = normalizeFileName(newFileName);
+		const fullFileName = `${normalizedName}.md`;
+		const existingPage = pages.find((x) => x.route === fullFileName);
+
+		if (existingPage) {
+			setVisiblePageIndexes([...visiblePageIndexes, existingPage.index]);
+			setSelectedIndex(existingPage.index);
+			navigate(existingPage.route);
+		} else {
 			const newFile = StorageService.createFile(fullFileName);
 			StorageService.saveOrUpdateData(newFile);
 			const updatedPages = [...pages, newFile];
@@ -92,6 +116,19 @@ export default function AppTree({
 			setVisiblePageIndexes([...visiblePageIndexes, newFile.index]);
 			setSelectedIndex(newFile.index);
 			navigate(newFile.route);
+		}
+
+		setIsCreatingFile(false);
+		setNewFileName('');
+	}
+
+	function handleKeyDown(e: React.KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			createNewFile();
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			handleCancelCreateFile();
 		}
 	}
 
@@ -263,6 +300,53 @@ export default function AppTree({
 							}}
 						/>
 					))}
+
+					{isCreatingFile && (
+						<TreeItem
+							nodeId='-2'
+							icon={<VscMarkdown color='#6997d5' />}
+							label={
+								<Box
+									sx={{
+										maxWidth: '100%',
+									}}
+									onClick={(e: React.MouseEvent) => e.stopPropagation()}
+								>
+									<InputBase
+										inputRef={fileInputRef}
+										value={`${normalizeFileName(newFileName)}`}
+										onChange={(e) => setNewFileName(e.target.value)}
+										onKeyDown={handleKeyDown}
+										placeholder={t('prompts.enter_filename')}
+										sx={{
+											color: renderTreeItemColor(-2),
+											maxWidth: '10rem',
+											'&& .MuiInputBase-input': {
+												p: 0,
+												m: 0,
+											},
+										}}
+										endAdornment={
+											<>
+												<IconButton
+													size='small'
+													onClick={createNewFile}
+												>
+													<VscCheck size={12} />
+												</IconButton>
+												<IconButton
+													size='small'
+													onClick={handleCancelCreateFile}
+												>
+													<VscClose size={12} />
+												</IconButton>
+											</>
+										}
+									/>
+								</Box>
+							}
+						/>
+					)}
 				</TreeItem>
 			</TreeView>
 

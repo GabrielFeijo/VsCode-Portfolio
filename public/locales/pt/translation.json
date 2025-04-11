@@ -108,7 +108,7 @@
         }
     },
     "prompts": {
-        "enter_filename": "Digite o nome do arquivo (sem extensão):",
+        "enter_filename": "digite o nome do arquivo (sem extensão):",
         "enter_foldername": "Digite o nome da pasta:"
     },
     "contextMenu": {
