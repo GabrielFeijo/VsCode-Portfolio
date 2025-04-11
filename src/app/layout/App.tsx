@@ -24,7 +24,12 @@ import i18n from '../../i18n';
 import { useTheme } from '../../contexts/ThemeContext';
 import { pageRoutes } from '../pages/pages';
 import { useTranslation } from 'react-i18next';
-import { sidebarAnimations, sidebarItemAnimations, slideInOut, slideUpDown } from '../../utils/motionVariants';
+import {
+	sidebarAnimations,
+	sidebarItemAnimations,
+	slideInOut,
+	slideUpDown,
+} from '../../utils/motionVariants';
 import { Page, StorageService } from '../../services/storageService';
 
 function initVisiblePageIndexes(pages: Page[]) {
@@ -79,9 +84,7 @@ export default function App() {
 		const newLanguage = language === 'pt' ? 'en' : 'pt';
 		const defaultPages = pageRoutes[newLanguage];
 		const pages = StorageService.getData() || [];
-		setPages([
-			...defaultPages,
-			...pages]);
+		setPages([...defaultPages, ...pages]);
 		setLanguage(newLanguage);
 		i18n.changeLanguage(newLanguage);
 	}
@@ -156,20 +159,20 @@ export default function App() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [language]);
 
-
 	useEffect(() => {
 		const defaultPages = pageRoutes[language];
 		const pages = StorageService.getData() || [];
 		if (pages.length === 0) return;
-		setPages([
-			...defaultPages,
-			...pages]);
+		setPages([...defaultPages, ...pages]);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
 		<>
-			<BoxRating ranking={ranking} setRanking={setRanking} />
+			<BoxRating
+				ranking={ranking}
+				setRanking={setRanking}
+			/>
 			<KeyboardShortcutsModal visible={true} />
 			{language && (
 				<ThemeProvider theme={theme}>
@@ -194,9 +197,9 @@ export default function App() {
 								>
 									<motion.div
 										variants={slideInOut}
-										initial="initial"
-										animate="animate"
-										exit="exit"
+										initial='initial'
+										animate='animate'
+										exit='exit'
 									>
 										<Sidebar
 											setExpanded={setExpanded}
@@ -208,14 +211,14 @@ export default function App() {
 										/>
 									</motion.div>
 								</Grid>
-								<AnimatePresence mode="wait">
+								<AnimatePresence mode='wait'>
 									{expanded && (
 										<motion.div
 											variants={sidebarAnimations}
-											initial="initial"
-											animate="animate"
-											exit="exit"
-											layout="position"
+											initial='initial'
+											animate='animate'
+											exit='exit'
+											layout='position'
 										>
 											<Grid
 												item
@@ -276,25 +279,25 @@ export default function App() {
 									<motion.div
 										initial={false}
 										animate={{
-											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'})`
+											height: `calc(100vh - 20px - 33px - ${
+												terminal ? '300px' : '0px'
+											})`,
 										}}
 										transition={{
-											type: "spring",
+											type: 'spring',
 											damping: 30,
 											stiffness: 200,
-											bounce: 0.2
+											bounce: 0.2,
 										}}
 										style={{
 											overflowY: 'auto',
-											scrollBehavior: 'smooth'
+											scrollBehavior: 'smooth',
 										}}
 									>
 										<Routes>
 											<Route
 												path='/'
-												element={
-													<Home setSelectedIndex={setSelectedIndex} />
-												}
+												element={<Home setSelectedIndex={setSelectedIndex} />}
 											/>
 											{pages.map(({ index, name, route }) => (
 												<Route
@@ -303,7 +306,7 @@ export default function App() {
 													element={
 														<MDContainer
 															path={`./pages/${language.toLowerCase()}/${name}`}
-															page={pages.find(p => p.index === index)}
+															page={pages.find((p) => p.index === index)}
 															setPages={setPages}
 														/>
 													}
@@ -336,7 +339,7 @@ export default function App() {
 						</Grid>
 					</Container>
 
-					<AnimatePresence >
+					<AnimatePresence>
 						{terminal && (
 							<Grid
 								sx={{
@@ -346,7 +349,7 @@ export default function App() {
 									position: 'absolute',
 									width: `calc(100% - 50px - ${expanded ? '220px' : '0px'})`,
 									bottom: 20,
-									right: 0
+									right: 0,
 								}}
 							>
 								<motion.div
@@ -355,21 +358,21 @@ export default function App() {
 										width: `calc(100% - 50px - ${expanded ? '220px' : '0px'})`,
 									}}
 									transition={{
-										type: "spring",
+										type: 'spring',
 										damping: 30,
 										stiffness: 200,
-										bounce: 0.2
+										bounce: 0.2,
 									}}
 									style={{
 										position: 'fixed',
-										right: 0
+										right: 0,
 									}}
 								>
 									<motion.div
 										variants={slideUpDown}
-										initial="initial"
-										animate="animate"
-										exit="exit"
+										initial='initial'
+										animate='animate'
+										exit='exit'
 									>
 										<Terminal
 											language={language}
@@ -384,10 +387,8 @@ export default function App() {
 							</Grid>
 						)}
 					</AnimatePresence>
-
-				</ThemeProvider >
-			)
-			}
+				</ThemeProvider>
+			)}
 		</>
 	);
 }

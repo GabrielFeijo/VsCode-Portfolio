@@ -16,7 +16,6 @@ interface Props {
 	changeLanguage: () => void;
 }
 
-
 const Cmd = ({ setRanking, changeLanguage }: Props) => {
 	const { t } = useTranslation();
 	const { toggleTheme } = useTheme();
@@ -49,10 +48,13 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 							console.error(responseData.message);
 						} else {
 							responseData.forEach((rate: IRate) => {
-								const date = dayjs(rate['createdAt']).format('DD/MM/YYYY HH:mm:ss');
+								const date = dayjs(rate['createdAt']).format(
+									'DD/MM/YYYY HH:mm:ss'
+								);
 
 								response.push(
-									`${date.replace(/,/g, ' ')} - [${rate.username}] ${rate.comment
+									`${date.replace(/,/g, ' ')} - [${rate.username}] ${
+										rate.comment
 									} ${t('terminal.info.feedback')}: ${rate.stars} - 
 									${t(`terminal.rating.${String(rate.stars)}`)}`
 								);
@@ -121,12 +123,10 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 		<Box id='teste'>
 			<Box>
 				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
-					GG Console [{t('terminal.info.version')}{' '}
-					1.0.0.19045.2728]
+					GG Console [{t('terminal.info.version')} 1.0.0.19045.2728]
 				</Typography>
 				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
-					(c) Feijó Corporation.{' '}
-					{t('terminal.info.allRightsReserved')}
+					(c) Feijó Corporation. {t('terminal.info.allRightsReserved')}
 				</Typography>
 			</Box>
 			<Box sx={{ wordBreak: 'break-word', mt: 1 }}>

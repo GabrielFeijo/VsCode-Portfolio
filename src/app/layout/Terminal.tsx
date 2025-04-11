@@ -52,8 +52,16 @@ const Terminal = ({
 		}
 	}
 	const opc = [
-		{ index: 0, name: t('terminal.tabs.problems'), element: <Problems language={language} /> },
-		{ index: 1, name: t('terminal.tabs.output'), element: <Output language={language} /> },
+		{
+			index: 0,
+			name: t('terminal.tabs.problems'),
+			element: <Problems language={language} />,
+		},
+		{
+			index: 1,
+			name: t('terminal.tabs.output'),
+			element: <Output language={language} />,
+		},
 		{
 			index: 2,
 			name: t('terminal.tabs.debug'),

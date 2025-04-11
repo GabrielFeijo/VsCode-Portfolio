@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	VscChromeClose,
-} from 'react-icons/vsc';
+import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './BoxRating.module.css';
 import { ReviewService } from '../../../services/api/review/ReviewService';
@@ -59,16 +57,16 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 				<motion.div
 					className={styles.modalContainer}
 					variants={fadeInOut}
-					initial="initial"
-					animate="animate"
-					exit="exit"
+					initial='initial'
+					animate='animate'
+					exit='exit'
 				>
 					<motion.div
 						className={`${styles.modal} ${isDarkMode ? styles.dark : ''}`}
 						variants={{
 							initial: { scale: 0.95, opacity: 0 },
 							animate: { scale: 1, opacity: 1 },
-							exit: { scale: 0.95, opacity: 0 }
+							exit: { scale: 0.95, opacity: 0 },
 						}}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
@@ -86,28 +84,38 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 						<div className={styles.modalContent}>
 							<div className={styles.formField}>
-								<label htmlFor="username" className={styles.label}>
+								<label
+									htmlFor='username'
+									className={styles.label}
+								>
 									{t('rating.name')}
 								</label>
 								<input
-									id="username"
-									type="text"
-									name="username"
-									className={`${styles.input} ${review.username ? '' : styles.error}`}
+									id='username'
+									type='text'
+									name='username'
+									className={`${styles.input} ${
+										review.username ? '' : styles.error
+									}`}
 									onChange={handleChange}
 									value={review.username}
-									autoComplete="off"
+									autoComplete='off'
 								/>
 							</div>
 
 							<div className={styles.formField}>
-								<label htmlFor="comment" className={styles.label}>
+								<label
+									htmlFor='comment'
+									className={styles.label}
+								>
 									{t('rating.comment')}
 								</label>
 								<textarea
-									id="comment"
-									name="comment"
-									className={`${styles.textarea} ${review.comment ? '' : styles.error}`}
+									id='comment'
+									name='comment'
+									className={`${styles.textarea} ${
+										review.comment ? '' : styles.error
+									}`}
 									onChange={handleChange}
 									value={review.comment}
 									rows={3}
@@ -126,7 +134,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									}}
 									icon={
 										<Star
-											fontSize="inherit"
+											fontSize='inherit'
 											sx={{
 												transition: 'transform 0.2s, filter 0.2s',
 											}}
@@ -134,7 +142,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									}
 									emptyIcon={
 										<StarBorder
-											fontSize="inherit"
+											fontSize='inherit'
 											sx={{
 												color: '#ccc',
 												transition: 'color 0.2s',
@@ -143,7 +151,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									}
 								/>
 								<div className={styles.ratingText}>
-									{star > 0 && t(`terminal.rating.${String(star).replace('.', '_')}`)}
+									{star > 0 &&
+										t(`terminal.rating.${String(star).replace('.', '_')}`)}
 								</div>
 							</div>
 

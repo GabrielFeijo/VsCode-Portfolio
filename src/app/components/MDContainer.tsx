@@ -22,13 +22,15 @@ import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { Page, StorageService } from '../../services/storageService';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { materialDark, materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {
+	materialDark,
+	materialLight,
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ReactSimpleCodeEditor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-markdown';
-import 'prismjs/themes/prism-tomorrow.css'
+import 'prismjs/themes/prism-tomorrow.css';
 import { useTheme } from '../../contexts/ThemeContext';
-
 
 interface Props {
 	path: string;
@@ -70,10 +72,16 @@ function MarkdownTableCell(props: { children: ReactNode }) {
 	);
 }
 
-function MarkdownCode(props: { children: ReactNode, className?: string }, isDarkTheme: boolean) {
+function MarkdownCode(
+	props: { children: ReactNode; className?: string },
+	isDarkTheme: boolean
+) {
 	const language = props.className ? props.className.split('-')[1] : 'md';
 	return (
-		<SyntaxHighlighter language={language} style={isDarkTheme ? materialDark : materialLight}>
+		<SyntaxHighlighter
+			language={language}
+			style={isDarkTheme ? materialDark : materialLight}
+		>
 			{String(props.children).replace(/\n$/, '')}
 		</SyntaxHighlighter>
 	);
@@ -150,7 +158,13 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		const newContent = String(code);
 		setContent(newContent);
 		if (page) {
-			setPages((prev) => prev.map(p => p.index === page.index ? { ...p, content: newContent, isSaved: false } : p));
+			setPages((prev) =>
+				prev.map((p) =>
+					p.index === page.index
+						? { ...p, content: newContent, isSaved: false }
+						: p
+				)
+			);
 		}
 	};
 
@@ -161,7 +175,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 				if (page && page.hasOwnProperty('content')) {
 					const updatedPage = { ...page, content, isSaved: true };
 					StorageService.saveOrUpdateData(updatedPage);
-					setPages((prev) => prev.map(p => p.index === page.index ? updatedPage : p));
+					setPages((prev) =>
+						prev.map((p) => (p.index === page.index ? updatedPage : p))
+					);
 				}
 			}
 		}
@@ -175,30 +191,44 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		<Container sx={{ height: '100%' }}>
 			{editMode ? (
 				<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-					<Grid container sx={{ height: '100%', pt: 2, pb: 2 }}>
-						<Grid item xs={5} sx={{ pt: 2 }}>
+					<Grid
+						container
+						sx={{ height: '100%', pt: 2, pb: 2 }}
+					>
+						<Grid
+							item
+							xs={5}
+							sx={{ pt: 2 }}
+						>
 							<ReactSimpleCodeEditor
 								value={content}
 								onValueChange={(code) => {
-									handleChange(code)
+									handleChange(code);
 								}}
-								highlight={(code) => highlight(code, languages.markdown, 'markdown')}
+								highlight={(code) =>
+									highlight(code, languages.markdown, 'markdown')
+								}
 								style={{
 									fontFamily: '"Fira code", "Fira Mono", monospace',
 									fontSize: 14,
 									lineHeight: '1.5',
 									height: '100%',
 								}}
-								textareaClassName="code-editor-textarea"
-								preClassName="code-editor-pre"
+								textareaClassName='code-editor-textarea'
+								preClassName='code-editor-pre'
 							/>
 						</Grid>
 
-						<Grid item xs={7} sx={{ pl: 2, borderLeft: '1px solid #8686867b' }}>
+						<Grid
+							item
+							xs={7}
+							sx={{ pl: 2, borderLeft: '1px solid #8686867b' }}
+						>
 							<ReactMarkdown
 								children={content}
 								components={{
-									code: (props: { children: ReactNode, className?: string }) => MarkdownCode(props, isDarkTheme),
+									code: (props: { children: ReactNode; className?: string }) =>
+										MarkdownCode(props, isDarkTheme),
 									a: MarkdownLink,
 									table: MarkdownTable,
 									thead: TableHead,
@@ -220,7 +250,8 @@ export default function MDContainer({ path, page, setPages }: Props) {
 				<ReactMarkdown
 					children={content}
 					components={{
-						code: (props: { children: ReactNode, className?: string }) => MarkdownCode(props, isDarkTheme),
+						code: (props: { children: ReactNode; className?: string }) =>
+							MarkdownCode(props, isDarkTheme),
 						a: MarkdownLink,
 						table: MarkdownTable,
 						thead: TableHead,
@@ -235,8 +266,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					remarkPlugins={[remarkGfm, remarkBreaks]}
 					rehypePlugins={[rehypeRaw]}
 				/>
-			)
-			}
-		</Container >
+			)}
+		</Container>
 	);
 }

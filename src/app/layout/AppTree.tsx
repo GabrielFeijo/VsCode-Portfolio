@@ -6,7 +6,12 @@ import TreeItem from '@mui/lab/TreeItem';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { VscMarkdown, VscNewFile, VscNewFolder, VscRefresh } from 'react-icons/vsc';
+import {
+	VscMarkdown,
+	VscNewFile,
+	VscNewFolder,
+	VscRefresh,
+} from 'react-icons/vsc';
 import { convertFileName } from '../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton } from '@mui/material';
@@ -74,15 +79,13 @@ export default function AppTree({
 		if (fileName) {
 			const normalizedName = normalizeFileName(fileName);
 			const fullFileName = `${normalizedName}.md`;
-			const existingPage = pages.find(
-				(x) => x.route === `${fullFileName}.md`
-			);
+			const existingPage = pages.find((x) => x.route === fullFileName);
 
 			if (existingPage) {
 				return existingPage;
 			}
 
-			const newFile = StorageService.createFile(`${fullFileName}.md`);
+			const newFile = StorageService.createFile(fullFileName);
 			StorageService.saveOrUpdateData(newFile);
 			const updatedPages = [...pages, newFile];
 			setPages(updatedPages);
@@ -90,11 +93,11 @@ export default function AppTree({
 			setSelectedIndex(newFile.index);
 			navigate(newFile.route);
 		}
-	};
+	}
 
 	const handleDeleteFile = (pageIndex: number) => {
-		setPages(prev => prev.filter(x => x.index !== pageIndex));
-		setVisiblePageIndexes(prev => prev.filter(x => x !== pageIndex));
+		setPages((prev) => prev.filter((x) => x.index !== pageIndex));
+		setVisiblePageIndexes((prev) => prev.filter((x) => x !== pageIndex));
 		StorageService.deleteFile(pageIndex);
 		setSelectedIndex(0);
 		navigate('/about-me');
@@ -111,11 +114,11 @@ export default function AppTree({
 		setContextMenu(
 			contextMenu === null
 				? {
-					mouseX: event.clientX - 2,
-					mouseY: event.clientY - 4,
-					pageIndex: index,
-				}
-				: null,
+						mouseX: event.clientX - 2,
+						mouseY: event.clientY - 4,
+						pageIndex: index,
+				  }
+				: null
 		);
 	};
 
@@ -124,18 +127,22 @@ export default function AppTree({
 	};
 
 	const handleDelete = () => {
-		if (contextMenu?.pageIndex !== null && contextMenu?.pageIndex !== undefined) {
+		if (
+			contextMenu?.pageIndex !== null &&
+			contextMenu?.pageIndex !== undefined
+		) {
 			handleDeleteFile(contextMenu.pageIndex);
 		}
 		handleClose();
 	};
 	const handleOpenFile = () => {
-		if (contextMenu?.pageIndex !== null && contextMenu?.pageIndex !== undefined) {
-			const existingPage = pages.find(
-				(x) => x.index === contextMenu.pageIndex
-			);
+		if (
+			contextMenu?.pageIndex !== null &&
+			contextMenu?.pageIndex !== undefined
+		) {
+			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
 
-			if (!existingPage) return
+			if (!existingPage) return;
 
 			setSelectedIndex(existingPage.index);
 			navigate(existingPage.route);
@@ -144,18 +151,21 @@ export default function AppTree({
 	};
 
 	const handleOpenFileOnGithub = () => {
-		if (contextMenu?.pageIndex !== null && contextMenu?.pageIndex !== undefined) {
-			const existingPage = pages.find(
-				(x) => x.index === contextMenu.pageIndex
+		if (
+			contextMenu?.pageIndex !== null &&
+			contextMenu?.pageIndex !== undefined
+		) {
+			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
+
+			if (!existingPage) return;
+
+			window.open(
+				`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${i18n.language}/${existingPage.name}`,
+				'_blank'
 			);
-
-			if (!existingPage) return
-
-			window.open(`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${i18n.language}/${existingPage.name}`, '_blank');
 		}
 		handleClose();
 	};
-
 
 	return (
 		<>
@@ -168,20 +178,42 @@ export default function AppTree({
 			>
 				<TreeItem
 					nodeId='-1'
-					label={<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-						{t('pages.home')}
-						<Box sx={{ display: 'flex' }}>
-							<IconButton size="small" onClick={handleCreateFile}>
-								<VscNewFile size={16} />
-							</IconButton>
-							<IconButton size="small" onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
-								<VscNewFolder size={16} />
-							</IconButton>
-							<IconButton size="small" onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
-								<VscRefresh size={16} />
-							</IconButton>
+					label={
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'space-between',
+								width: '100%',
+							}}
+						>
+							{t('pages.home')}
+							<Box sx={{ display: 'flex' }}>
+								<IconButton
+									size='small'
+									onClick={handleCreateFile}
+								>
+									<VscNewFile size={16} />
+								</IconButton>
+								<IconButton
+									size='small'
+									onClick={(e: React.MouseEvent) => {
+										e.stopPropagation();
+									}}
+								>
+									<VscNewFolder size={16} />
+								</IconButton>
+								<IconButton
+									size='small'
+									onClick={(e: React.MouseEvent) => {
+										e.stopPropagation();
+									}}
+								>
+									<VscRefresh size={16} />
+								</IconButton>
+							</Box>
 						</Box>
-					</Box>}
+					}
 					color='#bdc3cf'
 				>
 					{pages.map(({ index, name, route, isSaved }) => (
@@ -189,11 +221,29 @@ export default function AppTree({
 							key={index}
 							onContextMenu={(event) => handleContextMenu(event, index)}
 							nodeId={index.toString()}
-							label={<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
-								{convertFileName(name)}
-								{isSaved !== undefined && !isSaved && <Box sx={{ backgroundColor: '#fff', borderRadius: '100%', width: '10px', height: '10px' }}>
-								</Box>}
-							</Box>}
+							label={
+								<Box
+									sx={{
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'space-between',
+										width: '100%',
+										gap: 1,
+									}}
+								>
+									{convertFileName(name)}
+									{isSaved !== undefined && !isSaved && (
+										<Box
+											sx={{
+												backgroundColor: '#fff',
+												borderRadius: '100%',
+												width: '10px',
+												height: '10px',
+											}}
+										></Box>
+									)}
+								</Box>
+							}
 							sx={{
 								color: renderTreeItemColor(index),
 								backgroundColor: renderTreeItemBgColor(index),
@@ -210,7 +260,8 @@ export default function AppTree({
 								navigate(`${route}`);
 								setSelectedIndex(index);
 								setCurrentComponent('tree');
-							}} />
+							}}
+						/>
 					))}
 				</TreeItem>
 			</TreeView>

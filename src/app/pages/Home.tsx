@@ -31,20 +31,20 @@ export default function Home({ setSelectedIndex }: Props) {
 			index: 0,
 			icon: <FaGithub />,
 			title: t('contact.github.title'),
-			href: t('contact.github.href')
+			href: t('contact.github.href'),
 		},
 		{
 			index: 1,
 			icon: <FaLinkedin />,
 			title: t('contact.linkedin.title'),
-			href: t('contact.linkedin.href')
+			href: t('contact.linkedin.href'),
 		},
 		{
 			index: 2,
 			icon: <FaEnvelope />,
 			title: t('contact.email.title'),
-			href: t('contact.email.href')
-		}
+			href: t('contact.email.href'),
+		},
 	];
 
 	const getConnection = async () => {
@@ -63,7 +63,6 @@ export default function Home({ setSelectedIndex }: Props) {
 			console.error('Erro ao buscar dados do HomeService:', e);
 		}
 	};
-
 
 	useEffect(() => {
 		setSelectedIndex(-1);
@@ -108,9 +107,7 @@ export default function Home({ setSelectedIndex }: Props) {
 								display='flex'
 								justifyContent={{ xs: 'center', sm: 'center' }}
 							>
-								<Typography variant='h3'>
-									{t('header.title')}
-								</Typography>
+								<Typography variant='h3'>{t('header.title')}</Typography>
 							</Grid>
 							<Grid
 								display='flex'
@@ -148,7 +145,7 @@ export default function Home({ setSelectedIndex }: Props) {
 													<IconButton color='inherit'>{link.icon}</IconButton>
 												</Link>
 											</Tooltip>
-										)
+										);
 									})}
 								</Stack>
 							</Grid>

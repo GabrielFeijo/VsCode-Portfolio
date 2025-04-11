@@ -9,7 +9,7 @@ import {
 	VscGlobe,
 	VscChromeClose,
 	VscEditorLayout,
-	VscSave
+	VscSave,
 } from 'react-icons/vsc';
 import styles from './KeyboardShortcutsModal.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,7 +66,7 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 			icon: <VscSave className={styles.icon} />,
 			key: 'Ctrl + S',
 			label: t('shortcuts.save'),
-		}
+		},
 	];
 
 	return (
@@ -75,16 +75,16 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 				<motion.div
 					className={styles.modalContainer}
 					variants={fadeInOut}
-					initial="initial"
-					animate="animate"
-					exit="exit"
+					initial='initial'
+					animate='animate'
+					exit='exit'
 				>
 					<motion.div
 						className={styles.modal}
 						variants={{
 							initial: { scale: 0.95, opacity: 0 },
 							animate: { scale: 1, opacity: 1 },
-							exit: { scale: 0.95, opacity: 0 }
+							exit: { scale: 0.95, opacity: 0 },
 						}}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
@@ -109,7 +109,9 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 								>
 									<div className={styles.shortcutInfo}>
 										<div className={styles.iconContainer}>{shortcut.icon}</div>
-										<span className={styles.shortcutLabel}>{shortcut.label}</span>
+										<span className={styles.shortcutLabel}>
+											{shortcut.label}
+										</span>
 									</div>
 									<div className={styles.keyBadge}>{shortcut.key}</div>
 								</motion.div>

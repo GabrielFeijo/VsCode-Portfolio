@@ -36,20 +36,20 @@ export default function Sidebar({
 			index: 0,
 			icon: <FaGithub />,
 			title: t('contact.github.title'),
-			href: t('contact.github.href')
+			href: t('contact.github.href'),
 		},
 		{
 			index: 1,
 			icon: <FaLinkedin />,
 			title: t('contact.linkedin.title'),
-			href: t('contact.linkedin.href')
+			href: t('contact.linkedin.href'),
 		},
 		{
 			index: 2,
 			icon: <FaEnvelope />,
 			title: t('contact.email.title'),
-			href: t('contact.email.href')
-		}
+			href: t('contact.email.href'),
+		},
 	];
 
 	return (
@@ -76,8 +76,8 @@ export default function Sidebar({
 						borderLeft: expanded
 							? 'solid 0.12em white'
 							: isDarkMode
-								? 'solid 0.12em #343746'
-								: 'solid 0.12em #2c2c2c',
+							? 'solid 0.12em #343746'
+							: 'solid 0.12em #2c2c2c',
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 					}}
@@ -145,7 +145,9 @@ export default function Sidebar({
 				flexDirection='column'
 			>
 				<Tooltip
-					title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')}
+					title={
+						terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')
+					}
 					placement='right'
 					arrow
 				>
@@ -162,8 +164,8 @@ export default function Sidebar({
 							borderLeft: terminal
 								? 'solid 0.12em white'
 								: isDarkMode
-									? 'solid 0.12em #343746'
-									: 'solid 0.12em #2c2c2c',
+								? 'solid 0.12em #343746'
+								: 'solid 0.12em #2c2c2c',
 						}}
 						onClick={() => setTerminal(!terminal)}
 						display='flex'
@@ -175,7 +177,11 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Tooltip
-					title={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`)}
+					title={t(
+						`sidebar.language.to${
+							i18n.language === 'pt' ? 'English' : 'Portuguese'
+						}`
+					)}
 					placement='right'
 					arrow
 				>
@@ -200,7 +206,9 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Tooltip
-					title={isDarkMode ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
+					title={
+						isDarkMode ? t('sidebar.theme.light') : t('sidebar.theme.dark')
+					}
 					placement='right'
 					arrow
 				>
