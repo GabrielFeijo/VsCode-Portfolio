@@ -20,7 +20,7 @@ O projeto inclui as seguintes funcionalidades:
   'limpar' Limpar o terminal da plataforma.
   ```
 
-- Paginação: o projeto tem uma páginação para que os usuários possam navegar facilmente pelas diferentes seções.
+- Paginação: o projeto tem uma paginação para que os usuários possam navegar facilmente pelas diferentes seções.
 
 As páginas do projeto incluem:
 
@@ -33,7 +33,7 @@ As páginas do projeto incluem:
 
 ## Versão Online
 
-A versão online deste projeto pode ser acessada através do link <https://gabrielfeijo.netlify.app/>.
+A versão online deste projeto pode ser acessada através do link <https://gabrielfeijo.com.br>.
 
 Os usuários são encorajados a explorar as diferentes funcionalidades do projeto e dar sua avaliação. Para dar uma avaliação, basta abrir o terminal e digitar o comando 'evaluate' ou 'avaliar'. Seu feedback é muito importante para o desenvolvimento contínuo deste projeto.
 
