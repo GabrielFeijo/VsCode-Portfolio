@@ -31,6 +31,7 @@ import {
 	slideUpDown,
 } from '../../utils/motionVariants';
 import { Page, StorageService } from '../../services/storageService';
+import MetadataComponent from './Metadata';
 
 function initVisiblePageIndexes(pages: Page[]) {
 	const tabs = [];
@@ -169,6 +170,7 @@ export default function App() {
 
 	return (
 		<>
+			<MetadataComponent />
 			<BoxRating
 				ranking={ranking}
 				setRanking={setRanking}
