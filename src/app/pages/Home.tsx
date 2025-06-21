@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { CacheService } from '../../services/cacheService';
 import dayjs from 'dayjs';
+import MetadataComponent from '../layout/Metadata';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -75,6 +76,7 @@ export default function Home({ setSelectedIndex }: Props) {
 
 	return (
 		<>
+			<MetadataComponent />
 			{loading && <Loading></Loading>}
 			<Grid
 				container
