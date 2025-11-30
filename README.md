@@ -1,65 +1,112 @@
-# VsCode-Portfolio
+# 💻 VsCode Portfolio
 
-• Este projeto é uma releitura da IDE Visual Studio Code, com algumas features adicionais. Ele foi criado como um portfólio para demonstrar as habilidades do desenvolvedor e inclui links de contato direto com ele.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.0-blue?logo=react)](https://react.dev/)
+[![Material UI](https://img.shields.io/badge/MUI-5.8-007FFF?logo=mui)](https://mui.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.0-black?logo=framer)](https://www.framer.com/motion/)
+[![Node.js](https://img.shields.io/badge/Node.js-16.0-green?logo=node.js)](https://nodejs.org/)
 
-## Sobre o projeto
+## 📋 Sobre o Projeto
 
-O projeto inclui as seguintes funcionalidades:
+O **VsCode Portfolio** é uma aplicação web interativa que simula o ambiente de desenvolvimento do Visual Studio Code. Ele foi criado como um portfólio para demonstrar as habilidades do desenvolvedor e inclui links de contato direto com ele.
 
-- Modo claro e escuro: o usuário pode alternar entre o modo claro e escuro do projeto, dependendo de suas preferências.
-- Idiomas: o usuário pode escolher entre os idiomas português e inglês para usar o projeto.
-- Terminal: o projeto inclui um terminal para digitar comandos diretamente no editor.
+### 🎯 Destaques Técnicos
 
-  ```bash
-  'ajuda' Exibir todos os comandos disponíveis.
-  'avaliar' Comando para avaliar o projeto.
-  'avaliacoes' Ver todos os comentários.
-  'rota <nome>' Redirecionar para uma página específica.
-  'mudartema' Mudar o tema da plataforma.
-  'mudaridioma' Mudar o idioma da plataforma.
-  'limpar' Limpar o terminal da plataforma.
-  ```
+- **Interface Realista**: Recriação fiel da UI do VS Code, incluindo barra lateral, abas e status bar.
+- **Terminal Interativo**: Um terminal funcional onde usuários podem executar comandos como `help`, `open` e `contact`.
+- **Sistema de Arquivos Virtual**: Navegação intuitiva através de "arquivos" que representam as páginas do portfólio (Sobre, Projetos, Experiência).
+- **Temas Dinâmicos**: Suporte completo a **Modo Claro** e **Modo Escuro**, persistente e alternável.
+- **Internacionalização (i18n)**: Suporte nativo para **Português** e **Inglês**.
 
-- Paginação: o projeto tem uma paginação para que os usuários possam navegar facilmente pelas diferentes seções.
+---
 
-As páginas do projeto incluem:
+## 🌐 Demonstração Online
 
-- Sobre mim: uma breve introdução do desenvolvedor e suas paixões.
-- Habilidades: uma lista das habilidades do desenvolvedor em diferentes linguagens e ferramentas.
-- Projetos: uma lista de projetos de destaque desenvolvidos pelo desenvolvedor, com links para seus respectivos repositórios no GitHub.
-- Experiência profissional: uma lista de cargos anteriores do desenvolvedor e as empresas onde ele trabalhou.
-- Conquistas: uma lista de prêmios e reconhecimentos que o desenvolvedor recebeu.
-- Certificados: uma lista de certificados que o desenvolvedor obteve em diferentes cursos e programas de treinamento.
+### Acesse Agora
 
-## Versão Online
+| Versão       | URL                                                | Descrição                  |
+| :----------- | :------------------------------------------------- | :------------------------- |
+| **Produção** | [gabrielfeijo.com.br](https://gabrielfeijo.com.br) | Versão estável e otimizada |
 
-A versão online deste projeto pode ser acessada através do link <https://gabrielfeijo.com.br>.
+### ⌨️ Comandos do Terminal
 
-Os usuários são encorajados a explorar as diferentes funcionalidades do projeto e dar sua avaliação. Para dar uma avaliação, basta abrir o terminal e digitar o comando 'evaluate' ou 'avaliar'. Seu feedback é muito importante para o desenvolvimento contínuo deste projeto.
-
-## Versão Máquina Local
-
-Para executar esta aplicação em sua máquina local, siga os seguintes passos:
-
-1.Clone o repositório em sua máquina local. Você pode fazer isso clicando no botão "Clone" acima e copiando o link do repositório, ou digitando o seguinte comando no seu terminal:
+Experimente digitar estes comandos no terminal integrado do portfólio:
 
 ```bash
-git clone https://github.com/GabrielFeijo/VsCode-Portfolio.git
+ajuda         # Exibir todos os comandos disponíveis
+avaliar       # Avaliar o projeto (feedback interativo)
+avaliacoes    # Ver comentários de outros visitantes
+rota <nome>   # Navegar para uma página (ex: rota sobre)
+mudartema     # Alternar entre Light/Dark mode
+mudaridioma   # Alternar entre PT/EN
+limpar        # Limpar o terminal
 ```
 
-2.Certifique-se de que o Node.js está instalado em sua máquina. Caso não esteja, faça o download em <https://nodejs.org/>.
+---
 
-3.No terminal, navegue até o diretório do projeto e execute o comando npm install para instalar as dependências do projeto.
+## 🚀 Início Rápido
 
-```bash
-cd VsCode-Portfolio
-npm install
+### Pré-requisitos
+
+Certifique-se de ter instalado:
+
+- [Node.js](https://nodejs.org/) 16+
+- [npm](https://www.npmjs.com/) ou yarn
+
+### 💻 Instalação Local
+
+1. **Clone o repositório**
+
+   ```bash
+   git clone https://github.com/GabrielFeijo/VsCode-Portfolio.git
+   cd VsCode-Portfolio
+   ```
+
+2. **Instale as dependências**
+
+   ```bash
+   npm install
+   ```
+
+3. **Inicie o servidor de desenvolvimento**
+
+   ```bash
+   npm start
+   ```
+
+4. **Acesse a aplicação**
+   - Abra [http://localhost:3000](http://localhost:3000) no navegador
+
+---
+
+## 📦 Estrutura do Projeto
+
+```
+src/
+├── components/           # Componentes React reutilizáveis
+│   ├── Layout/           # Estrutura principal (Sidebar, Header)
+│   ├── Terminal/         # Lógica e UI do terminal interativo
+│   └── Editor/           # Área de conteúdo principal
+├── pages/                # "Arquivos" do portfólio
+│   ├── About/            # Sobre mim
+│   ├── Projects/         # Lista de projetos
+│   └── Experience/       # Experiência profissional
+├── hooks/                # Custom Hooks (Theme, Language)
+├── context/              # Context API (Global State)
+├── utils/                # Funções utilitárias
+└── assets/               # Imagens e ícones
 ```
 
-4.Após a instalação das dependências, execute o comando npm start para iniciar o servidor de desenvolvimento.
+---
 
-```bash
-npm start
-```
+## 📊 Tecnologias Utilizadas
 
-5.Abra o navegador da web e acesse o endereço <http://localhost:3000> para visualizar a aplicação.
+| Tecnologia        | Versão | Uso                                          |
+| :---------------- | :----- | :------------------------------------------- |
+| **React**         | 18.1   | Biblioteca de UI principal                   |
+| **TypeScript**    | 4.7    | Tipagem estática e segurança                 |
+| **Material UI**   | 5.8    | Componentes de interface e sistema de design |
+| **Framer Motion** | 12.6   | Animações fluidas e transições               |
+| **i18next**       | 23.6   | Internacionalização e tradução               |
+| **React Router**  | 6.3    | Roteamento SPA                               |
+| **Axios**         | 1.3    | Requisições HTTP                             |
