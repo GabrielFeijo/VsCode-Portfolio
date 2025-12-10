@@ -72,12 +72,22 @@ export default function Sidebar({
 				flexDirection='column'
 			>
 				<Box
+					role="button"
+					aria-label={expanded ? (t('sidebar.closeExplorer') || 'Close explorer') : (t('sidebar.openExplorer') || 'Open explorer')}
+					aria-expanded={expanded}
+					tabIndex={0}
+					onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							setExpanded(!expanded);
+						}
+					}}
 					sx={{
 						borderLeft: expanded
 							? 'solid 0.12em white'
 							: isDarkMode
-							? 'solid 0.12em #343746'
-							: 'solid 0.12em #2c2c2c',
+								? 'solid 0.12em #343746'
+								: 'solid 0.12em #2c2c2c',
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 					}}
@@ -152,6 +162,16 @@ export default function Sidebar({
 					arrow
 				>
 					<Box
+						role="button"
+						aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
+						aria-expanded={terminal}
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								setTerminal(!terminal);
+							}
+						}}
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
@@ -164,8 +184,8 @@ export default function Sidebar({
 							borderLeft: terminal
 								? 'solid 0.12em white'
 								: isDarkMode
-								? 'solid 0.12em #343746'
-								: 'solid 0.12em #2c2c2c',
+									? 'solid 0.12em #343746'
+									: 'solid 0.12em #2c2c2c',
 						}}
 						onClick={() => setTerminal(!terminal)}
 						display='flex'
@@ -178,14 +198,22 @@ export default function Sidebar({
 				</Tooltip>
 				<Tooltip
 					title={t(
-						`sidebar.language.to${
-							i18n.language === 'pt' ? 'English' : 'Portuguese'
+						`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'
 						}`
 					)}
 					placement='right'
 					arrow
 				>
 					<Box
+						role="button"
+						aria-label={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`) || 'Change language'}
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								changeLanguage();
+							}
+						}}
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
@@ -213,6 +241,15 @@ export default function Sidebar({
 					arrow
 				>
 					<Box
+						role="button"
+						aria-label={isDarkMode ? (t('sidebar.theme.light') || 'Switch to light theme') : (t('sidebar.theme.dark') || 'Switch to dark theme')}
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								toggleTheme();
+							}
+						}}
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
@@ -239,6 +276,14 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Box
+					role="button"
+					aria-label={t('sidebar.settings') || 'Settings'}
+					tabIndex={0}
+					onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+						}
+					}}
 					sx={{
 						flexGrow: 0,
 						fontSize: 24,

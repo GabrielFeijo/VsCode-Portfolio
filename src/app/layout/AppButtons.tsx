@@ -42,9 +42,9 @@ export default function AppButtons({
 
 	function renderButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? 'white' : '#817d7a';
+			return selectedIndex === index ? 'white' : '#b8b5b0';
 		} else {
-			return selectedIndex === index ? '#524a5f' : '#716f74';
+			return selectedIndex === index ? '#2d2a35' : '#4a484d';
 		}
 	}
 
@@ -58,9 +58,9 @@ export default function AppButtons({
 
 	function renderCloseButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#white' : '#21222c';
+			return selectedIndex === index ? 'white' : '#b8b5b0';
 		} else {
-			return selectedIndex === index ? '#72736d' : '#ececec';
+			return selectedIndex === index ? '#2d2a35' : '#4a484d';
 		}
 	}
 
@@ -74,9 +74,9 @@ export default function AppButtons({
 
 	function renderCloseButtonHoverColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex !== index ? '#817d7a' : '#white';
+			return selectedIndex !== index ? '#b8b5b0' : 'white';
 		} else {
-			return selectedIndex === index ? '#44434b' : '#92938e';
+			return selectedIndex === index ? '#2d2a35' : '#2d2a35';
 		}
 	}
 
@@ -95,6 +95,7 @@ export default function AppButtons({
 					disableRipple
 					disableElevation
 					disableFocusRipple
+					aria-label={`Open ${convertFileName(name)} page`}
 					onClick={() => {
 						setSelectedIndex(index);
 						setCurrentComponent('button');
@@ -121,6 +122,18 @@ export default function AppButtons({
 					{convertFileName(name)}
 					<Box
 						component={Paper}
+						role="button"
+						aria-label={`Close ${convertFileName(name)} tab`}
+						tabIndex={0}
+						onKeyDown={(e: any) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								e.stopPropagation();
+								setVisiblePageIndexes(
+									visiblePageIndexes.filter((x) => x !== index)
+								);
+							}
+						}}
 						sx={{
 							ml: 1,
 							mr: -1,
@@ -133,6 +146,7 @@ export default function AppButtons({
 							width: 20,
 							height: 20,
 							transition: 'none',
+							cursor: 'pointer',
 						}}
 						elevation={0}
 						onClick={(e: any) => {

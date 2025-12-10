@@ -106,6 +106,15 @@ const Terminal = ({
 					{opc.map(({ index, name }) => (
 						<Box
 							key={index}
+							role="button"
+							aria-label={`Switch to ${name} tab`}
+							tabIndex={0}
+							onKeyDown={(e: React.KeyboardEvent) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									setSelectedTerminalIndex(index);
+								}
+							}}
 							onClick={() => {
 								setSelectedTerminalIndex(index);
 							}}
@@ -132,6 +141,14 @@ const Terminal = ({
 					spacing={0}
 				>
 					<Box
+						role="button"
+						aria-label="Open terminal command"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+							}
+						}}
 						display='flex'
 						gap={0.5}
 						alignItems='center'
@@ -149,6 +166,14 @@ const Terminal = ({
 						<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
 					</Box>
 					<Box
+						role="button"
+						aria-label="Add new terminal"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+							}
+						}}
 						display='flex'
 						gap={0.5}
 						alignItems='center'
@@ -167,6 +192,14 @@ const Terminal = ({
 						<VscChevronDown />
 					</Box>
 					<Box
+						role="button"
+						aria-label="Split terminal"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+							}
+						}}
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
@@ -180,6 +213,14 @@ const Terminal = ({
 						<VscSplitHorizontal />
 					</Box>
 					<Box
+						role="button"
+						aria-label="Delete terminal"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+							}
+						}}
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
@@ -193,6 +234,14 @@ const Terminal = ({
 						<VscTrash />
 					</Box>
 					<Box
+						role="button"
+						aria-label="More options"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+							}
+						}}
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
@@ -206,6 +255,15 @@ const Terminal = ({
 						<VscEllipsis />
 					</Box>
 					<Box
+						role="button"
+						aria-label="Close terminal"
+						tabIndex={0}
+						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								setTerminal(false);
+							}
+						}}
 						onClick={() => setTerminal(false)}
 						sx={{
 							cursor: 'pointer',

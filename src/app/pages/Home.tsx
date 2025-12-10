@@ -109,7 +109,7 @@ export default function Home({ setSelectedIndex }: Props) {
 								display='flex'
 								justifyContent={{ xs: 'center', sm: 'center' }}
 							>
-								<Typography variant='h3'>{t('header.title')}</Typography>
+								<Typography component='h1' variant='h3'>{t('header.title')}</Typography>
 							</Grid>
 							<Grid
 								display='flex'

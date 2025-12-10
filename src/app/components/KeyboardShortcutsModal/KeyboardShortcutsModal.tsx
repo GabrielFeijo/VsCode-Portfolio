@@ -89,11 +89,11 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
 						<div className={styles.modalHeader}>
-							<h3 className={styles.title}>{t('shortcuts.title')}</h3>
+							<h2 className={styles.title}>{t('shortcuts.title')}</h2>
 							<button
 								className={styles.closeButton}
 								onClick={() => setShow(false)}
-								aria-label='Close'
+								aria-label={t('shortcuts.close') || 'Close keyboard shortcuts modal'}
 							>
 								<VscChromeClose />
 							</button>

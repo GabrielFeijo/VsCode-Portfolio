@@ -151,10 +151,10 @@ export default function AppTree({
 		setContextMenu(
 			contextMenu === null
 				? {
-						mouseX: event.clientX - 2,
-						mouseY: event.clientY - 4,
-						pageIndex: index,
-				  }
+					mouseX: event.clientX - 2,
+					mouseY: event.clientY - 4,
+					pageIndex: index,
+				}
 				: null
 		);
 	};
@@ -228,12 +228,14 @@ export default function AppTree({
 							<Box sx={{ display: 'flex' }}>
 								<IconButton
 									size='small'
+									aria-label={t('sidebar.createFile') || 'Create new file'}
 									onClick={handleCreateFile}
 								>
 									<VscNewFile size={16} />
 								</IconButton>
 								<IconButton
 									size='small'
+									aria-label={t('sidebar.createFolder') || 'Create new folder'}
 									onClick={(e: React.MouseEvent) => {
 										e.stopPropagation();
 									}}
@@ -242,6 +244,7 @@ export default function AppTree({
 								</IconButton>
 								<IconButton
 									size='small'
+									aria-label={t('sidebar.refresh') || 'Refresh'}
 									onClick={(e: React.MouseEvent) => {
 										e.stopPropagation();
 									}}
@@ -339,12 +342,14 @@ export default function AppTree({
 											<>
 												<IconButton
 													size='small'
+													aria-label={t('sidebar.confirm') || 'Confirm'}
 													onClick={createNewFile}
 												>
 													<VscCheck size={12} />
 												</IconButton>
 												<IconButton
 													size='small'
+													aria-label={t('sidebar.cancel') || 'Cancel'}
 													onClick={handleCancelCreateFile}
 												>
 													<VscClose size={12} />

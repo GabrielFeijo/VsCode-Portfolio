@@ -94,9 +94,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									id='username'
 									type='text'
 									name='username'
-									className={`${styles.input} ${
-										review.username ? '' : styles.error
-									}`}
+									className={`${styles.input} ${review.username ? '' : styles.error
+										}`}
 									onChange={handleChange}
 									value={review.username}
 									autoComplete='off'
@@ -113,9 +112,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 								<textarea
 									id='comment'
 									name='comment'
-									className={`${styles.textarea} ${
-										review.comment ? '' : styles.error
-									}`}
+									className={`${styles.textarea} ${review.comment ? '' : styles.error
+										}`}
 									onChange={handleChange}
 									value={review.comment}
 									rows={3}
@@ -159,6 +157,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 							<button
 								className={styles.submitButton}
 								onClick={sendReview}
+								aria-label={t('rating.submit') || 'Submit rating'}
 							>
 								{t('rating.submit')}
 							</button>

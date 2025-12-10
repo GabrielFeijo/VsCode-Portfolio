@@ -281,9 +281,8 @@ export default function App() {
 									<motion.div
 										initial={false}
 										animate={{
-											height: `calc(100vh - 20px - 33px - ${
-												terminal ? '300px' : '0px'
-											})`,
+											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
+												})`,
 										}}
 										transition={{
 											type: 'spring',
