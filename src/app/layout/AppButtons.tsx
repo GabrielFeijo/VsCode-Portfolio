@@ -1,4 +1,4 @@
-import { Button, Box, Paper } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import React from 'react';
 import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
