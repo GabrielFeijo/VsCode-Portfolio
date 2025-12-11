@@ -278,7 +278,7 @@ export default function App() {
 										/>
 									</Grid>
 
-									<motion.main
+									<motion.div
 										initial={false}
 										animate={{
 											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
@@ -325,7 +325,7 @@ export default function App() {
 												}
 											/>
 										</Routes>
-									</motion.main>
+									</motion.div>
 								</Grid>
 							</Grid>
 
