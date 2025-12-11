@@ -14,6 +14,7 @@ import {
 import styles from './KeyboardShortcutsModal.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInOut } from '../../../utils/motionVariants';
+import { isMobile } from 'react-device-detect';
 
 interface Props {
 	visible: boolean;
@@ -34,7 +35,7 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 		}
 	}, [visible]);
 
-	if (!show) return null;
+	if (!show || isMobile) return null;
 
 	const shortcuts = [
 		{

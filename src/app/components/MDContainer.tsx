@@ -190,7 +190,23 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	}, [path, page, content]);
 
 	return (
-		<Container sx={{ height: '100%' }}>
+		<Container
+			sx={{
+				height: '100%',
+				padding: { xs: 1, sm: 2, md: 3 },
+				'& h1, & h2, & h3': {
+					wordBreak: 'break-word',
+				},
+				'& p, & li': {
+					wordBreak: 'break-word',
+					overflowWrap: 'break-word',
+				},
+				'& img': {
+					maxWidth: '100%',
+					height: 'auto',
+				},
+			}}
+		>
 			{editMode ? (
 				<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 					<Grid

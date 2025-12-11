@@ -9,6 +9,7 @@ import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 import Divider from '@mui/material/Divider';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { isMobile } from 'react-device-detect';
 
 interface Props {
 	expanded: boolean;
@@ -158,52 +159,54 @@ export default function Sidebar({
 				justifyContent='center'
 				flexDirection='column'
 			>
-				<Tooltip
-					title={
-						terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')
-					}
-					placement='right'
-					arrow
-				>
-					<Box
-						component="button"
-						aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
-						aria-expanded={terminal}
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								setTerminal(!terminal);
-							}
-						}}
-						sx={{
-							flexGrow: 0,
-							fontSize: 24,
-							color: '#b0b8d0',
-							cursor: 'pointer',
-							'&:hover': {
-								color: '#ffffff',
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							borderLeft: terminal
-								? 'solid 0.12em #ffffff'
-								: isDarkMode
-									? 'solid 0.12em #343746'
-									: 'solid 0.12em #2c2c2c',
-							border: 'none',
-							background: 'transparent',
-							width: '100%',
-							padding: 0,
-						}}
-						onClick={() => setTerminal(!terminal)}
-						display='flex'
-						justifyContent='center'
+				{!isMobile && (
+					<Tooltip
+						title={
+							terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')
+						}
+						placement='right'
+						arrow
 					>
-						<Box sx={{ color: terminal ? '#ffffff' : '#b0b8d0' }}>
-							<TerminalIcon />
+						<Box
+							component="button"
+							aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
+							aria-expanded={terminal}
+							tabIndex={0}
+							onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									setTerminal(!terminal);
+								}
+							}}
+							sx={{
+								flexGrow: 0,
+								fontSize: 24,
+								color: '#b0b8d0',
+								cursor: 'pointer',
+								'&:hover': {
+									color: '#ffffff',
+								},
+								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+								borderLeft: terminal
+									? 'solid 0.12em #ffffff'
+									: isDarkMode
+										? 'solid 0.12em #343746'
+										: 'solid 0.12em #2c2c2c',
+								border: 'none',
+								background: 'transparent',
+								width: '100%',
+								padding: 0,
+							}}
+							onClick={() => setTerminal(!terminal)}
+							display='flex'
+							justifyContent='center'
+						>
+							<Box sx={{ color: terminal ? '#ffffff' : '#b0b8d0' }}>
+								<TerminalIcon />
+							</Box>
 						</Box>
-					</Box>
-				</Tooltip>
+					</Tooltip>
+				)}
 				<Tooltip
 					title={t(
 						`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'

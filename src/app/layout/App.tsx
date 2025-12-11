@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
+	Box,
 	Container,
 	createTheme,
 	CssBaseline,
@@ -16,7 +18,7 @@ import AppButtons from './AppButtons';
 import MDContainer from '../components/MDContainer';
 import Home from '../pages/Home';
 import { motion, AnimatePresence } from 'framer-motion';
-import { isBrowser } from 'react-device-detect';
+import { isBrowser, isMobile } from 'react-device-detect';
 import Terminal from './Terminal';
 import BoxRating from '../components/Rating/BoxRating';
 import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
@@ -52,7 +54,7 @@ export default function App() {
 	const navigate = useNavigate();
 
 	const [expanded, setExpanded] = useState(isBrowser);
-	const [terminal, setTerminal] = useState(isBrowser);
+	const [terminal, setTerminal] = useState(isBrowser && !isMobile);
 	const [selectedIndex, setSelectedIndex] = useState(-1);
 	const [selectedTerminalIndex, setSelectedTerminalIndex] = useState(3);
 	const [currentComponent, setCurrentComponent] = useState('');
@@ -129,7 +131,7 @@ export default function App() {
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
-			if (e.ctrlKey && e.key === 'j') {
+			if (e.ctrlKey && e.key === 'j' && !isMobile) {
 				e.preventDefault();
 				setTerminal((prev) => !prev);
 			}
@@ -157,7 +159,6 @@ export default function App() {
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [language]);
 
 	useEffect(() => {
@@ -165,7 +166,6 @@ export default function App() {
 		const pages = StorageService.getData() || [];
 		if (pages.length === 0) return;
 		setPages([...defaultPages, ...pages]);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
@@ -194,8 +194,10 @@ export default function App() {
 							>
 								<Grid
 									item
-									sx={{ width: 50 }}
-									zIndex={2}
+									sx={{
+										width: 50,
+										zIndex: isMobile ? 1000 : 2,
+									}}
 								>
 									<motion.div
 										variants={slideInOut}
@@ -221,6 +223,14 @@ export default function App() {
 											animate='animate'
 											exit='exit'
 											layout='position'
+											style={{
+												position: isMobile ? 'fixed' : 'relative',
+												left: isMobile ? 50 : 0,
+												top: 0,
+												height: isMobile ? '100vh' : 'auto',
+												zIndex: isMobile ? 999 : 'auto',
+												boxShadow: isMobile ? '2px 0 8px rgba(0,0,0,0.2)' : 'none',
+											}}
 										>
 											<Grid
 												item
@@ -257,10 +267,28 @@ export default function App() {
 										</motion.div>
 									)}
 								</AnimatePresence>
+								{isMobile && expanded && (
+									<Box
+										sx={{
+											position: 'fixed',
+											top: 0,
+											left: 0,
+											right: 0,
+											bottom: 0,
+											backgroundColor: 'rgba(0, 0, 0, 0.5)',
+											zIndex: 998,
+										}}
+										onClick={() => setExpanded(false)}
+									/>
+								)}
 								<Grid
 									item
 									xs
 									zeroMinWidth
+									sx={{
+										width: '100%',
+										maxWidth: '100%',
+									}}
 								>
 									<Grid
 										sx={{
@@ -281,7 +309,7 @@ export default function App() {
 									<motion.div
 										initial={false}
 										animate={{
-											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
+											height: `calc(100vh - 20px - 33px - ${terminal && !isMobile ? '300px' : '0px'
 												})`,
 										}}
 										transition={{
@@ -343,7 +371,7 @@ export default function App() {
 					</Container>
 
 					<AnimatePresence>
-						{terminal && (
+						{terminal && !isMobile && (
 							<Grid
 								sx={{
 									scrollBehavior: 'smooth',
