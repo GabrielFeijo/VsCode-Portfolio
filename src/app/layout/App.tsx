@@ -278,7 +278,7 @@ export default function App() {
 										/>
 									</Grid>
 
-									<motion.div
+									<motion.main
 										initial={false}
 										animate={{
 											height: `calc(100vh - 20px - 33px - ${terminal ? '300px' : '0px'
@@ -294,6 +294,8 @@ export default function App() {
 											overflowY: 'auto',
 											scrollBehavior: 'smooth',
 										}}
+										role="main"
+										aria-label="Main content"
 									>
 										<Routes>
 											<Route
@@ -323,7 +325,7 @@ export default function App() {
 												}
 											/>
 										</Routes>
-									</motion.div>
+									</motion.main>
 								</Grid>
 							</Grid>
 

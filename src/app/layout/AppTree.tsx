@@ -77,10 +77,10 @@ export default function AppTree({
 	function renderTreeItemColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index && currentComponent === 'tree'
-				? 'white'
-				: '#bdc3cf';
+				? '#ffffff'
+				: '#d0d0d0';
 		} else {
-			return selectedIndex === index ? '#e2ffff' : '#69665f';
+			return selectedIndex === index ? '#e2ffff' : '#2a2a2a';
 		}
 	}
 

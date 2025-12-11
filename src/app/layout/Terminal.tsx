@@ -46,9 +46,9 @@ const Terminal = ({
 	}
 	function renderTerminalColor(index: number) {
 		if (isDarkMode) {
-			return selectedTerminalIndex === index ? '#fff' : '#6272a4';
+			return selectedTerminalIndex === index ? '#ffffff' : '#b0b8d0';
 		} else {
-			return selectedTerminalIndex === index ? '#000' : 'gray';
+			return selectedTerminalIndex === index ? '#000000' : '#2a2a2a';
 		}
 	}
 	const opc = [
@@ -97,18 +97,23 @@ const Terminal = ({
 				alignItems='center'
 				display='flex'
 				flexDirection='row'
+				role="tablist"
+				aria-label="Terminal tabs"
 			>
 				<Stack
 					direction='row'
 					sx={{ pl: 1 }}
 					spacing={2}
+					role="tablist"
 				>
 					{opc.map(({ index, name }) => (
 						<Box
 							key={index}
-							role="button"
+							component="button"
 							aria-label={`Switch to ${name} tab`}
-							tabIndex={0}
+							aria-selected={selectedTerminalIndex === index}
+							role="tab"
+							tabIndex={selectedTerminalIndex === index ? 0 : -1}
 							onKeyDown={(e: React.KeyboardEvent) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
@@ -128,6 +133,10 @@ const Terminal = ({
 								},
 								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 								p: 0.8,
+								border: 'none',
+								background: 'transparent',
+								display: 'flex',
+								alignItems: 'center',
 							}}
 						>
 							<Typography sx={{ fontSize: '.7rem' }}>
@@ -139,9 +148,11 @@ const Terminal = ({
 				<Stack
 					direction='row'
 					spacing={0}
+					role="toolbar"
+					aria-label="Terminal toolbar"
 				>
 					<Box
-						role="button"
+						component="button"
 						aria-label="Open terminal command"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -160,13 +171,15 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
 						}}
 					>
 						<VscTerminalCmd />
 						<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
 					</Box>
 					<Box
-						role="button"
+						component="button"
 						aria-label="Add new terminal"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -186,13 +199,15 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
 						}}
 					>
 						<VscAdd />
 						<VscChevronDown />
 					</Box>
 					<Box
-						role="button"
+						component="button"
 						aria-label="Split terminal"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -208,12 +223,17 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 					>
 						<VscSplitHorizontal />
 					</Box>
 					<Box
-						role="button"
+						component="button"
 						aria-label="Delete terminal"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -229,12 +249,17 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 					>
 						<VscTrash />
 					</Box>
 					<Box
-						role="button"
+						component="button"
 						aria-label="More options"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -250,12 +275,17 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 					>
 						<VscEllipsis />
 					</Box>
 					<Box
-						role="button"
+						component="button"
 						aria-label="Close terminal"
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -273,6 +303,11 @@ const Terminal = ({
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
+							border: 'none',
+							background: 'transparent',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
 					>
 						<VscClose />

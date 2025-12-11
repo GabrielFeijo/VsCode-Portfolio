@@ -76,7 +76,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 							<button
 								className={styles.closeButton}
 								onClick={() => setRanking(false)}
-								aria-label='Close'
+								aria-label={t('rating.close') || 'Close rating modal'}
 							>
 								<VscChromeClose />
 							</button>

@@ -116,6 +116,7 @@ export default function Home({ setSelectedIndex }: Props) {
 								justifyContent={{ xs: 'center', sm: 'center' }}
 							>
 								<Typography
+									component='p'
 									variant='subtitle1'
 									gutterBottom
 									style={{ width: 300, textAlign: 'center' }}

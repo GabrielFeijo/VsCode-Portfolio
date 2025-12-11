@@ -55,7 +55,7 @@ function MarkdownTable(props: { children: ReactNode }) {
 		<TableContainer component={Paper}>
 			<Table
 				size='small'
-				aria-label='a dense table'
+				aria-label='Data table'
 			>
 				{props.children}
 			</Table>

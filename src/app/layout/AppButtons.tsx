@@ -42,9 +42,9 @@ export default function AppButtons({
 
 	function renderButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? 'white' : '#b8b5b0';
+			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
 		} else {
-			return selectedIndex === index ? '#2d2a35' : '#4a484d';
+			return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 		}
 	}
 
@@ -58,9 +58,9 @@ export default function AppButtons({
 
 	function renderCloseButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? 'white' : '#b8b5b0';
+			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
 		} else {
-			return selectedIndex === index ? '#2d2a35' : '#4a484d';
+			return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 		}
 	}
 
@@ -74,9 +74,9 @@ export default function AppButtons({
 
 	function renderCloseButtonHoverColor(index: number) {
 		if (theme.palette.mode === 'dark') {
-			return selectedIndex !== index ? '#b8b5b0' : 'white';
+			return selectedIndex !== index ? '#d0d0d0' : '#ffffff';
 		} else {
-			return selectedIndex === index ? '#2d2a35' : '#2d2a35';
+			return selectedIndex === index ? '#1a1a1a' : '#1a1a1a';
 		}
 	}
 
@@ -121,8 +121,7 @@ export default function AppButtons({
 					</Box>
 					{convertFileName(name)}
 					<Box
-						component={Paper}
-						role="button"
+						component="button"
 						aria-label={`Close ${convertFileName(name)} tab`}
 						tabIndex={0}
 						onKeyDown={(e: any) => {
@@ -139,7 +138,7 @@ export default function AppButtons({
 							mr: -1,
 							backgroundColor: renderCloseButtonBgColor(index),
 							color: renderCloseButtonColor(index),
-							'&.MuiPaper-root:hover': {
+							'&:hover': {
 								bgcolor: renderCloseButtonHoverBgColor(index),
 								color: renderCloseButtonHoverColor(index),
 							},
@@ -147,8 +146,12 @@ export default function AppButtons({
 							height: 20,
 							transition: 'none',
 							cursor: 'pointer',
+							border: 'none',
+							padding: 0,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
 						}}
-						elevation={0}
 						onClick={(e: any) => {
 							e.stopPropagation();
 							setVisiblePageIndexes(

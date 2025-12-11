@@ -22,6 +22,9 @@ export default function Footer() {
 			<Grid container>
 				<Grid
 					item
+					component="button"
+					aria-label="Remote connection status"
+					tabIndex={0}
 					sx={{
 						width: '35px',
 						backgroundColor: '#bd93f9',
@@ -31,6 +34,8 @@ export default function Footer() {
 						'&:hover': {
 							background: '#c49ff9',
 						},
+						border: 'none',
+						padding: 0,
 					}}
 					display='flex'
 				>
@@ -57,6 +62,8 @@ export default function Footer() {
 							underline='none'
 							color='white'
 							target='_blank'
+							rel="noopener noreferrer"
+							aria-label="View source code on GitHub - main branch"
 							display='flex'
 							sx={{
 								px: 0.5,
@@ -80,6 +87,8 @@ export default function Footer() {
 						<Stack
 							direction='row'
 							spacing={0.5}
+							role="status"
+							aria-label="Errors and warnings count"
 							sx={{
 								px: 0.5,
 								cursor: 'pointer',
@@ -96,7 +105,7 @@ export default function Footer() {
 									py: 0.3,
 								}}
 							>
-								<VscError fontSize='0.9rem' />
+								<VscError fontSize='0.9rem' aria-hidden="true" />
 							</Box>
 							<Box
 								display='flex'
@@ -106,7 +115,7 @@ export default function Footer() {
 									pt: 0.3,
 								}}
 							>
-								<Typography sx={{ fontSize: '0.6rem' }}>0</Typography>
+								<Typography sx={{ fontSize: '0.6rem' }} aria-label="Errors count">0</Typography>
 							</Box>
 
 							<Box
@@ -117,7 +126,7 @@ export default function Footer() {
 									py: 0.3,
 								}}
 							>
-								<VscWarning fontSize='0.9rem' />
+								<VscWarning fontSize='0.9rem' aria-hidden="true" />
 							</Box>
 							<Box
 								display='flex'
@@ -127,7 +136,7 @@ export default function Footer() {
 									pt: 0.3,
 								}}
 							>
-								<Typography sx={{ fontSize: '0.6rem' }}>0</Typography>
+								<Typography sx={{ fontSize: '0.6rem' }} aria-label="Warnings count">0</Typography>
 							</Box>
 						</Stack>
 					</Stack>

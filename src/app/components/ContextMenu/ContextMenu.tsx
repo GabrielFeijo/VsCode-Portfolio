@@ -72,10 +72,12 @@ export default function ContextMenu({
 					exit={{ scale: 0.95, opacity: 0 }}
 					transition={{ duration: 0.1 }}
 				>
-					<div className={styles.menuItems}>
+					<div className={styles.menuItems} role="menu">
 						<button
 							className={styles.menuItem}
 							onClick={handleOpenFile}
+							aria-label={t('contextMenu.open') || 'Open file'}
+							role="menuitem"
 						>
 							<div className={styles.iconContainer}>
 								<MdOpenInNew className={styles.icon} />
@@ -85,6 +87,8 @@ export default function ContextMenu({
 						<button
 							className={styles.menuItem}
 							onClick={handleDelete}
+							aria-label={t('contextMenu.delete') || 'Delete file'}
+							role="menuitem"
 						>
 							<div className={styles.iconContainer}>
 								<VscTrash className={styles.icon} />
@@ -94,6 +98,8 @@ export default function ContextMenu({
 						<button
 							className={styles.menuItem}
 							onClick={handleOpenFileOnGithub}
+							aria-label={t('contextMenu.openOnGithub') || 'Open file on GitHub'}
+							role="menuitem"
 						>
 							<div className={styles.iconContainer}>
 								<VscGithub className={styles.icon} />

@@ -53,8 +53,7 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 								);
 
 								response.push(
-									`${date.replace(/,/g, ' ')} - [${rate.username}] ${
-										rate.comment
+									`${date.replace(/,/g, ' ')} - [${rate.username}] ${rate.comment
 									} ${t('terminal.info.feedback')}: ${rate.stars} - 
 									${t(`terminal.rating.${String(rate.stars)}`)}`
 								);
@@ -164,6 +163,7 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 						placeholder={t('terminal.info.placeholder')}
 						className={styles.text}
 						rows={1}
+						aria-label={t('terminal.info.placeholder') || 'Terminal command input'}
 						style={{
 							outline: 0,
 							border: 0,

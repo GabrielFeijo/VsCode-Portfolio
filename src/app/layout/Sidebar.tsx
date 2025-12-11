@@ -72,7 +72,7 @@ export default function Sidebar({
 				flexDirection='column'
 			>
 				<Box
-					role="button"
+					component="button"
 					aria-label={expanded ? (t('sidebar.closeExplorer') || 'Close explorer') : (t('sidebar.openExplorer') || 'Open explorer')}
 					aria-expanded={expanded}
 					tabIndex={0}
@@ -90,6 +90,10 @@ export default function Sidebar({
 								: 'solid 0.12em #2c2c2c',
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+						border: 'none',
+						background: 'transparent',
+						width: '100%',
+						padding: 0,
 					}}
 					onClick={() => setExpanded(!expanded)}
 				>
@@ -97,11 +101,11 @@ export default function Sidebar({
 						sx={{
 							flexGrow: 0,
 							my: 1.5,
-							color: expanded ? 'white' : '#6272a4',
+							color: expanded ? '#ffffff' : '#b0b8d0',
 							fontSize: 24,
 							outline: 'none',
 							'&:hover': {
-								color: 'white',
+								color: '#ffffff',
 							},
 						}}
 						display='flex'
@@ -131,10 +135,10 @@ export default function Sidebar({
 								sx={{
 									flexGrow: 0,
 									m: 0.5,
-									color: '#6272a4',
+									color: '#b0b8d0',
 									fontSize: 24,
 									'&:hover': {
-										color: 'white',
+										color: '#ffffff',
 									},
 									cursor: 'pointer',
 								}}
@@ -162,7 +166,7 @@ export default function Sidebar({
 					arrow
 				>
 					<Box
-						role="button"
+						component="button"
 						aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
 						aria-expanded={terminal}
 						tabIndex={0}
@@ -175,23 +179,27 @@ export default function Sidebar({
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
-							color: '#6272a4',
+							color: '#b0b8d0',
 							cursor: 'pointer',
 							'&:hover': {
-								color: 'white',
+								color: '#ffffff',
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							borderLeft: terminal
-								? 'solid 0.12em white'
+								? 'solid 0.12em #ffffff'
 								: isDarkMode
 									? 'solid 0.12em #343746'
 									: 'solid 0.12em #2c2c2c',
+							border: 'none',
+							background: 'transparent',
+							width: '100%',
+							padding: 0,
 						}}
 						onClick={() => setTerminal(!terminal)}
 						display='flex'
 						justifyContent='center'
 					>
-						<Box sx={{ color: terminal ? 'white' : '#6272a4' }}>
+						<Box sx={{ color: terminal ? '#ffffff' : '#b0b8d0' }}>
 							<TerminalIcon />
 						</Box>
 					</Box>
@@ -205,7 +213,7 @@ export default function Sidebar({
 					arrow
 				>
 					<Box
-						role="button"
+						component="button"
 						aria-label={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`) || 'Change language'}
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -217,12 +225,16 @@ export default function Sidebar({
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
-							color: '#6272a4',
+							color: '#b0b8d0',
 							cursor: 'pointer',
 							'&:hover': {
-								color: 'white',
+								color: '#ffffff',
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+							border: 'none',
+							background: 'transparent',
+							width: '100%',
+							padding: 0,
 						}}
 						display='flex'
 						justifyContent='center'
@@ -241,7 +253,7 @@ export default function Sidebar({
 					arrow
 				>
 					<Box
-						role="button"
+						component="button"
 						aria-label={isDarkMode ? (t('sidebar.theme.light') || 'Switch to light theme') : (t('sidebar.theme.dark') || 'Switch to dark theme')}
 						tabIndex={0}
 						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -253,12 +265,16 @@ export default function Sidebar({
 						sx={{
 							flexGrow: 0,
 							fontSize: 24,
-							color: '#6272a4',
+							color: '#b0b8d0',
 							cursor: 'pointer',
 							'&:hover': {
-								color: 'white',
+								color: '#ffffff',
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+							border: 'none',
+							background: 'transparent',
+							width: '100%',
+							padding: 0,
 						}}
 						display='flex'
 						justifyContent='center'
@@ -276,7 +292,7 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Box
-					role="button"
+					component="button"
 					aria-label={t('sidebar.settings') || 'Settings'}
 					tabIndex={0}
 					onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
@@ -287,12 +303,16 @@ export default function Sidebar({
 					sx={{
 						flexGrow: 0,
 						fontSize: 24,
-						color: '#6272a4',
+						color: '#b0b8d0',
 						cursor: 'pointer',
 						'&:hover': {
-							color: 'white',
+							color: '#ffffff',
 						},
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+						border: 'none',
+						background: 'transparent',
+						width: '100%',
+						padding: 0,
 					}}
 					display='flex'
 					justifyContent='center'
