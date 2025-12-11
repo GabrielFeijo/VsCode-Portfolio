@@ -1,10 +1,11 @@
 import { Button, Box } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { Container } from '@mui/system';
 import { convertFileName } from '../utils/convertFileName';
+import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
 
 interface Props {
 	pages: {
@@ -31,7 +32,12 @@ export default function AppButtons({
 }: Props) {
 	const navigate = useNavigate();
 	const theme = useTheme();
-	// const [selectedIndex, setSelectedIndex] = useState(-1);
+	const [contextMenu, setContextMenu] = useState<{
+		mouseX: number;
+		mouseY: number;
+		tabIndex: number;
+	} | null>(null);
+
 	function renderButtonBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#282A36' : '#21222c';
@@ -80,6 +86,57 @@ export default function AppButtons({
 		}
 	}
 
+	const handleContextMenu = (event: React.MouseEvent, index: number) => {
+		event.preventDefault();
+		setContextMenu({
+			mouseX: event.clientX,
+			mouseY: event.clientY,
+			tabIndex: index,
+		});
+	};
+
+	const handleCloseContextMenu = () => {
+		setContextMenu(null);
+	};
+
+	const handleCloseTab = () => {
+		if (contextMenu) {
+			setVisiblePageIndexes(
+				visiblePageIndexes.filter((x) => x !== contextMenu.tabIndex)
+			);
+		}
+	};
+
+	const handleCloseOthers = () => {
+		if (contextMenu) {
+			setVisiblePageIndexes([contextMenu.tabIndex]);
+			setSelectedIndex(contextMenu.tabIndex);
+			const page = pages.find((x) => x.index === contextMenu.tabIndex);
+			if (page) navigate(`/${page.route}`);
+		}
+	};
+
+	const handleCloseToRight = () => {
+		if (contextMenu) {
+			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+			const newIndexes = visiblePageIndexes.slice(0, currentPosition + 1);
+			setVisiblePageIndexes(newIndexes);
+		}
+	};
+
+	const handleCloseToLeft = () => {
+		if (contextMenu) {
+			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+			const newIndexes = visiblePageIndexes.slice(currentPosition);
+			setVisiblePageIndexes(newIndexes);
+		}
+	};
+
+	const handleCloseAll = () => {
+		setVisiblePageIndexes([]);
+		navigate('/');
+	};
+
 	function renderPageButton(index: number, name: string, route: string) {
 		return (
 			<Box
@@ -91,7 +148,6 @@ export default function AppButtons({
 				}}
 			>
 				<Button
-					key={index}
 					disableRipple
 					disableElevation
 					disableFocusRipple
@@ -101,6 +157,7 @@ export default function AppButtons({
 						setCurrentComponent('button');
 						navigate(`/${route}`);
 					}}
+					onContextMenu={(e: React.MouseEvent<Element, MouseEvent>) => handleContextMenu(e, index)}
 					sx={{
 						borderRadius: 0,
 						px: 2,
@@ -167,32 +224,41 @@ export default function AppButtons({
 	}
 
 	return (
-		<Container
-			maxWidth={false}
-			disableGutters
-			sx={{
-				display: 'inline-block',
-				overflowX: 'auto',
-				overflowY: 'hidden',
-				whiteSpace: 'nowrap',
-				backgroundColor: theme.palette.mode === 'dark' ? '#191a21' : '#f3f3f3',
-				'&::-webkit-scrollbar': {
-					height: '3px',
-					// backgroundColor: 'red',
-				},
-				'&::-webkit-scrollbar-thumb': {
-					backgroundColor:
-						theme.palette.mode === 'dark' ? '#535353' : '#8c8c8c',
-				},
-				'&::-webkit-darkScrollbar-thumb': {
-					backgroundColor:
-						theme.palette.mode === 'dark' ? '#ffffff' : '#8c8c8c',
-				},
-			}}
-		>
-			{pages.map(({ index, name, route }) =>
-				renderPageButton(index, name, route)
-			)}
-		</Container>
+		<>
+			<Container
+				maxWidth={false}
+				disableGutters
+				sx={{
+					display: 'inline-block',
+					overflowX: 'auto',
+					overflowY: 'hidden',
+					whiteSpace: 'nowrap',
+					backgroundColor: theme.palette.mode === 'dark' ? '#191a21' : '#f3f3f3',
+					'&::-webkit-scrollbar': {
+						height: '3px',
+					},
+					'&::-webkit-scrollbar-thumb': {
+						backgroundColor:
+							theme.palette.mode === 'dark' ? '#535353' : '#8c8c8c',
+					},
+				}}
+			>
+				{pages.map(({ index, name, route }) =>
+					renderPageButton(index, name, route)
+				)}
+			</Container>
+
+			<TabContextMenu
+				contextMenu={contextMenu}
+				currentTabIndex={contextMenu?.tabIndex ?? -1}
+				visiblePageIndexes={visiblePageIndexes}
+				handleClose={handleCloseContextMenu}
+				handleCloseTab={handleCloseTab}
+				handleCloseOthers={handleCloseOthers}
+				handleCloseToRight={handleCloseToRight}
+				handleCloseToLeft={handleCloseToLeft}
+				handleCloseAll={handleCloseAll}
+			/>
+		</>
 	);
 }

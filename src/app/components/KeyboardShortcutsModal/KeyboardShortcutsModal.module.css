@@ -107,7 +107,7 @@
 }
 
 :global(.dark) .modal {
-	background-color: #1e293b;
+	background-color: #282a36;
 	color: #f8fafc;
 	border-color: #334155;
 }
@@ -117,11 +117,11 @@
 }
 
 :global(.dark) .shortcutItem:hover {
-	background-color: #1e293b;
+	background-color: #282a36;
 }
 
 :global(.dark) .iconContainer {
-	background-color: #334155;
+	background-color: #313341;
 	color: #e2e8f0;
 }
 
@@ -134,12 +134,12 @@
 }
 
 :global(.dark) .closeButton:hover {
-	background-color: #334155;
+	background-color: #313341;
 	color: #f8fafc;
 }
 
 :global(.dark) .keyBadge {
-	background-color: #334155;
+	background-color: #313341;
 	border-color: #475569;
 	color: #e2e8f0;
 }

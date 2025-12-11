@@ -115,5 +115,12 @@
         "open": "Abrir",
         "delete": "Excluir",
         "openOnGithub": "Abrir no GitHub"
+    },
+    "tabContextMenu": {
+        "close": "Fechar",
+        "closeOthers": "Fechar Outras",
+        "closeToRight": "Fechar à Direita",
+        "closeToLeft": "Fechar à Esquerda",
+        "closeAll": "Fechar Todas"
     }
 }
