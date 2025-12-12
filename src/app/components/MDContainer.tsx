@@ -67,7 +67,6 @@ function MarkdownTableCell(props: { children: ReactNode }) {
 	return (
 		<TableCell>
 			{props.children}
-			{/* <Typography>{props.children}</Typography> */}
 		</TableCell>
 	);
 }

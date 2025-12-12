@@ -15,7 +15,6 @@ export default function Footer() {
 			component={Paper}
 			square
 			elevation={0}
-			// sx={{ height: '3vh' }}
 			sx={{ height: '20px', color: 'white' }}
 			display='flex'
 		>
@@ -69,7 +68,6 @@ export default function Footer() {
 								px: 0.5,
 								justifyContent: 'center',
 								alignItems: 'center',
-								// cursor: "pointer",
 								'&:hover': {
 									background: '#1f8ad2',
 								},
@@ -80,10 +78,7 @@ export default function Footer() {
 								main
 							</Typography>
 						</Box>
-						{/* </Link> */}
 
-						{/* </Tooltip> */}
-						{/* </Stack> */}
 						<Stack
 							direction='row'
 							spacing={0.5}
@@ -143,7 +138,6 @@ export default function Footer() {
 				</Grid>
 				<Grid
 					item
-					// sx={{ backgroundColor: '#191a21', minWidth: `calc(100% - 35px)` }}
 					sx={{ backgroundColor: '#191a21', minWidth: `calc(100% - 235px)` }}
 					display='flex'
 					justifyContent='flex-end'
@@ -153,7 +147,6 @@ export default function Footer() {
 						justifyContent='flex-end'
 					>
 						<Stack
-							// display="flex"
 							justifyContent='end'
 							direction='row'
 							spacing={0.8}
