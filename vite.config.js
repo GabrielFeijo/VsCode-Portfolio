@@ -5,16 +5,16 @@ export default defineConfig({
     plugins: [react()],
     build: {
         outDir: 'build',
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
-                    }
-                },
-            },
-        },
-        chunkSizeWarningLimit: 1000, // Adjust the chunk size limit (in kB)
+        // rollupOptions: {
+        //     output: {
+        //         manualChunks(id) {
+        //             if (id.includes('node_modules')) {
+        //                 return id.toString().split('node_modules/')[1].split('/')[0].toString();
+        //             }
+        //         },
+        //     },
+        // },
+        // chunkSizeWarningLimit: 1000, // Adjust the chunk size limit (in kB)
     },
     server: {
         host: "localhost",
