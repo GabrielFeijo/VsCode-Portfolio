@@ -70,7 +70,7 @@ export default function Home({ setSelectedIndex }: Props) {
 	}, [setSelectedIndex]);
 
 	useEffect(() => {
-		document.title = process.env.REACT_APP_NAME!;
+		document.title = import.meta.env.VITE_NAME!;
 		getConnection();
 	}, [pathname]);
 

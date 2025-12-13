@@ -152,7 +152,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	useEffect(() => {
 		let title = pathname.substring(1, pathname.length);
 		title = title[0].toUpperCase() + title.substring(1);
-		document.title = `${process.env.REACT_APP_NAME!} | ${title}`;
+		document.title = `${import.meta.env.VITE_NAME!} | ${title}`;
 	}, [pathname]);
 
 	const handleChange = (code: string) => {
