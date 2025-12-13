@@ -178,7 +178,6 @@ export default function AppButtons({
 					</Box>
 					{convertFileName(name)}
 					<Box
-						component="button"
 						aria-label={`Close ${convertFileName(name)} tab`}
 						tabIndex={0}
 						onKeyDown={(e: any) => {
