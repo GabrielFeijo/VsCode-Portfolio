@@ -6,6 +6,7 @@ import App from './app/layout/App';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { HelmetProvider } from 'react-helmet-async';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const root = ReactDOM.createRoot(
 	document.getElementById('root') as HTMLElement
@@ -16,6 +17,7 @@ root.render(
 		<HelmetProvider>
 			<ThemeProvider>
 				<BrowserRouter>
+					<SpeedInsights />
 					<App />
 				</BrowserRouter>
 			</ThemeProvider>
