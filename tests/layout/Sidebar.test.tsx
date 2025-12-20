@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Sidebar from '../../src/app/layout/Sidebar';
 
 jest.mock('react-icons/vsc', () => ({
@@ -98,17 +99,19 @@ describe('Sidebar', () => {
         expect(defaultProps.changeLanguage).toHaveBeenCalled();
     });
 
-    it('calls setExpanded when files button is pressed with Enter', () => {
+    it('calls setExpanded and preventDefault when files button is pressed with Enter', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
-        fireEvent.keyDown(filesButton, { key: 'Enter' });
+        fireEvent.keyDown(filesButton, { key: 'Enter', preventDefault });
         expect(defaultProps.setExpanded).toHaveBeenCalledWith(false);
     });
 
-    it('calls setExpanded when files button is pressed with Space', () => {
+    it('calls setExpanded and preventDefault when files button is pressed with Space', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
-        fireEvent.keyDown(filesButton, { key: ' ' });
+        fireEvent.keyDown(filesButton, { key: ' ', preventDefault });
         expect(defaultProps.setExpanded).toHaveBeenCalledWith(false);
     });
 
@@ -119,35 +122,79 @@ describe('Sidebar', () => {
         expect(defaultProps.setExpanded).not.toHaveBeenCalled();
     });
 
-    it('calls setTerminal when terminal button is pressed with Enter', () => {
+    it('calls setTerminal and preventDefault when terminal button is pressed with Enter', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
-        fireEvent.keyDown(terminalButton, { key: 'Enter' });
+        fireEvent.keyDown(terminalButton, { key: 'Enter', preventDefault });
         expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
     });
 
-    it('calls setTerminal when terminal button is pressed with Space', () => {
+    it('calls setTerminal and preventDefault when terminal button is pressed with Space', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
-        fireEvent.keyDown(terminalButton, { key: ' ' });
+        fireEvent.keyDown(terminalButton, { key: ' ', preventDefault });
         expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
     });
 
-    it('calls changeLanguage when language button is pressed with Enter', () => {
+    it('does not call setTerminal when terminal button is pressed with other key', () => {
+        render(<Sidebar {...defaultProps} />);
+        const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
+        fireEvent.keyDown(terminalButton, { key: 'A' });
+        expect(defaultProps.setTerminal).not.toHaveBeenCalled();
+    });
+
+    it('calls changeLanguage and preventDefault when language button is pressed with Enter', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const languageButton = screen.getByRole('button', { name: /sidebar\.language\.toPortuguese/i });
-        fireEvent.keyDown(languageButton, { key: 'Enter' });
+        fireEvent.keyDown(languageButton, { key: 'Enter', preventDefault });
         expect(defaultProps.changeLanguage).toHaveBeenCalled();
     });
 
-    it('calls changeLanguage when language button is pressed with Space', () => {
+    it('calls changeLanguage and preventDefault when language button is pressed with Space', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const languageButton = screen.getByRole('button', { name: /sidebar\.language\.toPortuguese/i });
-        fireEvent.keyDown(languageButton, { key: ' ' });
+        fireEvent.keyDown(languageButton, { key: ' ', preventDefault });
         expect(defaultProps.changeLanguage).toHaveBeenCalled();
     });
 
-    it('calls toggleTheme when theme button is pressed with Enter', () => {
+    it('does not call changeLanguage when language button is pressed with other key', () => {
+        render(<Sidebar {...defaultProps} />);
+        const languageButton = screen.getByRole('button', { name: /sidebar\.language\.toPortuguese/i });
+        fireEvent.keyDown(languageButton, { key: 'A' });
+        expect(defaultProps.changeLanguage).not.toHaveBeenCalled();
+    });
+
+    it('calls toggleTheme and preventDefault when theme button is pressed with Enter', () => {
+        const toggleTheme = jest.fn();
+        const preventDefault = jest.fn();
+        mockUseTheme.mockReturnValue({
+            theme: 'light',
+            toggleTheme,
+        });
+        render(<Sidebar {...defaultProps} />);
+        const themeButton = screen.getByRole('button', { name: /sidebar\.theme\.dark/i });
+        fireEvent.keyDown(themeButton, { key: 'Enter', preventDefault });
+        expect(toggleTheme).toHaveBeenCalled();
+    });
+
+    it('calls toggleTheme and preventDefault when theme button is pressed with Space', () => {
+        const toggleTheme = jest.fn();
+        const preventDefault = jest.fn();
+        mockUseTheme.mockReturnValue({
+            theme: 'light',
+            toggleTheme,
+        });
+        render(<Sidebar {...defaultProps} />);
+        const themeButton = screen.getByRole('button', { name: /sidebar\.theme\.dark/i });
+        fireEvent.keyDown(themeButton, { key: ' ', preventDefault });
+        expect(toggleTheme).toHaveBeenCalled();
+    });
+
+    it('does not call toggleTheme when theme button is pressed with other key', () => {
         const toggleTheme = jest.fn();
         mockUseTheme.mockReturnValue({
             theme: 'light',
@@ -155,20 +202,8 @@ describe('Sidebar', () => {
         });
         render(<Sidebar {...defaultProps} />);
         const themeButton = screen.getByRole('button', { name: /sidebar\.theme\.dark/i });
-        fireEvent.keyDown(themeButton, { key: 'Enter' });
-        expect(toggleTheme).toHaveBeenCalled();
-    });
-
-    it('calls toggleTheme when theme button is pressed with Space', () => {
-        const toggleTheme = jest.fn();
-        mockUseTheme.mockReturnValue({
-            theme: 'light',
-            toggleTheme,
-        });
-        render(<Sidebar {...defaultProps} />);
-        const themeButton = screen.getByRole('button', { name: /sidebar\.theme\.dark/i });
-        fireEvent.keyDown(themeButton, { key: ' ' });
-        expect(toggleTheme).toHaveBeenCalled();
+        fireEvent.keyDown(themeButton, { key: 'A' });
+        expect(toggleTheme).not.toHaveBeenCalled();
     });
 
     it('renders terminal button when not mobile', () => {
@@ -184,17 +219,24 @@ describe('Sidebar', () => {
         require('react-device-detect').isMobile = originalIsMobile;
     });
 
-    it('handles keyDown on settings button with Enter', () => {
+    it('calls preventDefault when settings button is pressed with Enter', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
-        fireEvent.keyDown(settingsButton, { key: 'Enter' });
-        // No assertion needed, just to cover the code
+        fireEvent.keyDown(settingsButton, { key: 'Enter', preventDefault });
     });
 
-    it('handles keyDown on settings button with Space', () => {
+    it('calls preventDefault when settings button is pressed with Space', () => {
+        const preventDefault = jest.fn();
         render(<Sidebar {...defaultProps} />);
         const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
-        fireEvent.keyDown(settingsButton, { key: ' ' });
+        fireEvent.keyDown(settingsButton, { key: ' ', preventDefault });
+    });
+
+    it('handles keyDown on settings button with other key', () => {
+        render(<Sidebar {...defaultProps} />);
+        const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
+        fireEvent.keyDown(settingsButton, { key: 'A' });
         // No assertion needed, just to cover the code
     });
 
@@ -219,6 +261,28 @@ describe('Sidebar', () => {
         });
         render(<Sidebar {...defaultProps} terminal={true} />);
         expect(screen.getByRole('button', { name: /sidebar\.terminal\.close/i })).toBeInTheDocument();
+    });
+
+    it('renders collapsed sidebar with light theme', () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'light',
+            toggleTheme: jest.fn(),
+        });
+        render(<Sidebar {...defaultProps} expanded={false} />);
+        expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
+    });
+
+    it('renders contact links with correct attributes', () => {
+        render(<Sidebar {...defaultProps} />);
+        const githubLink = screen.getByTestId('fa-github').closest('a');
+        expect(githubLink).toHaveAttribute('href', 'contact.github.href');
+        expect(githubLink).toHaveAttribute('target', '_blank');
+        const linkedinLink = screen.getByTestId('fa-linkedin').closest('a');
+        expect(linkedinLink).toHaveAttribute('href', 'contact.linkedin.href');
+        expect(linkedinLink).toHaveAttribute('target', '_blank');
+        const emailLink = screen.getByTestId('fa-envelope').closest('a');
+        expect(emailLink).toHaveAttribute('href', 'contact.email.href');
+        expect(emailLink).toHaveAttribute('target', '_blank');
     });
 
     it('renders with Portuguese language', () => {
