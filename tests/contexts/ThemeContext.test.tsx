@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '../../src/contexts/ThemeContext';
 
 const localStorageMock = {
@@ -59,11 +58,13 @@ describe('ThemeContext', () => {
         localStorageMock.getItem.mockReturnValue(null);
         matchMediaMock.mockReturnValue({ matches: true, addEventListener: jest.fn(), removeEventListener: jest.fn() });
 
-        render(
-            <ThemeProvider>
-                <TestComponent />
-            </ThemeProvider>
-        );
+        act(() => {
+            render(
+                <ThemeProvider>
+                    <TestComponent />
+                </ThemeProvider>
+            );
+        });
 
         expect(screen.getByTestId('theme')).toHaveTextContent('dark');
         expect(document.documentElement.classList.contains('dark')).toBe(true);
@@ -73,11 +74,13 @@ describe('ThemeContext', () => {
         localStorageMock.getItem.mockReturnValue(null);
         matchMediaMock.mockReturnValue({ matches: false, addEventListener: jest.fn(), removeEventListener: jest.fn() });
 
-        render(
-            <ThemeProvider>
-                <TestComponent />
-            </ThemeProvider>
-        );
+        act(() => {
+            render(
+                <ThemeProvider>
+                    <TestComponent />
+                </ThemeProvider>
+            );
+        });
 
         expect(screen.getByTestId('theme')).toHaveTextContent('light');
         expect(document.documentElement.classList.contains('light')).toBe(true);
@@ -124,11 +127,13 @@ describe('ThemeContext', () => {
         const mediaQuery = { matches: false, addEventListener: jest.fn(), removeEventListener: jest.fn() };
         matchMediaMock.mockReturnValue(mediaQuery);
 
-        render(
-            <ThemeProvider>
-                <TestComponent />
-            </ThemeProvider>
-        );
+        act(() => {
+            render(
+                <ThemeProvider>
+                    <TestComponent />
+                </ThemeProvider>
+            );
+        });
 
         expect(screen.getByTestId('theme')).toHaveTextContent('light');
 
