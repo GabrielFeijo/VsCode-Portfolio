@@ -35,7 +35,7 @@ import {
 import { Page, StorageService } from '../../services/storageService';
 import MetadataComponent from './Metadata';
 
-function initVisiblePageIndexes(pages: Page[]) {
+export function initVisiblePageIndexes(pages: Page[]) {
 	const tabs = [];
 	for (let i = 0; i < pages.length; i++) {
 		const page = pages[i];

@@ -19,6 +19,7 @@ jest.mock('@mui/material', () => ({
     Rating: ({ onChange, value, emptyIcon, ...props }: any) => (
         <div data-testid="rating" {...props}>
             <button onClick={() => onChange(null, 5)}>Rate 5</button>
+            <button onClick={() => onChange(null, null)}>Rate null</button>
         </div>
     ),
 }));
@@ -58,6 +59,11 @@ jest.mock('../../src/app/components/Rating/BoxRating.module.css', () => ({
     errorMessage: 'errorMessage',
 }));
 
+const mockT = jest.fn();
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: mockT }),
+}));
+
 import BoxRating from '../../src/app/components/Rating/BoxRating';
 
 describe('BoxRating', () => {
@@ -70,6 +76,7 @@ describe('BoxRating', () => {
         jest.clearAllMocks();
         jest.useFakeTimers();
         mockUseTheme.mockReturnValue({ theme: 'light' });
+        mockT.mockImplementation((key) => key);
     });
 
     afterEach(() => {
@@ -263,5 +270,35 @@ describe('BoxRating', () => {
         expect(screen.getByTestId('rating')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /rating\.close/ })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /rating\.submit/ })).toBeInTheDocument();
+    });
+
+    it('uses default aria-label when translation is missing for close', () => {
+        mockT.mockImplementation((key) => key === 'rating.close' ? undefined : key);
+
+        render(<BoxRating {...defaultProps} />);
+
+        const closeButton = screen.getByRole('button', { name: 'Close rating modal' });
+        expect(closeButton).toBeInTheDocument();
+
+        mockT.mockImplementation((key) => key);
+    });
+
+    it('uses default aria-label when translation is missing for submit', () => {
+        mockT.mockImplementation((key) => key === 'rating.submit' ? undefined : key);
+
+        render(<BoxRating {...defaultProps} />);
+
+        const submitButton = screen.getByRole('button', { name: 'Submit rating' });
+        expect(submitButton).toBeInTheDocument();
+
+        mockT.mockImplementation((key) => key);
+    });
+
+    it('does not set star when rating is null', () => {
+        render(<BoxRating {...defaultProps} />);
+
+        const rateNullButton = screen.getByText('Rate null');
+        fireEvent.click(rateNullButton);
+        expect(screen.queryByText(/terminal\.rating/)).not.toBeInTheDocument();
     });
 });

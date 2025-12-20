@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import KeyboardShortcutsModal from '../../src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 
@@ -31,9 +30,15 @@ jest.mock('react-icons/vsc', () => ({
     VscSave: () => <div data-testid="save-icon" />,
 }));
 
+const mockT = jest.fn();
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: mockT }),
+}));
+
 describe('KeyboardShortcutsModal', () => {
     beforeEach(() => {
         jest.useFakeTimers();
+        mockT.mockImplementation((key) => key);
     });
 
     afterEach(() => {
@@ -104,10 +109,38 @@ describe('KeyboardShortcutsModal', () => {
         await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
     });
 
-    it('clears timeouts on unmount', () => {
+    it('uses default aria-label when translation is missing', async () => {
+        mockT.mockImplementation((key) => key === 'shortcuts.close' ? undefined : key);
+
+        render(<KeyboardShortcutsModal visible={true} />);
+
+        act(() => {
+            jest.advanceTimersByTime(2500);
+        });
+
+        const closeButton = screen.getByRole('button', { name: 'Close keyboard shortcuts modal' });
+        expect(closeButton).toBeInTheDocument();
+
+        mockT.mockImplementation((key) => key);
+    });
+
+    it('clears timeouts on unmount before show', () => {
         const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
 
         jest.advanceTimersByTime(1000);
+
+        unmount();
+
+        expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
+    });
+
+    it('clears hide timeout on unmount after show', () => {
+        const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
+
+        act(() => {
+            jest.advanceTimersByTime(2500);
+        });
+        expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
 
         unmount();
 

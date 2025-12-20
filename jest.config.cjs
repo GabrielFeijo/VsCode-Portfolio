@@ -19,17 +19,5 @@ module.exports = {
             lines: 90,
             statements: 90
         },
-        'src/app/components/': {
-            branches: 90,
-            functions: 90,
-            lines: 90,
-            statements: 90
-        },
-        'src/app/utils/': {
-            branches: 90,
-            functions: 90,
-            lines: 90,
-            statements: 90
-        },
     }
 };

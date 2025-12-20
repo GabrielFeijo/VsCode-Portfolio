@@ -13,13 +13,6 @@ jest.mock('react-router-dom', () => {
     };
 });
 
-jest.mock('../src/contexts/ThemeContext', () => ({
-    useTheme: jest.fn(),
-}));
-
-const { useTheme } = require('../src/contexts/ThemeContext');
-useTheme.mockReturnValue({ theme: 'light', toggleTheme: jest.fn() });
-
 global.fetch = (global.fetch as any) || jest.fn(() => Promise.resolve({ text: () => Promise.resolve('# hello') }));
 
 (global as any).import = {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react';
 
 jest.mock('../../src/app/components/Terminal/Cmd', () => ({
@@ -12,7 +11,7 @@ import Cmd from '../../src/app/components/Terminal/Cmd';
 
 test('renders Cmd component', () => {
   const { getByTestId } = render(
-    <Cmd setRanking={() => { }} changeLanguage={() => { }} /> as any
+    <Cmd setRanking={() => { }} changeLanguage={() => { }} />
   );
   expect(getByTestId('mock-cmd')).toBeTruthy();
 });

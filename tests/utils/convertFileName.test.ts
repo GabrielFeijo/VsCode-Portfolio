@@ -1,4 +1,4 @@
-import { convertFileName } from '../../src/app/utils/convertFileName';
+import { convertFileName } from '../../src/utils/convertFileName';
 
 test('converts .html to .md', () => {
     expect(convertFileName('page.html')).toBe('page.md');

@@ -14,7 +14,7 @@ import {
 	VscCheck,
 	VscClose,
 } from 'react-icons/vsc';
-import { convertFileName } from '../utils/convertFileName';
+import { convertFileName } from '../../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, InputBase } from '@mui/material';
 import { Page, StorageService } from '../../services/storageService';

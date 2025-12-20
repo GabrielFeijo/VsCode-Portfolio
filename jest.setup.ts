@@ -13,8 +13,4 @@ jest.mock('react-router-dom', () => {
     };
 });
 
-jest.mock('./src/contexts/ThemeContext', () => ({
-    useTheme: () => ({ theme: 'light', toggleTheme: jest.fn() }),
-}));
-
 global.fetch = (global.fetch as any) || jest.fn(() => Promise.resolve({ text: () => Promise.resolve('# hello') }));

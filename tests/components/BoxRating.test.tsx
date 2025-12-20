@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -6,13 +5,18 @@ jest.useFakeTimers();
 
 const mockCreate = jest.fn();
 jest.mock('../../src/services/api/review/ReviewService', () => ({
+    __esModule: true,
     ReviewService: {
         create: mockCreate,
     },
 }));
 
-const { useTheme } = require('../../src/contexts/ThemeContext');
+jest.mock('../../src/contexts/ThemeContext', () => ({
+    __esModule: true,
+    useTheme: jest.fn(),
+}));
 
+const { useTheme } = require('../../src/contexts/ThemeContext');
 import BoxRating from '../../src/app/components/Rating/BoxRating';
 
 describe('BoxRating component', () => {
@@ -175,7 +179,7 @@ describe('BoxRating component', () => {
             expect(mockCreate).toHaveBeenCalledWith({
                 username: 'Test User',
                 comment: 'Great!',
-                stars: 1, // 1 Star
+                stars: 1,
             });
         });
 

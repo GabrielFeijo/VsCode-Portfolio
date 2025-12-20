@@ -4,7 +4,7 @@ import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { Container } from '@mui/system';
-import { convertFileName } from '../utils/convertFileName';
+import { convertFileName } from '../../utils/convertFileName';
 import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
 
 interface Props {
