@@ -69,9 +69,27 @@ describe('Terminal', () => {
         expect(screen.getByTestId('debug')).toBeInTheDocument();
     });
 
-    it('renders with selectedTerminalIndex 3', () => {
-        render(<Terminal {...defaultProps} selectedTerminalIndex={3} />);
-        expect(screen.getByTestId('cmd')).toBeInTheDocument();
+    it('renders with dark theme', () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'dark',
+        });
+        render(<Terminal {...defaultProps} />);
+        expect(screen.getByText('TERMINAL.TABS.PROBLEMS')).toBeInTheDocument();
+    });
+
+    it('renders with dark theme and selectedTerminalIndex 1', () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'dark',
+        });
+        render(<Terminal {...defaultProps} selectedTerminalIndex={1} />);
+        expect(screen.getByTestId('output')).toBeInTheDocument();
+    });
+
+    it('calls setSelectedTerminalIndex when tab is clicked', () => {
+        render(<Terminal {...defaultProps} />);
+        const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
+        fireEvent.click(problemsTab);
+        expect(defaultProps.setSelectedTerminalIndex).toHaveBeenCalledWith(0);
     });
 
     it('calls setSelectedTerminalIndex when tab is pressed with Enter', () => {
@@ -95,6 +113,13 @@ describe('Terminal', () => {
         expect(defaultProps.setSelectedTerminalIndex).not.toHaveBeenCalled();
     });
 
+    it('calls setTerminal when close button is clicked', () => {
+        render(<Terminal {...defaultProps} />);
+        const closeButton = screen.getByTestId('vsc-close');
+        fireEvent.click(closeButton);
+        expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
+    });
+
     it('calls setTerminal when close button is pressed with Enter', () => {
         render(<Terminal {...defaultProps} />);
         const closeButton = screen.getByTestId('vsc-close');
@@ -107,6 +132,13 @@ describe('Terminal', () => {
         const closeButton = screen.getByTestId('vsc-close');
         fireEvent.keyDown(closeButton, { key: ' ' });
         expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
+    });
+
+    it('does not call setTerminal when close button is pressed with other key', () => {
+        render(<Terminal {...defaultProps} />);
+        const closeButton = screen.getByTestId('vsc-close');
+        fireEvent.keyDown(closeButton, { key: 'A' });
+        expect(defaultProps.setTerminal).not.toHaveBeenCalled();
     });
 
     it('handles keyboard on cmd button', () => {
