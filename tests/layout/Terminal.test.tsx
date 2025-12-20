@@ -147,10 +147,22 @@ describe('Terminal', () => {
         fireEvent.keyDown(cmdButton, { key: 'Enter' });
     });
 
+    it('handles keyboard on cmd button with Space', () => {
+        render(<Terminal {...defaultProps} />);
+        const cmdButton = screen.getByLabelText('Open terminal command');
+        fireEvent.keyDown(cmdButton, { key: ' ' });
+    });
+
     it('handles keyboard on add button', () => {
         render(<Terminal {...defaultProps} />);
         const addButton = screen.getByLabelText('Add new terminal');
         fireEvent.keyDown(addButton, { key: 'Enter' });
+    });
+
+    it('handles keyboard on add button with Space', () => {
+        render(<Terminal {...defaultProps} />);
+        const addButton = screen.getByLabelText('Add new terminal');
+        fireEvent.keyDown(addButton, { key: ' ' });
     });
 
     it('handles keyboard on split button', () => {
@@ -159,15 +171,33 @@ describe('Terminal', () => {
         fireEvent.keyDown(splitButton, { key: 'Enter' });
     });
 
+    it('handles keyboard on split button with Space', () => {
+        render(<Terminal {...defaultProps} />);
+        const splitButton = screen.getByLabelText('Split terminal');
+        fireEvent.keyDown(splitButton, { key: ' ' });
+    });
+
     it('handles keyboard on delete button', () => {
         render(<Terminal {...defaultProps} />);
         const deleteButton = screen.getByLabelText('Delete terminal');
         fireEvent.keyDown(deleteButton, { key: 'Enter' });
     });
 
+    it('handles keyboard on delete button with Space', () => {
+        render(<Terminal {...defaultProps} />);
+        const deleteButton = screen.getByLabelText('Delete terminal');
+        fireEvent.keyDown(deleteButton, { key: ' ' });
+    });
+
     it('handles keyboard on more options button', () => {
         render(<Terminal {...defaultProps} />);
         const moreButton = screen.getByLabelText('More options');
         fireEvent.keyDown(moreButton, { key: 'Enter' });
+    });
+
+    it('handles keyboard on more options button with Space', () => {
+        render(<Terminal {...defaultProps} />);
+        const moreButton = screen.getByLabelText('More options');
+        fireEvent.keyDown(moreButton, { key: ' ' });
     });
 });

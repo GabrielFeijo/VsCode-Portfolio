@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import React from 'react';
 import App, { initVisiblePageIndexes } from '../../src/app/layout/App';
 
@@ -43,14 +44,23 @@ jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedI
     React.useEffect(() => {
         if (!mockCalled) {
             mockCalled = true;
-            if (appTreeMode === 'empty') {
-                setVisiblePageIndexes([]);
-            } else if (appTreeMode === 'delete') {
-                if (setPages) setPages((prev: any) => [...prev, { index: 2, name: 'stored.html', route: 'stored' }]);
-                if (setSelectedIndex) setSelectedIndex(2);
-                setVisiblePageIndexes([0, 1]);
-            } else {
-                setVisiblePageIndexes([1]);
+
+            switch (appTreeMode) {
+                case 'empty':
+                    setVisiblePageIndexes([]);
+                    break;
+                case 'delete':
+                    if (setPages) setPages((prev: any) => [...prev, { index: 2, name: 'stored.html', route: 'stored' }]);
+                    if (setSelectedIndex) setSelectedIndex(2);
+                    setVisiblePageIndexes([0, 1]);
+                    break;
+                case 'delete_min':
+                    if (setPages) setPages((prev: any) => [...prev, { index: 1, name: 'stored.html', route: 'stored' }]);
+                    if (setSelectedIndex) setSelectedIndex(1);
+                    setVisiblePageIndexes([0, 2]);
+                    break;
+                default:
+                    setVisiblePageIndexes([1]);
             }
         }
     }, []);
@@ -241,6 +251,27 @@ describe('App', () => {
         require('react-device-detect').isMobile = originalIsMobile;
     });
 
+    it('does not toggle terminal on Ctrl+J when mobile', () => {
+        const originalIsMobile = require('react-device-detect').isMobile;
+        require('react-device-detect').isMobile = true;
+        render(<App />);
+        expect(screen.queryByTestId('terminal')).not.toBeInTheDocument();
+        fireEvent.keyDown(window, { key: 'j', ctrlKey: true });
+        expect(screen.queryByTestId('terminal')).not.toBeInTheDocument();
+        require('react-device-detect').isMobile = originalIsMobile;
+    });
+
+    it('closes sidebar on overlay click when mobile', () => {
+        const originalIsMobile = require('react-device-detect').isMobile;
+        require('react-device-detect').isMobile = true;
+        render(<App />);
+        const overlay = screen.getByTestId('sidebar-overlay');
+        fireEvent.click(overlay);
+        const sidebar = screen.getByTestId('sidebar');
+        expect(sidebar).toHaveAttribute('data-expanded', 'false');
+        require('react-device-detect').isMobile = originalIsMobile;
+    });
+
     it('handles page removal correctly', async () => {
         const mockNavigate = require('react-router-dom').useNavigate;
         render(<App />);
@@ -264,6 +295,18 @@ describe('App', () => {
         await waitFor(() => {
             const appButtons = screen.getByTestId('app-buttons');
             expect(appButtons).toBeInTheDocument();
+        });
+        mockStorage.getData.mockReturnValue([]);
+        appTreeMode = 'default';
+    });
+
+    it('when deletedIndex < max visible, navigates to min page route', async () => {
+        const mockStorage = require('src/services/storageService').StorageService;
+        mockStorage.getData.mockReturnValue([{ index: 1, name: 'stored.html', route: 'stored' }]);
+        appTreeMode = 'delete_min';
+        render(<App />);
+        await waitFor(() => {
+            expect(navigateMock).toHaveBeenCalledWith('/about-me');
         });
         mockStorage.getData.mockReturnValue([]);
         appTreeMode = 'default';

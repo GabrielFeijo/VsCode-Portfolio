@@ -269,6 +269,7 @@ export default function App() {
 								</AnimatePresence>
 								{isMobile && expanded && (
 									<Box
+										data-testid="sidebar-overlay"
 										sx={{
 											position: 'fixed',
 											top: 0,

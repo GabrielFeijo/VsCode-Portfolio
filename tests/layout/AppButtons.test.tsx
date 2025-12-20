@@ -40,6 +40,7 @@ jest.mock('src/app/components/TabContextMenu/TabContextMenu', () => {
                 <button data-testid="close-to-right" onClick={props.handleCloseToRight} />
                 <button data-testid="close-to-left" onClick={props.handleCloseToLeft} />
                 <button data-testid="close-all" onClick={props.handleCloseAll} />
+                <button data-testid="close-menu" onClick={props.handleClose} />
             </div>
         );
     };
@@ -159,6 +160,14 @@ describe('AppButtons', () => {
         fireEvent.click(closeAllButton);
         expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([]);
         expect(navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('closes context menu', () => {
+        render(<AppButtons {...defaultProps} />);
+        const aboutButton = screen.getByText('About');
+        fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
+        const closeMenuButton = screen.getByTestId('close-menu');
+        fireEvent.click(closeMenuButton);
     });
 
     it('does not call setSelectedIndex when close button is clicked', () => {
