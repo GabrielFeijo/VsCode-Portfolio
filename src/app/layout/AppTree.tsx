@@ -69,9 +69,8 @@ export default function AppTree({
 	function renderTreeItemBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#313341' : '#21222c';
-		} else {
-			return selectedIndex === index ? '#295fbf' : '#f3f3f3';
 		}
+		return selectedIndex === index ? '#295fbf' : '#f3f3f3';
 	}
 
 	function renderTreeItemColor(index: number) {
@@ -79,9 +78,8 @@ export default function AppTree({
 			return selectedIndex === index && currentComponent === 'tree'
 				? '#ffffff'
 				: '#d0d0d0';
-		} else {
-			return selectedIndex === index ? '#e2ffff' : '#2a2a2a';
 		}
+		return selectedIndex === index ? '#e2ffff' : '#2a2a2a';
 	}
 
 	function handleCreateFile(e: React.MouseEvent) {
@@ -90,8 +88,20 @@ export default function AppTree({
 	}
 
 	function handleCancelCreateFile() {
+		resetFileCreationState();
+	}
+
+	function resetFileCreationState() {
 		setIsCreatingFile(false);
 		setNewFileName('');
+	}
+
+	function openFile(page: Page) {
+		if (!visiblePageIndexes.includes(page.index)) {
+			setVisiblePageIndexes((prev) => [...prev, page.index]);
+		}
+		setSelectedIndex(page.index);
+		navigate(page.route);
 	}
 
 	function createNewFile() {
@@ -105,30 +115,28 @@ export default function AppTree({
 		const existingPage = pages.find((x) => x.route === fullFileName);
 
 		if (existingPage) {
-			setVisiblePageIndexes([...visiblePageIndexes, existingPage.index]);
-			setSelectedIndex(existingPage.index);
-			navigate(existingPage.route);
-		} else {
-			const newFile = StorageService.createFile(fullFileName);
-			StorageService.saveOrUpdateData(newFile);
-			const updatedPages = [...pages, newFile];
-			setPages(updatedPages);
-			setVisiblePageIndexes([...visiblePageIndexes, newFile.index]);
-			setSelectedIndex(newFile.index);
-			navigate(newFile.route);
+			openFile(existingPage);
+			resetFileCreationState();
+			return;
 		}
 
-		setIsCreatingFile(false);
-		setNewFileName('');
+		const newFile = StorageService.createFile(fullFileName);
+		StorageService.saveOrUpdateData(newFile);
+		setPages([...pages, newFile]);
+		openFile(newFile);
+		resetFileCreationState();
 	}
 
 	function handleKeyDown(e: React.KeyboardEvent) {
-		if (e.key === 'Enter') {
+		const keyActions: Record<string, () => void> = {
+			Enter: createNewFile,
+			Escape: handleCancelCreateFile,
+		};
+
+		const action = keyActions[e.key];
+		if (action) {
 			e.preventDefault();
-			createNewFile();
-		} else if (e.key === 'Escape') {
-			e.preventDefault();
-			handleCancelCreateFile();
+			action();
 		}
 	}
 

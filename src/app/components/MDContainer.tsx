@@ -137,16 +137,26 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	const [editMode, setEditMode] = useState(false);
 	const { pathname } = useLocation();
 
-	useEffect(() => {
-		if (page && page.hasOwnProperty('content')) {
-			setContent(page?.content || '');
+	const loadContent = async () => {
+		if (page && 'content' in page) {
+			setContent(page.content || '');
 			setEditMode(true);
-		} else {
-			setEditMode(false);
-			fetch(path)
-				.then((res) => res.text())
-				.then((text) => setContent(text));
+			return;
 		}
+
+		setEditMode(false);
+		try {
+			const response = await fetch(path);
+			const text = await response.text();
+			setContent(text);
+		} catch (error) {
+			console.error('Failed to load markdown content:', error);
+			setContent('# Error\n\nFailed to load content.');
+		}
+	};
+
+	useEffect(() => {
+		loadContent();
 	}, [path, page]);
 
 	useEffect(() => {

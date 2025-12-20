@@ -24,8 +24,8 @@ export const StorageService = {
 			(page: Page) => page.index === data.index
 		)
 			? parsedData.map((page: Page) =>
-					page.index === data.index ? data : page
-			  )
+				page.index === data.index ? data : page
+			)
 			: [...parsedData, data];
 
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
@@ -56,9 +56,8 @@ export const StorageService = {
 		const updatedData = data.filter((page) => {
 			if (typeof identifier === 'number') {
 				return page.index !== identifier;
-			} else {
-				return page.name !== identifier;
 			}
+			return page.name !== identifier;
 		});
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},

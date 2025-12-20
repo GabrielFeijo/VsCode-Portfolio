@@ -40,16 +40,14 @@ const Terminal = ({
 	function renderTerminalBgColor(index: number) {
 		if (isDarkMode) {
 			return selectedTerminalIndex === index ? '#ff79c6' : 'transparent';
-		} else {
-			return selectedTerminalIndex === index ? '#000' : 'transparent';
 		}
+		return selectedTerminalIndex === index ? '#000' : 'transparent';
 	}
 	function renderTerminalColor(index: number) {
 		if (isDarkMode) {
 			return selectedTerminalIndex === index ? '#ffffff' : '#b0b8d0';
-		} else {
-			return selectedTerminalIndex === index ? '#000000' : '#2a2a2a';
 		}
+		return selectedTerminalIndex === index ? '#000000' : '#2a2a2a';
 	}
 	const opc = [
 		{

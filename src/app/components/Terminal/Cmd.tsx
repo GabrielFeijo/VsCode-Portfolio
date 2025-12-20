@@ -29,97 +29,125 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 		}[]
 	>([]);
 
-	const verifyCommand = async (e: any) => {
-		if (
-			e.nativeEvent.inputType === 'insertLineBreak' ||
-			(e.nativeEvent.inputType === 'insertText' && e.nativeEvent.data === null)
-		) {
-			if (command.length > 1) {
-				let response: [string] = [''];
-				let color = '';
-				setCommand('');
-
-				switch (command) {
-					case 'reviews':
-					case 'avaliacoes':
-						const responseData = await ReviewService.findAll();
-
-						if (responseData instanceof Error) {
-							console.error(responseData.message);
-						} else {
-							responseData.forEach((rate: IRate) => {
-								const date = dayjs(rate['createdAt']).format(
-									'DD/MM/YYYY HH:mm:ss'
-								);
-
-								response.push(
-									`${date.replace(/,/g, ' ')} - [${rate.username}] ${rate.comment
-									} ${t('terminal.info.feedback')}: ${rate.stars} - 
-									${t(`terminal.rating.${String(rate.stars)}`)}`
-								);
-							});
-
-							saveResult(response, color);
-						}
-
-						break;
-					case 'evaluate':
-					case 'avaliar':
-						setRanking(true);
-						saveResult(response, color);
-						break;
-					case 'changetheme':
-					case 'mudartema':
-						toggleTheme();
-						response.push(t('terminal.info.theme'));
-						saveResult(response, color);
-						break;
-					case 'changelanguage':
-					case 'mudaridioma':
-						changeLanguage();
-						response.push(t('terminal.info.language'));
-						saveResult(response, color);
-						break;
-					case 'clear':
-					case 'limpar':
-						setResults([]);
-						break;
-					default:
-						const cmd = command.substring(0, command.indexOf(' '));
-						switch (cmd) {
-							case 'route':
-							case 'rota':
-								const route = command.replace(`${cmd} `, '');
-								navigate(`/${route}`);
-								saveResult(response, color);
-								break;
-							default:
-								const responseData = await CommandService.getResponse(command);
-
-								if (responseData instanceof Error) {
-									console.error(responseData.message);
-
-									response.push(t('terminal.info.error'));
-									color = '#ed4337';
-								} else {
-									response = responseData.response;
-								}
-								saveResult(response, color);
-						}
-				}
-
-				return;
-			}
-		}
-		setCommand(e.target.value);
-	};
-
-	const saveResult = (response: [string], color: string) => {
+	const saveResult = (response: [string], color: string = '') => {
 		setResults((prevState) => [...prevState, { command, response, color }]);
 	};
 
+	const isEnterKeyPressed = (e: React.ChangeEvent<HTMLTextAreaElement>): boolean => {
+		const inputEvent = e.nativeEvent as InputEvent;
+		return (
+			inputEvent.inputType === 'insertLineBreak' ||
+			(inputEvent.inputType === 'insertText' && inputEvent.data === null)
+		);
+	};
+
+	const formatReviewResponse = (rates: IRate[]): string[] => {
+		return rates.map((rate) => {
+			const date = dayjs(rate.createdAt).format('DD/MM/YYYY HH:mm:ss');
+			return `${date} - [${rate.username}] ${rate.comment} ${t('terminal.info.feedback')}: ${rate.stars} - ${t(`terminal.rating.${String(rate.stars)}`)}`;
+		});
+	};
+
+	const handleReviewsCommand = async (): Promise<void> => {
+		const responseData = await ReviewService.findAll();
+
+		if (responseData instanceof Error) {
+			console.error(responseData.message);
+			return;
+		}
+
+		const response = ['', ...formatReviewResponse(responseData)] as [string];
+		saveResult(response);
+	};
+
+	const handleEvaluateCommand = (): void => {
+		setRanking(true);
+		saveResult(['']);
+	};
+
+	const handleChangeThemeCommand = (): void => {
+		toggleTheme();
+		saveResult([t('terminal.info.theme')]);
+	};
+
+	const handleChangeLanguageCommand = (): void => {
+		changeLanguage();
+		saveResult([t('terminal.info.language')]);
+	};
+
+	const handleClearCommand = (): void => {
+		setResults([]);
+	};
+
+	const handleRouteCommand = (route: string): void => {
+		navigate(`/${route}`);
+		saveResult(['']);
+	};
+
+	const handleDefaultCommand = async (): Promise<void> => {
+		const responseData = await CommandService.getResponse(command);
+
+		if (responseData instanceof Error) {
+			console.error(responseData.message);
+			saveResult([t('terminal.info.error')], '#ed4337');
+			return;
+		}
+
+		saveResult(responseData.response);
+	};
+
+	const executeCommand = async (): Promise<void> => {
+		const lowerCommand = command.toLowerCase();
+
+		const commandMap: Record<string, () => void | Promise<void>> = {
+			'reviews': handleReviewsCommand,
+			'avaliacoes': handleReviewsCommand,
+			'evaluate': handleEvaluateCommand,
+			'avaliar': handleEvaluateCommand,
+			'changetheme': handleChangeThemeCommand,
+			'mudartema': handleChangeThemeCommand,
+			'changelanguage': handleChangeLanguageCommand,
+			'mudaridioma': handleChangeLanguageCommand,
+			'clear': handleClearCommand,
+			'limpar': handleClearCommand,
+		};
+
+		const handler = commandMap[lowerCommand];
+		if (handler) {
+			await handler();
+			return;
+		}
+
+		const spaceIndex = command.indexOf(' ');
+		if (spaceIndex > 0) {
+			const cmd = command.substring(0, spaceIndex).toLowerCase();
+			const arg = command.substring(spaceIndex + 1);
+
+			if (cmd === 'route' || cmd === 'rota') {
+				handleRouteCommand(arg);
+				return;
+			}
+		}
+
+		await handleDefaultCommand();
+	};
+
+	const verifyCommand = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		if (!isEnterKeyPressed(e)) {
+			setCommand(e.target.value);
+			return;
+		}
+
+		if (command.length <= 1) {
+			return;
+		}
+
+		setCommand('');
+		await executeCommand();
+	};
+
 	return (
-		<Box id='teste'>
+		<Box id='cmd-terminal'>
 			<Box>
 				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
 					GG Console [{t('terminal.info.version')} 1.0.0.19045.2728]

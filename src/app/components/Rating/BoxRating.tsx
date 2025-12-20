@@ -30,25 +30,40 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		setReview({ ...review, [e.target.name]: e.target.value });
 	}
 
+	const isFormValid = (): boolean => {
+		return Boolean(review.username.trim() && review.comment.trim() && star !== 0);
+	};
+
+	const showError = (message: string) => {
+		setError(message);
+		setTimeout(() => setError(''), 1500);
+	};
+
+	const resetForm = () => {
+		setReview({ username: '', comment: '' });
+		setStar(0);
+	};
+
 	const sendReview = async () => {
-		if (review.username !== '' && review.comment !== '' && star !== 0) {
-			setRanking(false);
-
-			const response = await ReviewService.create({
-				username: review.username,
-				comment: review.comment,
-				stars: star,
-			});
-
-			if (response instanceof Error) {
-				console.error(response.message);
-			}
-		} else {
-			setError(t('rating.error'));
-			setTimeout(() => {
-				setError('');
-			}, 1500);
+		if (!isFormValid()) {
+			showError(t('rating.error'));
+			return;
 		}
+
+		const response = await ReviewService.create({
+			username: review.username.trim(),
+			comment: review.comment.trim(),
+			stars: star,
+		});
+
+		if (response instanceof Error) {
+			console.error(response.message);
+			showError(t('rating.submitError') || 'Failed to submit review');
+			return;
+		}
+
+		resetForm();
+		setRanking(false);
 	};
 
 	return (

@@ -41,49 +41,43 @@ export default function AppButtons({
 	function renderButtonBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#282A36' : '#21222c';
-		} else {
-			return selectedIndex === index ? '#ffffff' : '#ececec';
 		}
+		return selectedIndex === index ? '#ffffff' : '#ececec';
 	}
 
 	function renderButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		} else {
-			return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 		}
+		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 	}
 
 	function renderCloseButtonBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#282A36' : '#21222c';
-		} else {
-			return selectedIndex === index ? '#ffffff' : '#ececec';
 		}
+		return selectedIndex === index ? '#ffffff' : '#ececec';
 	}
 
 	function renderCloseButtonColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		} else {
-			return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 		}
+		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
 	}
 
 	function renderCloseButtonHoverBgColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex === index ? '#333c43' : '#333c43';
-		} else {
-			return selectedIndex === index ? '#e6e4e5' : '#dadada';
 		}
+		return selectedIndex === index ? '#e6e4e5' : '#dadada';
 	}
 
 	function renderCloseButtonHoverColor(index: number) {
 		if (theme.palette.mode === 'dark') {
 			return selectedIndex !== index ? '#d0d0d0' : '#ffffff';
-		} else {
-			return selectedIndex === index ? '#1a1a1a' : '#1a1a1a';
 		}
+		return selectedIndex === index ? '#1a1a1a' : '#1a1a1a';
 	}
 
 	const handleContextMenu = (event: React.MouseEvent, index: number) => {

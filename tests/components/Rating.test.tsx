@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 const consoleError = console.error;
 beforeAll(() => {
@@ -177,7 +178,7 @@ describe('BoxRating', () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => expect(mockCreate).toHaveBeenCalled());
-        expect(defaultProps.setRanking).toHaveBeenCalledWith(false);
+        expect(defaultProps.setRanking).not.toHaveBeenCalled();
     });
 
     it('applies dark theme class', () => {
