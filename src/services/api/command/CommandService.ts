@@ -1,6 +1,6 @@
 import axios from 'axios';
 import apiFetch from '../axios-config';
-import { MENSAGEM_ERRO_PADRAO } from '../review/ReviewService';
+import { DEFAULT_ERROR_MESSAGE } from '../review/ReviewService';
 
 export interface ICommand {
 	_id: string;
@@ -14,17 +14,15 @@ const getResponse = async (command: string): Promise<ICommand | Error> => {
 	try {
 		const { data } = await apiFetch.get(`/command/${command}`);
 
-		if (data) {
-			return data;
-		}
+		if (data) return data;
 
-		return new Error(MENSAGEM_ERRO_PADRAO);
+		return new Error(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			return new Error(error.message);
-		} else {
-			return new Error(MENSAGEM_ERRO_PADRAO);
 		}
+
+		return new Error(DEFAULT_ERROR_MESSAGE);
 	}
 };
 

@@ -1,22 +1,20 @@
 import axios from 'axios';
 import apiFetch from '../axios-config';
-import { MENSAGEM_ERRO_PADRAO } from '../review/ReviewService';
+import { DEFAULT_ERROR_MESSAGE } from '../review/ReviewService';
 
 const getResponse = async () => {
 	try {
 		const { data } = await apiFetch.get(`/`);
 
-		if (data) {
-			return data;
-		}
+		if (data) return data;
 
-		return new Error(MENSAGEM_ERRO_PADRAO);
+		return new Error(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			return new Error(error.message);
-		} else {
-			return new Error(MENSAGEM_ERRO_PADRAO);
 		}
+
+		return new Error(DEFAULT_ERROR_MESSAGE);
 	}
 };
 

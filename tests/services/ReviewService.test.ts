@@ -69,4 +69,12 @@ describe('ReviewService', () => {
         expect(result).toBeInstanceOf(Error);
         expect((result as Error).message).toBe('bad create');
     });
+
+    it('returns Error when create receives no data', async () => {
+        (apiFetch.post as jest.Mock).mockResolvedValue({ data: null });
+        const mod = await import('../../src/services/api/review/ReviewService');
+        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 });
+        expect(result).toBeInstanceOf(Error);
+        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+    });
 });
