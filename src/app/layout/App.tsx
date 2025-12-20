@@ -107,25 +107,18 @@ export default function App() {
 
 		if (visiblePageIndexes.length === 0) {
 			setSelectedIndex(-1);
-			navigate('/');
-		} else if (
-			deletedIndex === selectedIndex &&
-			deletedIndex > Math.max(...visiblePageIndexes)
-		) {
-			setSelectedIndex(Math.max(...visiblePageIndexes));
-			const page = pages.find(
-				(x) => x.index === Math.max(...visiblePageIndexes)
-			);
-			if (page) navigate('/' + page.route);
-		} else if (
-			deletedIndex === selectedIndex &&
-			deletedIndex < Math.max(...visiblePageIndexes)
-		) {
-			setSelectedIndex(Math.min(...visiblePageIndexes));
-			const page = pages.find(
-				(x) => x.index === Math.min(...visiblePageIndexes)
-			);
-			if (page) navigate('/' + page.route);
+			return navigate('/');
+		}
+
+		if (deletedIndex === selectedIndex) {
+			const maxIndex = Math.max(...visiblePageIndexes);
+			const minIndex = Math.min(...visiblePageIndexes);
+
+			const newIndex = deletedIndex > maxIndex ? maxIndex : minIndex;
+			setSelectedIndex(newIndex);
+
+			const page = pages.find((x) => x.index === newIndex);
+			if (page) navigate(`/${page.route}`);
 		}
 	}, [visiblePageIndexes, navigate, deletedIndex, selectedIndex, pages]);
 
