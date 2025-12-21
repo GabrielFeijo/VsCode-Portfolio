@@ -34,7 +34,7 @@ jest.mock('@mui/material', () => {
         ThemeProvider: ({ children }: any) => <div>{children}</div>,
         CssBaseline: () => <div />,
         Typography: ({ children, ...props }: any) => <div {...filterProps(props)}>{children}</div>,
-        createTheme: jest.fn(() => ({})),
+        createTheme: jest.requireActual('@mui/material').createTheme,
     };
 });
 
@@ -157,6 +157,22 @@ describe('App', () => {
     });
 
     it('renders the app with all components', async () => {
+        render(<App />);
+        expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+        expect(screen.getByTestId('app-tree')).toBeInTheDocument();
+        expect(screen.getByTestId('footer')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByTestId('terminal')).toBeInTheDocument();
+        });
+        expect(screen.getByTestId('box-rating')).toBeInTheDocument();
+        expect(screen.getByTestId('keyboard-shortcuts')).toBeInTheDocument();
+    });
+
+    it('renders the app with dark theme', async () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'dark',
+            toggleTheme: jest.fn(),
+        });
         render(<App />);
         expect(screen.getByTestId('sidebar')).toBeInTheDocument();
         expect(screen.getByTestId('app-tree')).toBeInTheDocument();
