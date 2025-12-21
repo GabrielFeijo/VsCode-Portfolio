@@ -211,10 +211,12 @@ describe('App', () => {
         expect(toggleTheme).toHaveBeenCalled();
     });
 
-    it('changes language on Ctrl+L', () => {
+    it('changes language from pt to en on Ctrl+L', () => {
+        mockI18n.language = 'pt';
         render(<App />);
         fireEvent.keyDown(window, { key: 'l', ctrlKey: true });
-        expect(mockI18n.changeLanguage).toHaveBeenCalledWith('pt');
+        expect(mockI18n.changeLanguage).toHaveBeenCalledWith('en');
+        mockI18n.language = 'en';
     });
 
     it('navigates to home on Ctrl+H', () => {
