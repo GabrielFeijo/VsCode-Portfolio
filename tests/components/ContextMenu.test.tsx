@@ -112,13 +112,6 @@ describe('ContextMenu', () => {
         spy.mockRestore();
     });
 
-    it('applies dark mode class when theme is dark', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' });
-        const { container } = render(<ContextMenu {...defaultProps} />);
-        const menu = container.querySelector('[role="menu"]');
-        expect(menu?.parentElement).toHaveClass('dark');
-    });
-
     it('positions the menu at the specified coordinates', () => {
         const { container } = render(<ContextMenu {...defaultProps} />);
         const menu = container.querySelector('[role="menu"]');

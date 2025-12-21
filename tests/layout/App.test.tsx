@@ -243,6 +243,12 @@ describe('App', () => {
         expect(appButtons).toHaveAttribute('data-pages', '1');
     });
 
+    it('does not load stored pages when none exist', () => {
+        mockStorageService.getData.mockReturnValue([]);
+        render(<App />);
+        // Should not crash, and useEffect should return early
+    });
+
     it('does not show terminal on mobile', () => {
         const originalIsMobile = require('react-device-detect').isMobile;
         require('react-device-detect').isMobile = true;

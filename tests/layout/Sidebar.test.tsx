@@ -302,4 +302,13 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} terminal={false} />);
         expect(screen.getByRole('button', { name: /sidebar\.terminal\.open/i })).toBeInTheDocument();
     });
+
+    it('renders with expanded false and dark theme', () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'dark',
+            toggleTheme: jest.fn(),
+        });
+        render(<Sidebar {...defaultProps} expanded={false} />);
+        expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
+    });
 });

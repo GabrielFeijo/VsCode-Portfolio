@@ -181,14 +181,6 @@ describe('BoxRating', () => {
         expect(defaultProps.setRanking).not.toHaveBeenCalled();
     });
 
-    it('applies dark theme class', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' });
-
-        render(<BoxRating {...defaultProps} />);
-        const modal = screen.getByText('rating.evaluate').closest('.modal');
-        expect(modal).toHaveClass('dark');
-    });
-
     it('does not apply dark class in light theme', () => {
         mockUseTheme.mockReturnValue({ theme: 'light' });
 

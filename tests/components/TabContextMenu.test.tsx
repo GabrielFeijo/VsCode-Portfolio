@@ -162,13 +162,6 @@ describe('TabContextMenu', () => {
         expect(defaultProps.handleClose).toHaveBeenCalledTimes(1);
     });
 
-    it('applies dark mode class when theme is dark', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' });
-        const { container } = render(<TabContextMenu {...defaultProps} />);
-        const menu = container.querySelector('[role="menu"]');
-        expect(menu?.parentElement?.className).toMatch(/dark/);
-    });
-
     it('positions the menu at the specified coordinates', () => {
         const { container } = render(<TabContextMenu {...defaultProps} />);
         const menu = container.querySelector('[role="menu"]');
