@@ -44,7 +44,7 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 	const formatReviewResponse = (rates: IRate[]): string[] => {
 		return rates.map((rate) => {
 			const date = dayjs(rate.createdAt).format('DD/MM/YYYY HH:mm:ss');
-			return `${date} - [${rate.username}] ${rate.comment} ${t('terminal.info.feedback')}: ${rate.stars} - ${t(`terminal.rating.${String(rate.stars)}`)}`;
+			return `${date} - [${rate.username}] ${rate.comment} ${t('terminal.info.feedback')}: ${rate.stars} - ${t(`terminal.rating.${String(rate.stars).replace('.', '_')}`)}`;
 		});
 	};
 
