@@ -6,7 +6,6 @@ import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './BoxRating.module.css';
 import { ReviewService } from '../../../services/api/review/ReviewService';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { fadeInOut } from '../../../utils/motionVariants';
 import { Rating } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
@@ -18,8 +17,6 @@ interface Props {
 
 export default function BoxRating({ ranking, setRanking }: Props) {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
-	const isDarkMode = theme === 'dark';
 	const [error, setError] = useState('');
 	const [star, setStar] = useState<number>(0);
 	const [review, setReview] = useState({ username: '', comment: '' });
@@ -77,7 +74,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 					exit='exit'
 				>
 					<motion.div
-						className={`${styles.modal} ${isDarkMode ? styles.dark : ''}`}
+						className={styles.modal}
 						variants={{
 							initial: { scale: 0.95, opacity: 0 },
 							animate: { scale: 1, opacity: 1 },

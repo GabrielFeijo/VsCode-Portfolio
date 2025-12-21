@@ -20,8 +20,8 @@
 	border: 1px solid #e5e7eb;
 }
 
-.contextMenu.dark {
-	background-color: #1e293b;
+:global(.dark) .contextMenu {
+	background-color: #282a36;
 	border-color: #334155;
 }
 
@@ -46,8 +46,8 @@
 	background-color: #f8fafc;
 }
 
-.contextMenu.dark .menuItem:hover {
-	background-color: #334155;
+:global(.dark) .menuItem:hover {
+	background-color: #313341;
 }
 
 .iconContainer {
@@ -57,7 +57,7 @@
 	color: #475569;
 }
 
-.contextMenu.dark .iconContainer {
+:global(.dark) .iconContainer {
 	color: #e2e8f0;
 }
 
@@ -71,7 +71,7 @@
 	font-size: 14px;
 }
 
-.contextMenu.dark .menuText {
+:global(.dark) .menuText {
 	color: #f8fafc;
 }
 
@@ -80,6 +80,7 @@
 		transform: scale(0.95);
 		opacity: 0;
 	}
+
 	100% {
 		transform: scale(1);
 		opacity: 1;

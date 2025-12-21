@@ -23,8 +23,8 @@
 	border: 1px solid #e5e7eb;
 }
 
-.modal.dark {
-	background-color: #1e293b;
+:global(.dark) .modal {
+	background-color: #282a36;
 	color: #f8fafc;
 	border-color: #334155;
 }
@@ -37,7 +37,7 @@
 	border-bottom: 1px solid #f3f4f6;
 }
 
-.modal.dark .modalHeader {
+:global(.dark) .modalHeader {
 	border-bottom-color: #334155;
 }
 
@@ -66,8 +66,12 @@
 	color: #0f172a;
 }
 
-.modal.dark .closeButton:hover {
-	background-color: #334155;
+:global(.dark) .closeButton {
+	color: #94a3b8;
+}
+
+:global(.dark) .closeButton:hover {
+	background-color: #313341;
 	color: #f8fafc;
 }
 
@@ -87,11 +91,11 @@
 
 .label {
 	font-size: 14px;
-	color: #475569;
+	color: #334155;
 	margin-bottom: 4px;
 }
 
-.modal.dark .label {
+:global(.dark) .label {
 	color: #e2e8f0;
 }
 
@@ -100,7 +104,7 @@
 	padding: 10px 12px;
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
-	background-color: #fff;
+	background-color: #f8fafc;
 	color: #334155;
 	font-size: 14px;
 	transition: border-color 0.2s;
@@ -119,15 +123,15 @@
 	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.modal.dark .input,
-.modal.dark .textarea {
-	background-color: #1e293b;
+:global(.dark) .input,
+:global(.dark) .textarea {
+	background-color: #313341;
 	border-color: #475569;
-	color: #f8fafc;
+	color: #e2e8f0;
 }
 
-.modal.dark .input:focus,
-.modal.dark .textarea:focus {
+:global(.dark) .input:focus,
+:global(.dark) .textarea:focus {
 	border-color: #60a5fa;
 	box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
 }
@@ -136,7 +140,7 @@
 	border-color: #ef4444;
 }
 
-.modal.dark .error {
+:global(.dark) .error {
 	border-color: #f87171;
 }
 
@@ -148,10 +152,12 @@
 	padding: 12px;
 	width: 100%;
 	border-radius: 8px;
+	background-color: #f8fafc;
 	border: 1px solid #e2e8f0;
 }
 
-.modal.dark .ratingContainer {
+:global(.dark) .ratingContainer {
+	background-color: #313341;
 	border-color: #475569;
 }
 
@@ -183,7 +189,7 @@
 	color: #475569;
 }
 
-.modal.dark .ratingText {
+:global(.dark) .ratingText {
 	color: #e2e8f0;
 }
 
@@ -205,14 +211,14 @@
 	color: #ffffff;
 }
 
-.modal.dark .submitButton {
+:global(.dark) .submitButton {
 	color: #60a5fa;
 	border-color: #60a5fa;
 }
 
-.modal.dark .submitButton:hover {
+:global(.dark) .submitButton:hover {
 	background-color: #60a5fa;
-	color: #1e293b;
+	color: #282a36;
 }
 
 .errorMessage {
@@ -225,6 +231,7 @@
 	from {
 		opacity: 0;
 	}
+
 	to {
 		opacity: 1;
 	}

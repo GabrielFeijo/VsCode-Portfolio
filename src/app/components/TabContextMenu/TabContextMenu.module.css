@@ -20,7 +20,7 @@
 	border: 1px solid #e5e7eb;
 }
 
-.contextMenu.dark {
+:global(.dark) .contextMenu {
 	background-color: #282a36;
 	border-color: #334155;
 }
@@ -43,10 +43,10 @@
 }
 
 .menuItem:hover:not(.disabled) {
-	background-color: #deeefd;
+	background-color: #f8fafc;
 }
 
-.contextMenu.dark .menuItem:hover:not(.disabled) {
+:global(.dark) .menuItem:hover:not(.disabled) {
 	background-color: #313341;
 }
 
@@ -62,7 +62,7 @@
 	color: #475569;
 }
 
-.contextMenu.dark .iconContainer {
+:global(.dark) .iconContainer {
 	color: #e2e8f0;
 }
 
@@ -77,7 +77,7 @@
 	font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
 }
 
-.contextMenu.dark .menuText {
+:global(.dark) .menuText {
 	color: #f8fafc;
 }
 
@@ -86,6 +86,7 @@
 		transform: scale(0.95);
 		opacity: 0;
 	}
+
 	100% {
 		transform: scale(1);
 		opacity: 1;

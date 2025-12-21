@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { VscGithub, VscTrash } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ContextMenu.module.css';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { MdOpenInNew } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 
@@ -28,8 +27,6 @@ export default function ContextMenu({
 	handleClose,
 	handleDelete,
 }: Props) {
-	const { theme } = useTheme();
-	const isDarkMode = theme === 'dark';
 	const menuRef = useRef<HTMLDivElement>(null);
 	const { t } = useTranslation();
 
@@ -62,7 +59,7 @@ export default function ContextMenu({
 			>
 				<motion.div
 					ref={menuRef}
-					className={`${styles.contextMenu} ${isDarkMode ? styles.dark : ''}`}
+					className={styles.contextMenu}
 					style={{
 						top: contextMenu.mouseY,
 						left: contextMenu.mouseX,

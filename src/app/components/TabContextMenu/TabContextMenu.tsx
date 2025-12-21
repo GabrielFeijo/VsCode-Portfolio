@@ -3,7 +3,6 @@ import { VscChromeClose, VscCloseAll } from 'react-icons/vsc';
 import { MdChevronRight, MdChevronLeft } from 'react-icons/md';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './TabContextMenu.module.css';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 interface ContextMenuPosition {
@@ -34,8 +33,6 @@ export default function TabContextMenu({
     handleCloseToLeft,
     handleCloseAll,
 }: Props) {
-    const { theme } = useTheme();
-    const isDarkMode = theme === 'dark';
     const menuRef = useRef<HTMLDivElement>(null);
     const { t } = useTranslation();
 
@@ -114,7 +111,7 @@ export default function TabContextMenu({
             >
                 <motion.div
                     ref={menuRef}
-                    className={`${styles.contextMenu} ${isDarkMode ? styles.dark : ''}`}
+                    className={styles.contextMenu}
                     style={{
                         top: contextMenu.mouseY,
                         left: contextMenu.mouseX,
