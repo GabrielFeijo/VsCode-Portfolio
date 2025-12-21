@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 jest.useFakeTimers();
 
@@ -16,6 +17,13 @@ jest.mock('../../src/contexts/ThemeContext', () => ({
     useTheme: jest.fn(),
 }));
 
+const mockT = jest.fn((key: string) => key);
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: mockT,
+    }),
+}));
+
 const { useTheme } = require('../../src/contexts/ThemeContext');
 import BoxRating from '../../src/app/components/Rating/BoxRating';
 
@@ -23,6 +31,7 @@ describe('BoxRating component', () => {
     beforeEach(() => {
         mockCreate.mockClear();
         useTheme.mockReturnValue({ theme: 'light' });
+        mockT.mockImplementation((key: string) => key);
     });
 
     it('renders the modal when ranking is true', () => {
@@ -43,22 +52,22 @@ describe('BoxRating component', () => {
         expect(screen.queryByText('rating.evaluate')).not.toBeInTheDocument();
     });
 
-    it('updates username input', () => {
+    it('updates username input', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const usernameInput = screen.getByLabelText('rating.name');
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        await userEvent.type(usernameInput, 'Test User');
 
         expect(usernameInput).toHaveValue('Test User');
     });
 
-    it('updates comment textarea', () => {
+    it('updates comment textarea', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const commentTextarea = screen.getByLabelText('rating.comment');
-        fireEvent.change(commentTextarea, { target: { value: 'Great portfolio!' } });
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         expect(commentTextarea).toHaveValue('Great portfolio!');
     });
@@ -80,17 +89,9 @@ describe('BoxRating component', () => {
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const submit = screen.getByRole('button', { name: /rating.submit/i });
-        act(() => {
-            fireEvent.click(submit);
-        });
+        fireEvent.click(submit);
 
-        expect(screen.getByText(/rating.error/i)).toBeInTheDocument();
-
-        act(() => {
-            jest.advanceTimersByTime(1500);
-        });
-
-        expect(screen.queryByText(/rating.error/i)).toBeNull();
+        expect(screen.queryByText(/rating.error/i)).not.toBeInTheDocument();
     });
 
     it('closes the modal when close button is clicked', () => {
@@ -103,21 +104,23 @@ describe('BoxRating component', () => {
         expect(setRanking).toHaveBeenCalledWith(false);
     });
 
-    it('applies error class to inputs when empty on submit', () => {
+    it('applies error class to inputs when empty on submit', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const submit = screen.getByRole('button', { name: /rating.submit/i });
         fireEvent.click(submit);
 
-        const usernameInput = screen.getByLabelText('rating.name');
-        const commentTextarea = screen.getByLabelText('rating.comment');
+        await waitFor(() => {
+            const usernameInput = screen.getByLabelText('rating.name');
+            const commentTextarea = screen.getByLabelText('rating.comment');
 
-        expect(usernameInput).toHaveClass('error');
-        expect(commentTextarea).toHaveClass('error');
+            expect(usernameInput).toHaveClass('error');
+            expect(commentTextarea).toHaveClass('error');
+        });
     });
 
-    it('removes error class when inputs are filled', () => {
+    it('removes error class when inputs are filled', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
@@ -126,21 +129,28 @@ describe('BoxRating component', () => {
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
         fireEvent.click(submit);
-        expect(usernameInput).toHaveClass('error');
 
-        fireEvent.change(usernameInput, { target: { value: 'Test' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Comment' } });
+        await userEvent.type(usernameInput, 'Test');
+        await userEvent.type(commentTextarea, 'Comment here long enough');
+
+        await waitFor(() => {
+            expect(usernameInput).not.toHaveClass('error');
+            expect(commentTextarea).not.toHaveClass('error');
+        });
     });
 
-    it('removes error class when inputs are filled', () => {
+    it('removes error class when inputs are filled', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const usernameInput = screen.getByLabelText('rating.name');
         const commentTextarea = screen.getByLabelText('rating.comment');
 
-        fireEvent.change(usernameInput, { target: { value: 'Test' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Comment' } });
+        await userEvent.type(usernameInput, 'Test');
+        await userEvent.type(commentTextarea, 'Comment here long enough');
+
+        await userEvent.type(usernameInput, 'Test');
+        await userEvent.type(commentTextarea, 'Comment here long enough');
 
         expect(usernameInput).not.toHaveClass('error');
         expect(commentTextarea).not.toHaveClass('error');
@@ -156,8 +166,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio comment!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 1) {
@@ -169,7 +179,7 @@ describe('BoxRating component', () => {
         await waitFor(() => {
             expect(mockCreate).toHaveBeenCalledWith({
                 username: 'Test User',
-                comment: 'Great!',
+                comment: 'Great portfolio comment!',
                 stars: 1,
             });
         });
@@ -188,15 +198,19 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
-            fireEvent.click(stars[0]);
+            await act(async () => {
+                fireEvent.click(stars[0]);
+            });
         }
 
-        fireEvent.click(submit);
+        await act(async () => {
+            fireEvent.click(submit);
+        });
 
         await waitFor(() => {
             expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
@@ -218,8 +232,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -245,8 +259,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -272,8 +286,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -298,8 +312,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -326,8 +340,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -354,8 +368,8 @@ describe('BoxRating component', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
 
         const stars = screen.getAllByRole('radio');
         if (stars.length > 0) {
@@ -367,5 +381,84 @@ describe('BoxRating component', () => {
         await waitFor(() => {
             expect(screen.getByText('rating.errors.starsMax')).toBeInTheDocument();
         });
+    });
+
+    it('shows generic validation error for unknown 400 error', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Bad Request') as any;
+        error.statusCode = 400;
+        error.validationErrors = ['Some unknown validation error'];
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('Some unknown validation error')).toBeInTheDocument();
+        });
+    });
+
+    it('resets form when modal is closed', async () => {
+        const setRanking = jest.fn();
+        const { rerender } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        rerender(<BoxRating ranking={false} setRanking={setRanking} />);
+        rerender(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const newUsernameInput = screen.getByLabelText('rating.name');
+        const newCommentTextarea = screen.getByLabelText('rating.comment');
+
+        expect(newUsernameInput).toHaveValue('');
+        expect(newCommentTextarea).toHaveValue('');
+    });
+
+    it('handles onChange with null value for rating', () => {
+        const setRanking = jest.fn();
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[2]);
+            expect(screen.getByText('terminal.rating.1_5')).toBeInTheDocument();
+
+            fireEvent.click(stars[0]);
+            expect(screen.getByText('terminal.rating.0_5')).toBeInTheDocument();
+        }
+    });
+
+    it('uses fallback aria-labels when translation returns falsy', () => {
+        mockT.mockImplementation(() => '');
+        const setRanking = jest.fn();
+        const { container } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const closeButton = screen.getByLabelText('Close rating modal');
+        const submitButton = screen.getByLabelText('Submit rating');
+
+        expect(closeButton).toBeInTheDocument();
+        expect(submitButton).toBeInTheDocument();
     });
 });

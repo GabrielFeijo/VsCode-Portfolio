@@ -58,6 +58,7 @@ jest.mock('../../src/app/components/Rating/BoxRating.module.css', () => ({
     ratingContainer: 'ratingContainer',
     submitButton: 'submitButton',
     errorMessage: 'errorMessage',
+    errorSpan: 'errorSpan',
 }));
 
 const mockT = jest.fn();
@@ -129,14 +130,12 @@ describe('BoxRating', () => {
     it('shows error when submitting with incomplete data', async () => {
         render(<BoxRating {...defaultProps} />);
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
-        fireEvent.click(submitButton);
-
-        expect(screen.getByText('rating.error')).toBeInTheDocument();
-
         act(() => {
-            jest.advanceTimersByTime(1500);
+            fireEvent.click(submitButton);
         });
-        await waitFor(() => expect(screen.queryByText('rating.error')).not.toBeInTheDocument());
+        expect(await screen.findByText('rating.errors.usernameMin')).toBeInTheDocument();
+        expect(screen.getByText('rating.errors.commentMin')).toBeInTheDocument();
+        expect(screen.getByText('rating.error')).toBeInTheDocument();
     });
 
     it('submits review successfully', async () => {
@@ -150,13 +149,13 @@ describe('BoxRating', () => {
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
         fireEvent.change(usernameInput, { target: { value: 'John' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        fireEvent.change(commentTextarea, { target: { value: 'This is a great comment that meets the minimum length requirement!' } });
         fireEvent.click(rateButton);
         fireEvent.click(submitButton);
 
         await waitFor(() => expect(mockCreate).toHaveBeenCalledWith({
             username: 'John',
-            comment: 'Great!',
+            comment: 'This is a great comment that meets the minimum length requirement!',
             stars: 5,
         }));
         expect(defaultProps.setRanking).toHaveBeenCalledWith(false);
@@ -173,12 +172,18 @@ describe('BoxRating', () => {
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
         fireEvent.change(usernameInput, { target: { value: 'John' } });
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+        fireEvent.change(commentTextarea, { target: { value: 'This is a great comment that meets the minimum length requirement!' } });
         fireEvent.click(rateButton);
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
-        await waitFor(() => expect(mockCreate).toHaveBeenCalled());
-        expect(defaultProps.setRanking).not.toHaveBeenCalled();
+        expect(await screen.findByText('rating.errors.unknownError')).toBeInTheDocument();
+
+        act(() => {
+            jest.advanceTimersByTime(1500);
+        });
+        await waitFor(() => expect(screen.queryByText('rating.errors.unknownError')).not.toBeInTheDocument());
     });
 
     it('does not apply dark class in light theme', () => {
@@ -190,19 +195,26 @@ describe('BoxRating', () => {
     });
 
     it('clears error message after timeout', async () => {
+        const mockCreate = require('../../src/services/api/review/ReviewService').ReviewService.create;
+        mockCreate.mockResolvedValue(new Error('Failed'));
+
         render(<BoxRating {...defaultProps} />);
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const rateButton = screen.getByText('Rate 5');
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
+        fireEvent.change(usernameInput, { target: { value: 'John' } });
+        fireEvent.change(commentTextarea, { target: { value: 'This is a great comment that meets the minimum length requirement!' } });
+        fireEvent.click(rateButton);
         fireEvent.click(submitButton);
-        expect(screen.getByText('rating.error')).toBeInTheDocument();
+
+        expect(await screen.findByText('rating.errors.unknownError')).toBeInTheDocument();
 
         act(() => {
             jest.advanceTimersByTime(1500);
         });
-
-        await waitFor(() => {
-            expect(screen.queryByText('rating.error')).not.toBeInTheDocument();
-        });
+        await waitFor(() => expect(screen.queryByText('rating.errors.unknownError')).not.toBeInTheDocument());
     });
 
     it('handles all input fields separately', () => {
@@ -225,8 +237,11 @@ describe('BoxRating', () => {
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
         fireEvent.change(usernameInput, { target: { value: 'John' } });
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
+        expect(await screen.findByText('rating.errors.commentMin')).toBeInTheDocument();
         expect(screen.getByText('rating.error')).toBeInTheDocument();
     });
 
@@ -236,9 +251,12 @@ describe('BoxRating', () => {
         const commentTextarea = screen.getByLabelText('rating.comment');
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
-        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
-        fireEvent.click(submitButton);
+        fireEvent.change(commentTextarea, { target: { value: 'This is a great comment that meets the minimum length requirement!' } });
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
+        expect(await screen.findByText('rating.errors.usernameMin')).toBeInTheDocument();
         expect(screen.getByText('rating.error')).toBeInTheDocument();
     });
 
@@ -249,9 +267,12 @@ describe('BoxRating', () => {
         const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
 
         fireEvent.click(rateButton);
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
-        expect(screen.getByText('rating.error')).toBeInTheDocument();
+        expect(await screen.findByText('rating.errors.usernameMin')).toBeInTheDocument();
+        expect(screen.getByText('rating.errors.commentMin')).toBeInTheDocument();
     });
 
     it('renders all required form elements', () => {

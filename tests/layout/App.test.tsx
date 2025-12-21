@@ -264,7 +264,6 @@ describe('App', () => {
     it('does not load stored pages when none exist', () => {
         mockStorageService.getData.mockReturnValue([]);
         render(<App />);
-        // Should not crash, and useEffect should return early
     });
 
     it('does not show terminal on mobile', () => {

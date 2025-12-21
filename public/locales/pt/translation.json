@@ -60,7 +60,9 @@
     "rating": {
         "evaluate": "Avalie este portfólio",
         "name": "Seu nome",
+        "namePlaceholder": "Digite seu nome",
         "comment": "Seu comentário",
+        "commentPlaceholder": "Digite seu comentário",
         "submit": "Enviar avaliação",
         "error": "Preencha todas as informações",
         "success": "Avaliação enviada com sucesso!",

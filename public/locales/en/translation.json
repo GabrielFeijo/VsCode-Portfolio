@@ -60,7 +60,9 @@
     "rating": {
         "evaluate": "Evaluate this portfolio",
         "name": "Your name",
+        "namePlaceholder": "Enter your name",
         "comment": "Your comment",
+        "commentPlaceholder": "Enter your comment",
         "submit": "Send review",
         "error": "Please fill in all the information",
         "success": "Review submitted successfully!",

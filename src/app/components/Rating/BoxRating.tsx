@@ -1,9 +1,10 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getReviewSchema } from './schemas/BoxRatingSchema';
 import styles from './BoxRating.module.css';
 import { ApiError, ReviewService } from '../../../services/api/review/ReviewService';
 import { fadeInOut } from '../../../utils/motionVariants';
@@ -15,30 +16,40 @@ interface Props {
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface ReviewFormData {
+	username: string;
+	comment: string;
+	stars: number;
+}
+
 export default function BoxRating({ ranking, setRanking }: Props) {
 	const { t } = useTranslation();
+
+	const reviewSchema = getReviewSchema(t);
+
 	const [error, setError] = useState('');
-	const [star, setStar] = useState<number>(0);
-	const [review, setReview] = useState({ username: '', comment: '' });
+	const {
+		register,
+		handleSubmit,
+		control,
+		watch,
+		reset,
+		formState: { errors },
+	} = useForm<ReviewFormData>({
+		resolver: zodResolver(reviewSchema),
+		defaultValues: {
+			username: '',
+			comment: '',
+			stars: 0,
+		},
+		mode: 'onBlur',
+	});
 
-	function handleChange(e: {
-		target: { name: string; value: string | number };
-	}) {
-		setReview({ ...review, [e.target.name]: e.target.value });
-	}
-
-	const isFormValid = (): boolean => {
-		return Boolean(review.username.trim() && review.comment.trim() && star !== 0);
-	};
+	const stars = watch('stars');
 
 	const showError = (message: string) => {
 		setError(message);
 		setTimeout(() => setError(''), 1500);
-	};
-
-	const resetForm = () => {
-		setReview({ username: '', comment: '' });
-		setStar(0);
 	};
 
 	const getErrorMessage = (error: ApiError): string => {
@@ -75,16 +86,11 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		return t('rating.errors.unknownError');
 	};
 
-	const sendReview = async () => {
-		if (!isFormValid()) {
-			showError(t('rating.error'));
-			return;
-		}
-
+	const onSubmit = async (data: ReviewFormData) => {
 		const response = await ReviewService.create({
-			username: review.username.trim(),
-			comment: review.comment.trim(),
-			stars: star,
+			username: data.username.trim(),
+			comment: data.comment.trim(),
+			stars: data.stars,
 		});
 
 		if (response instanceof Error) {
@@ -93,9 +99,16 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 			return;
 		}
 
-		resetForm();
+		reset();
 		setRanking(false);
 	};
+
+	useEffect(() => {
+		if (!ranking) {
+			reset();
+			setError('');
+		}
+	}, [ranking, reset]);
 
 	return (
 		<AnimatePresence>
@@ -129,94 +142,100 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 						</div>
 
 						<div className={styles.modalContent}>
-							<div className={styles.formField}>
-								<label
-									htmlFor='username'
-									className={styles.label}
-								>
-									{t('rating.name')}
-								</label>
-								<input
-									id='username'
-									type='text'
-									name='username'
-									className={`${styles.input} ${review.username ? '' : styles.error
-										}`}
-									onChange={handleChange}
-									value={review.username}
-									autoComplete='off'
-								/>
-							</div>
-
-							<div className={styles.formField}>
-								<label
-									htmlFor='comment'
-									className={styles.label}
-								>
-									{t('rating.comment')}
-								</label>
-								<textarea
-									id='comment'
-									name='comment'
-									className={`${styles.textarea} ${review.comment ? '' : styles.error
-										}`}
-									onChange={handleChange}
-									value={review.comment}
-									rows={3}
-								/>
-							</div>
-
-							<div className={styles.ratingContainer}>
-								<Rating
-									name='star'
-									value={star}
-									precision={0.5}
-									onChange={(event, newValue) => {
-										if (newValue) {
-											setStar(newValue);
-										}
-									}}
-									icon={
-										<Star
-											fontSize='inherit'
-											sx={{
-												transition: 'transform 0.2s, filter 0.2s',
-											}}
-										/>
-									}
-									emptyIcon={
-										<StarBorder
-											fontSize='inherit'
-											sx={{
-												color: '#ccc',
-												transition: 'color 0.2s',
-											}}
-										/>
-									}
-								/>
-								<div className={styles.ratingText}>
-									{star > 0 &&
-										t(`terminal.rating.${String(star).replace('.', '_')}`)}
+							<form onSubmit={handleSubmit(onSubmit)}>
+								<div className={styles.formField}>
+									<label
+										htmlFor='username'
+										className={styles.label}
+									>
+										{t('rating.name')}
+									</label>
+									<input
+										id='username'
+										type='text'
+										{...register('username')}
+										className={`${styles.input} ${errors.username ? styles.error : ''}`}
+										autoComplete='off'
+										placeholder={t('rating.namePlaceholder')}
+									/>
+									{errors.username && <span className={styles.errorSpan}>{errors.username.message}</span>}
 								</div>
-							</div>
 
-							<button
-								className={styles.submitButton}
-								onClick={sendReview}
-								aria-label={t('rating.submit') || 'Submit rating'}
-							>
-								{t('rating.submit')}
-							</button>
+								<div className={styles.formField}>
+									<label
+										htmlFor='comment'
+										className={styles.label}
+									>
+										{t('rating.comment')}
+									</label>
+									<textarea
+										id='comment'
+										{...register('comment')}
+										className={`${styles.textarea} ${errors.comment ? styles.error : ''}`}
+										rows={3}
+										autoComplete='off'
+										placeholder={t('rating.commentPlaceholder')}
+									/>
+									{errors.comment && <span className={styles.errorSpan}>{errors.comment.message}</span>}
+								</div>
 
-							{error.length > 0 && (
-								<motion.div
-									className={styles.errorMessage}
-									initial={{ opacity: 0, y: -10 }}
-									animate={{ opacity: 1, y: 0 }}
+								<div className={styles.ratingContainer}>
+									<Controller
+										name='stars'
+										control={control}
+										render={({ field }) => (
+											<Rating
+												{...field}
+												value={field.value}
+												precision={0.5}
+												onChange={(_, newValue) => {
+													field.onChange(newValue || 0);
+												}}
+												icon={
+													<Star
+														fontSize='inherit'
+														sx={{
+															transition: 'transform 0.2s, filter 0.2s',
+														}}
+													/>
+												}
+												emptyIcon={
+													<StarBorder
+														fontSize='inherit'
+														sx={{
+															color: '#ccc',
+															transition: 'color 0.2s',
+														}}
+													/>
+												}
+											/>
+										)}
+									/>
+									<div className={styles.ratingText}>
+										{stars > 0 &&
+											t(`terminal.rating.${String(stars).replace('.', '_')}`)}
+									</div>
+									{errors.stars && <span className={styles.errorSpan}>{errors.stars.message}</span>}
+								</div>
+
+								<button
+									type='submit'
+									className={styles.submitButton}
+									aria-label={t('rating.submit') || 'Submit rating'}
 								>
-									{error}
-								</motion.div>
-							)}
+									{t('rating.submit')}
+								</button>
+
+								{error.length > 0 && (
+									<motion.div
+										className={styles.errorMessage}
+										initial={{ opacity: 0, y: -10 }}
+										animate={{ opacity: 1, y: 0 }}
+									>
+										{error}
+									</motion.div>
+								)}
+							</form>
 						</div>
 					</motion.div>
 				</motion.div>

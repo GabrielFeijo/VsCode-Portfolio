@@ -75,7 +75,7 @@
 	color: #f8fafc;
 }
 
-.modalContent {
+.modalContent form {
 	padding: 16px 20px;
 	display: flex;
 	flex-direction: column;
@@ -112,7 +112,7 @@
 }
 
 .textarea {
-	resize: vertical;
+	resize: none;
 	min-height: 80px;
 }
 
@@ -225,6 +225,16 @@
 	color: #ef4444;
 	font-size: 14px;
 	text-align: center;
+}
+
+.errorSpan {
+	color: #ef4444;
+	font-size: 12px;
+	margin-top: 4px;
+}
+
+:global(.dark) .errorSpan {
+	color: #f87171;
 }
 
 @keyframes fadeIn {
