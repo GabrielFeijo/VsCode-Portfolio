@@ -77,4 +77,60 @@ describe('ReviewService', () => {
         expect(result).toBeInstanceOf(Error);
         expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
     });
+
+    it('returns ApiError with statusCode 400 and validationErrors for bad request', async () => {
+        const err = {
+            isAxiosError: true,
+            message: 'Bad Request',
+            response: {
+                status: 400,
+                data: {
+                    message: ['Username must be at least 2 characters', 'Comment must be at least 10 characters'],
+                    error: 'Bad Request',
+                    statusCode: 400,
+                },
+            },
+        };
+        (apiFetch.post as jest.Mock).mockRejectedValue(err);
+        const mod = await import('../../src/services/api/review/ReviewService');
+        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as mod.ApiError;
+        expect(result).toBeInstanceOf(Error);
+        expect(result.statusCode).toBe(400);
+        expect(result.validationErrors).toEqual(['Username must be at least 2 characters', 'Comment must be at least 10 characters']);
+    });
+
+    it('returns ApiError with statusCode 429 for too many requests', async () => {
+        const err = {
+            isAxiosError: true,
+            message: 'Too Many Requests',
+            response: {
+                status: 429,
+                data: {},
+            },
+        };
+        (apiFetch.post as jest.Mock).mockRejectedValue(err);
+        const mod = await import('../../src/services/api/review/ReviewService');
+        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as mod.ApiError;
+        expect(result).toBeInstanceOf(Error);
+        expect(result.statusCode).toBe(429);
+    });
+
+    it('handles single validation error message', async () => {
+        const err = {
+            isAxiosError: true,
+            message: 'Bad Request',
+            response: {
+                status: 400,
+                data: {
+                    message: 'Stars must not exceed 5',
+                },
+            },
+        };
+        (apiFetch.post as jest.Mock).mockRejectedValue(err);
+        const mod = await import('../../src/services/api/review/ReviewService');
+        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 6 }) as mod.ApiError;
+        expect(result).toBeInstanceOf(Error);
+        expect(result.statusCode).toBe(400);
+        expect(result.validationErrors).toEqual(['Stars must not exceed 5']);
+    });
 });

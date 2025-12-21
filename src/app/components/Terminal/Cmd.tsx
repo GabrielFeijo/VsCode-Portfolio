@@ -158,17 +158,17 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 			</Box>
 			<Box sx={{ wordBreak: 'break-word', mt: 1 }}>
 				{results.length > 0 ? (
-					results.map((resultado: any, index: number) => (
+					results.map((result, index) => (
 						<Box key={index}>
 							<Typography>
 								D:\GG\Desktop\workspace\React\react-vscode{'>'}{' '}
-								{resultado.command}
+								{result.command}
 							</Typography>
 							<Box
-								style={resultado.color !== '' ? { color: resultado.color } : {}}
+								style={result.color !== '' ? { color: result.color } : {}}
 							>
-								{resultado.response.length > 0 &&
-									resultado.response.map((res: [string], index: number) => (
+								{result.response.length > 0 &&
+									result.response.map((res, index) => (
 										<Typography key={index}>{res}</Typography>
 									))}
 								<br />

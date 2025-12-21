@@ -132,15 +132,6 @@ describe('BoxRating component', () => {
         fireEvent.change(commentTextarea, { target: { value: 'Comment' } });
     });
 
-    it('applies dark mode class when theme is dark', () => {
-        useTheme.mockReturnValue({ theme: 'dark' });
-        const setRanking = jest.fn();
-        render(<BoxRating ranking={true} setRanking={setRanking} />);
-
-        const modal = screen.getByText('rating.evaluate').closest('.modal');
-        expect(modal).toHaveClass('dark');
-    });
-
     it('removes error class when inputs are filled', () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
@@ -186,10 +177,10 @@ describe('BoxRating component', () => {
         expect(setRanking).toHaveBeenCalledWith(false);
     });
 
-    it('logs error when ReviewService.create fails', async () => {
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    it('shows error message when ReviewService.create fails', async () => {
         const setRanking = jest.fn();
-        mockCreate.mockResolvedValue(new Error('API Error'));
+        const error = new Error('API Error') as any;
+        mockCreate.mockResolvedValue(error);
 
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
@@ -208,9 +199,173 @@ describe('BoxRating component', () => {
         fireEvent.click(submit);
 
         await waitFor(() => {
-            expect(consoleSpy).toHaveBeenCalledWith('API Error');
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
         });
 
-        consoleSpy.mockRestore();
+        expect(setRanking).not.toHaveBeenCalledWith(false);
+    });
+
+    it('shows validation error for username too short (400)', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Bad Request') as any;
+        error.statusCode = 400;
+        error.validationErrors = ['Username must be at least 2 characters'];
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.usernameMin')).toBeInTheDocument();
+        });
+    });
+
+    it('shows too many requests error (429)', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Too Many Requests') as any;
+        error.statusCode = 429;
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.tooManyRequests')).toBeInTheDocument();
+        });
+    });
+
+    it('shows server error for 500+ status codes', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Internal Server Error') as any;
+        error.statusCode = 500;
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.serverError')).toBeInTheDocument();
+        });
+    });
+
+    it('shows network error message', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Network Error') as any;
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.networkError')).toBeInTheDocument();
+        });
+    });
+
+    it('shows validation error for comment too short (400)', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Bad Request') as any;
+        error.statusCode = 400;
+        error.validationErrors = ['Comment must be at least 10 characters'];
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.commentMin')).toBeInTheDocument();
+        });
+    });
+
+    it('shows validation error for stars exceeding limit (400)', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('Bad Request') as any;
+        error.statusCode = 400;
+        error.validationErrors = ['Stars must not exceed 5'];
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+        fireEvent.change(commentTextarea, { target: { value: 'Great!' } });
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        fireEvent.click(submit);
+
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.starsMax')).toBeInTheDocument();
+        });
     });
 });

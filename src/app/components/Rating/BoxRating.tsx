@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './BoxRating.module.css';
-import { ReviewService } from '../../../services/api/review/ReviewService';
+import { ApiError, ReviewService } from '../../../services/api/review/ReviewService';
 import { fadeInOut } from '../../../utils/motionVariants';
 import { Rating } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
@@ -41,6 +41,40 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		setStar(0);
 	};
 
+	const getErrorMessage = (error: ApiError): string => {
+		const statusCode = error.statusCode;
+
+		if (statusCode === 400 && error.validationErrors) {
+			const validationError = error.validationErrors[0];
+
+			if (validationError.includes('Username must be at least')) {
+				return t('rating.errors.usernameMin');
+			}
+			if (validationError.includes('Comment must be at least')) {
+				return t('rating.errors.commentMin');
+			}
+			if (validationError.includes('Stars must not exceed')) {
+				return t('rating.errors.starsMax');
+			}
+
+			return validationError;
+		}
+
+		if (statusCode === 429) {
+			return t('rating.errors.tooManyRequests');
+		}
+
+		if (statusCode && statusCode >= 500) {
+			return t('rating.errors.serverError');
+		}
+
+		if (error.message.toLowerCase().includes('network')) {
+			return t('rating.errors.networkError');
+		}
+
+		return t('rating.errors.unknownError');
+	};
+
 	const sendReview = async () => {
 		if (!isFormValid()) {
 			showError(t('rating.error'));
@@ -54,8 +88,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		});
 
 		if (response instanceof Error) {
-			console.error(response.message);
-			showError(t('rating.submitError') || 'Failed to submit review');
+			const errorMessage = getErrorMessage(response);
+			showError(errorMessage);
 			return;
 		}
 

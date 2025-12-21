@@ -62,7 +62,17 @@
         "name": "Your name",
         "comment": "Your comment",
         "submit": "Send review",
-        "error": "Please fill in all the information"
+        "error": "Please fill in all the information",
+        "success": "Review submitted successfully!",
+        "errors": {
+            "usernameMin": "Username must be at least 2 characters",
+            "commentMin": "Comment must be at least 10 characters",
+            "starsMax": "Stars must not exceed 5",
+            "tooManyRequests": "Too many requests. Please try again later",
+            "serverError": "An internal server error occurred. Please try again",
+            "networkError": "Network error. Check your connection and try again",
+            "unknownError": "An unexpected error occurred. Please try again"
+        }
     },
     "pages": {
         "home": "Home",

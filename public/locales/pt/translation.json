@@ -62,7 +62,17 @@
         "name": "Seu nome",
         "comment": "Seu comentário",
         "submit": "Enviar avaliação",
-        "error": "Preencha todas as informações"
+        "error": "Preencha todas as informações",
+        "success": "Avaliação enviada com sucesso!",
+        "errors": {
+            "usernameMin": "O nome deve ter pelo menos 2 caracteres",
+            "commentMin": "O comentário deve ter pelo menos 10 caracteres",
+            "starsMax": "A avaliação não pode exceder 5 estrelas",
+            "tooManyRequests": "Muitas requisições. Tente novamente mais tarde",
+            "serverError": "Ocorreu um erro interno no servidor. Tente novamente",
+            "networkError": "Erro de conexão. Verifique sua internet e tente novamente",
+            "unknownError": "Ocorreu um erro inesperado. Tente novamente"
+        }
     },
     "pages": {
         "home": "Início",
