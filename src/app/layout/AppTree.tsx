@@ -1,8 +1,5 @@
 import * as React from 'react';
-import TreeView from '@mui/lab/TreeView';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem from '@mui/lab/TreeItem';
+import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
@@ -214,15 +211,19 @@ export default function AppTree({
 
 	return (
 		<>
-			<TreeView
+			<SimpleTreeView
 				aria-label='file system navigator'
-				defaultCollapseIcon={<ExpandMoreIcon />}
-				defaultExpandIcon={<ChevronRightIcon />}
-				sx={{ minWidth: 220 }}
-				defaultExpanded={['-1']}
+				sx={{
+					minWidth: 220,
+					'& .MuiTreeItem-content': {
+						paddingTop: 0,
+						paddingBottom: 0,
+					},
+				}}
+				defaultExpandedItems={['-1']}
 			>
 				<TreeItem
-					nodeId='-1'
+					itemId='-1'
 					label={
 						<Box
 							sx={{
@@ -268,7 +269,7 @@ export default function AppTree({
 						<TreeItem
 							key={index}
 							onContextMenu={(event) => handleContextMenu(event, index)}
-							nodeId={index.toString()}
+							itemId={index.toString()}
 							label={
 								<Box
 									sx={{
@@ -308,7 +309,7 @@ export default function AppTree({
 									backgroundColor: renderTreeItemBgColor(index),
 								},
 							}}
-							icon={<VscMarkdown color='#6997d5' />}
+							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
 							onClick={() => {
 								if (!visiblePageIndexes.includes(index)) {
 									const newIndexes = [...visiblePageIndexes, index];
@@ -323,8 +324,8 @@ export default function AppTree({
 
 					{isCreatingFile && (
 						<TreeItem
-							nodeId='-2'
-							icon={<VscMarkdown color='#6997d5' />}
+							itemId='-2'
+							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
 							label={
 								<Box
 									sx={{
@@ -370,7 +371,7 @@ export default function AppTree({
 						/>
 					)}
 				</TreeItem>
-			</TreeView>
+			</SimpleTreeView>
 
 			<ContextMenu
 				contextMenu={contextMenu}
