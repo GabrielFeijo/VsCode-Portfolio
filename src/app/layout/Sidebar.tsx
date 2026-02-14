@@ -154,8 +154,9 @@ export default function Sidebar({
 			</Box>
 
 			<Box
-				sx={{ flexGrow: 0, pb: 0.5 }}
+				sx={{ flexGrow: 0, pb: 1 }}
 				display='flex'
+				gap={1}
 				justifyContent='center'
 				flexDirection='column'
 			>

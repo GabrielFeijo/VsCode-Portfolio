@@ -8,11 +8,9 @@ jest.mock('@mui/system', () => ({
 jest.mock('@mui/material', () => ({
     Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
     Box: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-}));
-
-jest.mock('@mui/system', () => ({
     Container: ({ children, ...props }: any) => <div {...props}>{children}</div>,
 }));
+
 
 jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(),
