@@ -17,7 +17,13 @@ jest.mock('react-markdown', () => {
 		default: ({ components, rehypePlugins }: { components: Record<string, React.ElementType>; rehypePlugins: unknown[] }) =>
 			React.createElement(
 				'div',
-				{ 'data-testid': 'markdown-root', 'data-raw-html': rehypePlugins.length > 0 },
+				{
+					'data-testid': 'markdown-root',
+					'data-raw-html': rehypePlugins.length > 0,
+					'data-strips-title': (
+						(rehypePlugins[1] as [unknown, { strip?: string[] }])?.[1]?.strip || []
+					).includes('title'),
+				},
 				React.createElement(components.h1, null, 'Title'),
 				React.createElement(components.h2, null, 'Subtitle'),
 				React.createElement(components.a, { href: 'https://example.com' }, 'Portfolio'),
@@ -54,6 +60,7 @@ jest.mock('rehype-sanitize', () => ({
 	default: jest.fn(),
 	defaultSchema: {
 		attributes: { '*': [] },
+		strip: ['script'],
 		tagNames: [],
 	},
 }));
@@ -119,6 +126,10 @@ describe('MarkdownRenderer', () => {
 		);
 		expect(iframe).toHaveAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
 		expect(screen.getByTestId('markdown-root')).toHaveAttribute('data-raw-html', 'true');
+		expect(screen.getByTestId('markdown-root')).toHaveAttribute(
+			'data-strips-title',
+			'true'
+		);
 	});
 
 	it.each([

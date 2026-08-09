@@ -28,6 +28,7 @@ interface MarkdownRendererProps {
 const markdownPlugins = [remarkGfm, remarkBreaks];
 const rawHtmlSchema = {
 	...defaultSchema,
+	strip: [...defaultSchema.strip!, 'title'],
 	tagNames: [...defaultSchema.tagNames!, 'iframe', 'link', 'main'],
 	attributes: {
 		...defaultSchema.attributes,
@@ -42,6 +43,16 @@ const rawHtmlSchema = {
 			'allowFullScreen',
 		],
 		link: ['href', ['rel', 'stylesheet']],
+		section: [
+			'dataFootnotes',
+			['className', 'footnotes', 'desc', 'exp', 'flex', 'header'],
+		],
+		ul: [
+			'ariaDescribedBy',
+			'ariaLabel',
+			'ariaLabelledBy',
+			['className', 'contains-task-list', 'flex'],
+		],
 	},
 };
 const rawHtmlPlugins: NonNullable<ReactMarkdownOptions['rehypePlugins']> = [
