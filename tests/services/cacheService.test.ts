@@ -7,9 +7,16 @@ describe('CacheService', () => {
         jest.restoreAllMocks();
     });
 
-    it('getCache returns null when no cache', () => {
-        expect(CacheService.getCache()).toBeNull();
-    });
+	it('getCache returns null when no cache', () => {
+		expect(CacheService.getCache()).toBeNull();
+	});
+
+	it('getCache recovers from invalid cache data', () => {
+		localStorage.setItem('home-cache', '{invalid');
+
+		expect(CacheService.getCache()).toBeNull();
+		expect(localStorage.getItem('home-cache')).toBeNull();
+	});
 
     it('setCache stores and getCache returns parsed object', () => {
         const cache = { lastFetch: dayjs().toISOString() };
@@ -17,9 +24,14 @@ describe('CacheService', () => {
         expect(CacheService.getCache()).toEqual(cache);
     });
 
-    it('has24HoursPassed returns true when no cache', () => {
-        expect(CacheService.has24HoursPassed()).toBe(true);
-    });
+	it('has24HoursPassed returns true when no cache', () => {
+		expect(CacheService.has24HoursPassed()).toBe(true);
+	});
+
+	it('has24HoursPassed returns true for an invalid date', () => {
+		CacheService.setCache({ lastFetch: 'not-a-date' });
+		expect(CacheService.has24HoursPassed()).toBe(true);
+	});
 
     it('has24HoursPassed returns true when lastFetch older than 24 hours', () => {
         const old = dayjs().subtract(25, 'hour').toISOString();

@@ -1,8 +1,7 @@
-import axios from 'axios';
 import apiFetch from '../axios-config';
-import { DEFAULT_ERROR_MESSAGE } from '../review/ReviewService';
+import { ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
 
-const getResponse = async () => {
+const getResponse = async (): Promise<unknown | ApiError> => {
 	try {
 		const { data } = await apiFetch.get(`/`);
 
@@ -10,11 +9,7 @@ const getResponse = async () => {
 
 		return new Error(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			return new Error(error.message);
-		}
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return toApiError(error);
 	}
 };
 

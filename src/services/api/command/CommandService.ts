@@ -1,16 +1,15 @@
-import axios from 'axios';
 import apiFetch from '../axios-config';
-import { DEFAULT_ERROR_MESSAGE } from '../review/ReviewService';
+import { ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
 
 export interface ICommand {
 	_id: string;
 	command: string;
-	response: [string];
+	response: string[];
 	created_at: string;
 	updatedAt: string;
 }
 
-const getResponse = async (command: string): Promise<ICommand | Error> => {
+const getResponse = async (command: string): Promise<ICommand | ApiError> => {
 	try {
 		const { data } = await apiFetch.get(`/command/${command}`);
 
@@ -18,11 +17,7 @@ const getResponse = async (command: string): Promise<ICommand | Error> => {
 
 		return new Error(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			return new Error(error.message);
-		}
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return toApiError(error);
 	}
 };
 

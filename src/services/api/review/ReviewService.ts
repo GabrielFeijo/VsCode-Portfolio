@@ -1,5 +1,9 @@
-import axios from 'axios';
 import apiFetch from '../axios-config';
+import {
+	ApiError,
+	DEFAULT_ERROR_MESSAGE,
+	toApiError,
+} from '../apiError';
 
 export interface IRate {
 	_id: string;
@@ -10,12 +14,13 @@ export interface IRate {
 	updatedAt: string;
 }
 
-export interface ApiError extends Error {
-	statusCode?: number;
-	validationErrors?: string[];
-}
+export { ApiError, DEFAULT_ERROR_MESSAGE } from '../apiError';
 
-export const DEFAULT_ERROR_MESSAGE = 'Ocorreu um erro interno no servidor';
+export interface CreateReviewInput {
+	username: string;
+	comment: string;
+	stars: number;
+}
 
 const findAll = async (): Promise<IRate[] | Error> => {
 	try {
@@ -25,39 +30,19 @@ const findAll = async (): Promise<IRate[] | Error> => {
 
 		return new Error(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			return new Error(error.message);
-		}
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return toApiError(error);
 	}
 };
 
-const create = async (review: {
-	username: string;
-	comment: string;
-	stars: number;
-}): Promise<IRate | ApiError> => {
+const create = async (review: CreateReviewInput): Promise<IRate | ApiError> => {
 	try {
 		const { data } = await apiFetch.post(`/review`, review);
 
 		if (data) return data;
 
-		return new Error(DEFAULT_ERROR_MESSAGE) as ApiError;
+		return new ApiError(DEFAULT_ERROR_MESSAGE);
 	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			const apiError = new Error(error.message) as ApiError;
-			apiError.statusCode = error.response?.status;
-
-			if (error.response?.status === 400 && error.response?.data?.message) {
-				const messages = error.response.data.message;
-				apiError.validationErrors = Array.isArray(messages) ? messages : [messages];
-			}
-
-			return apiError;
-		}
-
-		return new Error(DEFAULT_ERROR_MESSAGE) as ApiError;
+		return toApiError(error, true);
 	}
 };
 

@@ -1,4 +1,5 @@
 import apiFetch from '../../src/services/api/axios-config';
+import type { ApiError } from '../../src/services/api/review/ReviewService';
 
 jest.mock('../../src/services/api/axios-config', () => ({
     __esModule: true,
@@ -93,7 +94,7 @@ describe('ReviewService', () => {
         };
         (apiFetch.post as jest.Mock).mockRejectedValue(err);
         const mod = await import('../../src/services/api/review/ReviewService');
-        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as mod.ApiError;
+		const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as ApiError;
         expect(result).toBeInstanceOf(Error);
         expect(result.statusCode).toBe(400);
         expect(result.validationErrors).toEqual(['Username must be at least 2 characters', 'Comment must be at least 10 characters']);
@@ -110,7 +111,7 @@ describe('ReviewService', () => {
         };
         (apiFetch.post as jest.Mock).mockRejectedValue(err);
         const mod = await import('../../src/services/api/review/ReviewService');
-        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as mod.ApiError;
+		const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 }) as ApiError;
         expect(result).toBeInstanceOf(Error);
         expect(result.statusCode).toBe(429);
     });
@@ -128,7 +129,7 @@ describe('ReviewService', () => {
         };
         (apiFetch.post as jest.Mock).mockRejectedValue(err);
         const mod = await import('../../src/services/api/review/ReviewService');
-        const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 6 }) as mod.ApiError;
+		const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 6 }) as ApiError;
         expect(result).toBeInstanceOf(Error);
         expect(result.statusCode).toBe(400);
         expect(result.validationErrors).toEqual(['Stars must not exceed 5']);

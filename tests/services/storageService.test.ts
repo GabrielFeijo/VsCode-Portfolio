@@ -6,9 +6,35 @@ describe('StorageService', () => {
         jest.restoreAllMocks();
     });
 
-    it('getData returns empty array when nothing stored', () => {
-        expect(StorageService.getData()).toEqual([]);
-    });
+	it('getData returns empty array when nothing stored', () => {
+		expect(StorageService.getData()).toEqual([]);
+	});
+
+	it('getData recovers from invalid stored data', () => {
+		localStorage.setItem('markdown-editor-data', '{invalid');
+
+		expect(StorageService.getData()).toEqual([]);
+		expect(localStorage.getItem('markdown-editor-data')).toBeNull();
+	});
+
+	it('getData rejects stored values that are not arrays', () => {
+		localStorage.setItem('markdown-editor-data', JSON.stringify({ page: 1 }));
+
+		expect(StorageService.getData()).toEqual([]);
+	});
+
+	it('getData removes invalid entries while preserving valid pages', () => {
+		const validPage = { index: 1, name: 'valid.md', route: 'valid.md' };
+		localStorage.setItem(
+			'markdown-editor-data',
+			JSON.stringify([validPage, { index: 'invalid' }])
+		);
+
+		expect(StorageService.getData()).toEqual([validPage]);
+		expect(JSON.parse(localStorage.getItem('markdown-editor-data') || '[]')).toEqual([
+			validPage,
+		]);
+	});
 
     it('saveOrUpdateData adds new page when none exists', () => {
         const page: Page = { index: 1, name: 'a', route: 'a' };
