@@ -10,7 +10,6 @@ export default defineConfig({
                 manualChunks: {
                     'mui-vendor': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
                     'framer-motion-vendor': ['framer-motion'],
-                    'markdown-vendor': ['react-markdown', 'rehype-raw', 'remark-breaks', 'remark-gfm', 'react-syntax-highlighter'],
                 }
             }
         }
