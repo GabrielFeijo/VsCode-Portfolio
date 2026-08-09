@@ -38,8 +38,9 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build",
+		"build": "vite build && node scripts/generate-seo-pages.mjs && node scripts/validate-seo.mjs",
 		"preview": "vite preview",
+		"seo:check": "node scripts/validate-seo.mjs",
 		"typecheck": "tsc --noEmit",
 		"test": "jest --config jest.config.cjs --coverage",
 		"test:watch": "jest --config jest.config.cjs --watch"

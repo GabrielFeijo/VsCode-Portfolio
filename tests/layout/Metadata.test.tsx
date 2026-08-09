@@ -1,80 +1,124 @@
 import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import MetadataComponent from '../../src/app/layout/Metadata';
 
 jest.mock('react-helmet-async', () => ({
-    Helmet: ({ children }: any) => <div data-testid="helmet">{children}</div>,
+	Helmet: ({ children }: any) => <div data-testid='helmet'>{children}</div>,
 }));
 
+function renderMetadata(path = '/') {
+	return render(
+		<MemoryRouter initialEntries={[path]}>
+			<MetadataComponent />
+		</MemoryRouter>
+	);
+}
+
 describe('MetadataComponent', () => {
-    it('renders Helmet with metadata', () => {
-        render(<MetadataComponent />);
-        expect(document.querySelector('title')).toHaveTextContent('Gabriel Feijó | Desenvolvedor Full Stack');
-        const metaDescription = document.querySelector('meta[name="description"]');
-        expect(metaDescription).toHaveAttribute('content', expect.stringContaining('Portfolio interativo'));
-    });
+	it('renders concise metadata for the home page', () => {
+		renderMetadata();
 
-    it('sets all basic meta tags', () => {
-        render(<MetadataComponent />);
-        expect(document.querySelector('meta[name="title"]')).toHaveAttribute('content', 'Gabriel Feijó | Desenvolvedor Full Stack');
-        expect(document.querySelector('meta[name="description"]')).toHaveAttribute('content', expect.stringContaining('desenvolvedor Full Stack'));
-        expect(document.querySelector('meta[name="author"]')).toHaveAttribute('content', 'Gabriel Feijó');
-        expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#282A36');
-        expect(document.querySelector('meta[name="keywords"]')).toHaveAttribute('content', expect.stringContaining('Gabriel Feijó'));
-        expect(document.querySelector('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
-        expect(document.querySelector('meta[name="language"]')).toHaveAttribute('content', 'Portuguese');
-        expect(document.querySelector('meta[name="revisit-after"]')).toHaveAttribute('content', '7 days');
-        expect(document.querySelector('meta[name="rating"]')).toHaveAttribute('content', 'general');
-    });
+		expect(document.querySelector('title')).toHaveTextContent(
+			'Gabriel Feijó | Desenvolvedor Full Stack'
+		);
+		expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+			'content',
+			expect.stringContaining('Portfólio de Gabriel Feijó')
+		);
+		expect(document.querySelector('meta[name="author"]')).toHaveAttribute(
+			'content',
+			'Gabriel Feijó'
+		);
+		expect(document.querySelector('meta[name="robots"]')).toHaveAttribute(
+			'content',
+			'index, follow, max-image-preview:large'
+		);
+	});
 
-    it('sets canonical link', () => {
-        render(<MetadataComponent />);
-        expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.gabrielfeijo.com.br');
-    });
+	it('sets route-specific title, description, and canonical URL', () => {
+		renderMetadata('/projects');
 
-    it('sets Open Graph meta tags', () => {
-        render(<MetadataComponent />);
-        expect(document.querySelector('meta[property="og:type"]')).toHaveAttribute('content', 'website');
-        expect(document.querySelector('meta[property="og:url"]')).toHaveAttribute('content', 'https://www.gabrielfeijo.com.br');
-        expect(document.querySelector('meta[property="og:title"]')).toHaveAttribute('content', 'Gabriel Feijó | Desenvolvedor Full Stack');
-        expect(document.querySelector('meta[property="og:description"]')).toHaveAttribute('content', expect.stringContaining('Portfolio interativo'));
-        expect(document.querySelector('meta[property="og:image"]')).toHaveAttribute('content', 'https://www.gabrielfeijo.com.br/gg.png');
-        expect(document.querySelector('meta[property="og:image:width"]')).toHaveAttribute('content', '1200');
-        expect(document.querySelector('meta[property="og:image:height"]')).toHaveAttribute('content', '630');
-        expect(document.querySelector('meta[property="og:locale"]')).toHaveAttribute('content', 'pt_BR');
-        expect(document.querySelector('meta[property="og:site_name"]')).toHaveAttribute('content', 'Gabriel Feijó');
-    });
+		expect(document.querySelector('title')).toHaveTextContent(
+			'Projetos Full Stack | Gabriel Feijó'
+		);
+		expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute(
+			'href',
+			'https://www.gabrielfeijo.com.br/projects'
+		);
+		expect(document.querySelector('meta[property="og:url"]')).toHaveAttribute(
+			'content',
+			'https://www.gabrielfeijo.com.br/projects'
+		);
+	});
 
-    it('sets Twitter meta tags', () => {
-        render(<MetadataComponent />);
-        expect(document.querySelector('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
-        expect(document.querySelector('meta[name="twitter:url"]')).toHaveAttribute('content', 'https://www.gabrielfeijo.com.br');
-        expect(document.querySelector('meta[name="twitter:title"]')).toHaveAttribute('content', 'Gabriel Feijó | Desenvolvedor Full Stack');
-        expect(document.querySelector('meta[name="twitter:description"]')).toHaveAttribute('content', expect.stringContaining('Portfolio interativo'));
-        expect(document.querySelector('meta[name="twitter:image"]')).toHaveAttribute('content', 'https://www.gabrielfeijo.com.br/gg.png');
-        expect(document.querySelector('meta[name="twitter:creator"]')).toHaveAttribute('content', '@gabrielfeijo');
-    });
+	it('uses English metadata after the language changes', () => {
+		renderMetadata('/en/experience');
 
-    it('sets JSON-LD structured data', () => {
-        render(<MetadataComponent />);
-        const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-        expect(scripts).toHaveLength(2);
+		expect(document.querySelector('title')).toHaveTextContent(
+			'Professional experience | Gabriel Feijó'
+		);
+		expect(document.querySelector('meta[property="og:locale"]')).toHaveAttribute(
+			'content',
+			'en_US'
+		);
+		expect(
+			document.querySelector('meta[property="og:locale:alternate"]')
+		).toHaveAttribute('content', 'pt_BR');
+	});
 
-        const personScript = scripts[0];
-        const personData = JSON.parse(personScript.textContent || '{}');
-        expect(personData['@type']).toBe('Person');
-        expect(personData.name).toBe('Gabriel Feijó');
-        expect(personData.jobTitle).toBe('Desenvolvedor Full Stack');
-        expect(personData.address.addressLocality).toBe('Recife');
-        expect(personData.sameAs).toEqual([
-            'https://github.com/GabrielFeijo',
-            'https://www.linkedin.com/in/gabriel-feijo/'
-        ]);
-        expect(personData.knowsAbout).toContain('React');
+	it('publishes bidirectional language alternates and x-default', () => {
+		renderMetadata('/en/projects');
 
-        const websiteScript = scripts[1];
-        const websiteData = JSON.parse(websiteScript.textContent || '{}');
-        expect(websiteData['@type']).toBe('WebSite');
-        expect(websiteData.name).toBe('Gabriel Feijó | Desenvolvedor Full Stack');
-        expect(websiteData.inLanguage).toBe('pt-BR');
-    });
+		expect(document.querySelector('link[hreflang="pt-BR"]')).toHaveAttribute(
+			'href',
+			'https://www.gabrielfeijo.com.br/projects'
+		);
+		expect(document.querySelector('link[hreflang="en"]')).toHaveAttribute(
+			'href',
+			'https://www.gabrielfeijo.com.br/en/projects'
+		);
+		expect(document.querySelector('link[hreflang="x-default"]')).toHaveAttribute(
+			'href',
+			'https://www.gabrielfeijo.com.br/projects'
+		);
+	});
+
+	it('sets complete Open Graph and Twitter image metadata', () => {
+		renderMetadata('/about-me');
+		const imageUrl = 'https://www.gabrielfeijo.com.br/og-image.png';
+
+		expect(document.querySelector('meta[property="og:image"]')).toHaveAttribute(
+			'content',
+			imageUrl
+		);
+		expect(
+			document.querySelector('meta[property="og:image:secure_url"]')
+		).toHaveAttribute('content', imageUrl);
+		expect(document.querySelector('meta[property="og:image:type"]')).toHaveAttribute(
+			'content',
+			'image/png'
+		);
+		expect(document.querySelector('meta[name="twitter:card"]')).toHaveAttribute(
+			'content',
+			'summary_large_image'
+		);
+		expect(document.querySelector('meta[name="twitter:image"]')).toHaveAttribute(
+			'content',
+			imageUrl
+		);
+	});
+
+	it('publishes connected Person, WebSite, and ProfilePage structured data', () => {
+		renderMetadata('/about-me');
+		const script = document.querySelector('script[type="application/ld+json"]');
+		const structuredData = JSON.parse(script?.textContent || '{}');
+		const [person, website, page] = structuredData['@graph'];
+
+		expect(person['@type']).toBe('Person');
+		expect(person['@id']).toBe('https://www.gabrielfeijo.com.br/#person');
+		expect(person.sameAs).toContain('https://github.com/GabrielFeijo');
+		expect(website['@type']).toBe('WebSite');
+		expect(page['@type']).toBe('ProfilePage');
+		expect(page.url).toBe('https://www.gabrielfeijo.com.br/about-me');
+	});
 });

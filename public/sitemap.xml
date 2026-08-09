@@ -1,33 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.gabrielfeijo.com.br/</loc>
-    <lastmod>2024-12-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/" />
+    <lastmod>2026-08-09</lastmod>
   </url>
   <url>
     <loc>https://www.gabrielfeijo.com.br/about-me</loc>
-    <lastmod>2024-12-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/about-me" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/about-me" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/about-me" />
+    <lastmod>2026-08-09</lastmod>
   </url>
   <url>
-    <loc>https://www.gabrielfeijo.com.br/projects</loc>
-    <lastmod>2024-12-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.gabrielfeijo.com.br/experience</loc>
-    <lastmod>2024-12-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://www.gabrielfeijo.com.br/en/about-me</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/about-me" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/about-me" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/about-me" />
+    <lastmod>2026-08-09</lastmod>
   </url>
   <url>
     <loc>https://www.gabrielfeijo.com.br/skills</loc>
-    <lastmod>2024-12-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/skills" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/skills" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/skills" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en/skills</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/skills" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/skills" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/skills" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/projects</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/projects" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/projects" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/projects" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en/projects</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/projects" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/projects" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/projects" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/experience</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/experience" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/experience" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/experience" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en/experience</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/experience" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/experience" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/experience" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/accomplishments</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/accomplishments" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/accomplishments" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/accomplishments" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en/accomplishments</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/accomplishments" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/accomplishments" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/accomplishments" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/certificates</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/certificates" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/certificates" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/certificates" />
+    <lastmod>2026-08-09</lastmod>
+  </url>
+  <url>
+    <loc>https://www.gabrielfeijo.com.br/en/certificates</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.gabrielfeijo.com.br/certificates" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.gabrielfeijo.com.br/en/certificates" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.gabrielfeijo.com.br/certificates" />
+    <lastmod>2026-08-09</lastmod>
   </url>
 </urlset>
