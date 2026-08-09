@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import Cmd from 'src/app/components/Terminal/Cmd';
+import Cmd from '../../src/app/components/Terminal/Cmd';
 
 const navigate = jest.fn();
 const toggleTheme = jest.fn();

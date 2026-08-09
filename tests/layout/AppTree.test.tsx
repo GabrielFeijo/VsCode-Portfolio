@@ -1,8 +1,8 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createElement, SetStateAction } from 'react';
-import AppTree from 'src/app/layout/AppTree';
-import { Page } from 'src/domain/page';
+import AppTree from '../../src/app/layout/AppTree';
+import { Page } from '../../src/domain/page';
 
 const navigate = jest.fn();
 const createFile = jest.fn();

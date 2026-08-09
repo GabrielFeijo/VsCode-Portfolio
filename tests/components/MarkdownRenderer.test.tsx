@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import MarkdownRenderer from 'src/app/components/MarkdownRenderer';
+import MarkdownRenderer from '../../src/app/components/MarkdownRenderer';
 
 jest.mock('react-markdown', () => {
 	const React = jest.requireActual('react');

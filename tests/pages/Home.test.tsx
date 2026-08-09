@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import Home from 'src/app/pages/Home';
+import Home from '../../src/app/pages/Home';
 
 const has24HoursPassed = jest.fn();
 const setCache = jest.fn();

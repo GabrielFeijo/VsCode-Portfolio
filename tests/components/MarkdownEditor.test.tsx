@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import MarkdownEditor from 'src/app/components/MarkdownEditor';
+import MarkdownEditor from '../../src/app/components/MarkdownEditor';
 
-const highlightMock = jest.fn((code: string) => `highlighted:${code}`);
+const highlightMock = jest.fn(
+	(code: string, _language: unknown, _name: string) => `highlighted:${code}`
+);
 
 jest.mock('prismjs', () => ({
 	highlight: (code: string, language: unknown, name: string) =>
