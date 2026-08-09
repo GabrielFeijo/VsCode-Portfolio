@@ -5,11 +5,33 @@ jest.mock('@mui/system', () => ({
     styled: jest.fn(() => jest.fn(() => <div />)),
 }));
 
-jest.mock('@mui/material', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-    Box: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    Container: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-}));
+jest.mock('@mui/material', () => {
+    const domProps = ({
+        children,
+        disableElevation,
+        disableFocusRipple,
+        disableGutters,
+        disableRipple,
+        maxWidth,
+        sx,
+        ...props
+    }: any) => ({ children, props });
+
+    return {
+        Button: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <button {...props}>{children}</button>;
+        },
+        Box: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <div {...props}>{children}</div>;
+        },
+        Container: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <div {...props}>{children}</div>;
+        },
+    };
+});
 
 
 jest.mock('react-router-dom', () => ({

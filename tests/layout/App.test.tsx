@@ -75,7 +75,13 @@ jest.mock('src/app/layout/Sidebar', () => ({ setExpanded, expanded, terminal, se
 ));
 let mockPathname = '/';
 jest.mock('react-router-dom', () => ({
-    Routes: ({ children }: any) => <div>{children}</div>,
+    Routes: ({ children }: any) => (
+        <div>
+            {React.Children.map(children, (child, index) =>
+                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
+            )}
+        </div>
+    ),
     Route: ({ element }: any) => element,
     useNavigate: jest.fn(),
     useLocation: () => ({ pathname: mockPathname }),
@@ -93,7 +99,9 @@ jest.mock('src/app/components/MDContainer', () => ({ path }: any) => (
 jest.mock('src/app/pages/Home', () => ({ setSelectedIndex }: any) => <div data-testid="home" onClick={() => setSelectedIndex(0)} />);
 jest.mock('framer-motion', () => ({
     motion: {
-        div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+        div: ({ children, initial, animate, exit, variants, transition, ...props }: any) => (
+            <div {...props}>{children}</div>
+        ),
     },
     AnimatePresence: ({ children }: any) => <div>{children}</div>,
 }));

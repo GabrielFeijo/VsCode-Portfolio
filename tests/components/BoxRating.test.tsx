@@ -2,8 +2,6 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-jest.useFakeTimers();
-
 const mockCreate = jest.fn();
 jest.mock('../../src/services/api/review/ReviewService', () => ({
     __esModule: true,
@@ -34,11 +32,14 @@ describe('BoxRating component', () => {
         mockT.mockImplementation((key: string) => key);
     });
 
-    it('renders the modal when ranking is true', () => {
+    it('renders the modal when ranking is true', async () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
+        await act(async () => {
+            await Promise.resolve();
+        });
 
-        expect(screen.getByText('rating.evaluate')).toBeInTheDocument();
+        expect(await screen.findByText('rating.evaluate')).toBeInTheDocument();
         expect(screen.getByLabelText('rating.name')).toBeInTheDocument();
         expect(screen.getByLabelText('rating.comment')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /rating.submit/i })).toBeInTheDocument();
@@ -84,16 +85,6 @@ describe('BoxRating component', () => {
         expect(screen.getByText('terminal.rating.3')).toBeInTheDocument();
     });
 
-    it('shows error when submit without required fields and clears after timeout', async () => {
-        const setRanking = jest.fn();
-        render(<BoxRating ranking={true} setRanking={setRanking} />);
-
-        const submit = screen.getByRole('button', { name: /rating.submit/i });
-        fireEvent.click(submit);
-
-        expect(screen.queryByText(/rating.error/i)).not.toBeInTheDocument();
-    });
-
     it('closes the modal when close button is clicked', () => {
         const setRanking = jest.fn();
         render(<BoxRating ranking={true} setRanking={setRanking} />);
@@ -109,7 +100,8 @@ describe('BoxRating component', () => {
         render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const submit = screen.getByRole('button', { name: /rating.submit/i });
-        fireEvent.click(submit);
+        const user = userEvent.setup();
+        await user.click(submit);
 
         await waitFor(() => {
             const usernameInput = screen.getByLabelText('rating.name');

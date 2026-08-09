@@ -139,7 +139,7 @@ describe('ThemeContext', () => {
 
         mediaQuery.matches = true;
         const changeHandler = mediaQuery.addEventListener.mock.calls.find(call => call[0] === 'change')[1];
-        changeHandler();
+        act(() => changeHandler());
 
         await waitFor(() => {
             expect(screen.getByTestId('theme')).toHaveTextContent('dark');

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	const reviewSchema = getReviewSchema(t);
 
 	const [error, setError] = useState('');
+	const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const {
 		register,
 		handleSubmit,
@@ -49,7 +50,11 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 	const showError = (message: string) => {
 		setError(message);
-		setTimeout(() => setError(''), 1500);
+		if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+		errorTimeoutRef.current = setTimeout(() => {
+			setError('');
+			errorTimeoutRef.current = null;
+		}, 1500);
 	};
 
 	const getErrorMessage = (error: ApiError): string => {
@@ -105,10 +110,21 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 	useEffect(() => {
 		if (!ranking) {
+			if (errorTimeoutRef.current) {
+				clearTimeout(errorTimeoutRef.current);
+				errorTimeoutRef.current = null;
+			}
 			reset();
 			setError('');
 		}
 	}, [ranking, reset]);
+
+	useEffect(
+		() => () => {
+			if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+		},
+		[]
+	);
 
 	return (
 		<AnimatePresence>
