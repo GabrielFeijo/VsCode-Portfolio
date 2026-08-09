@@ -13,7 +13,7 @@ module.exports = {
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',
         '!src/**/index.tsx',
-        '!src/vite-env.d.ts',
+        '!src/**/*.d.ts',
         // Vite composition root: its client factory is covered directly below.
         '!src/services/api/axios-config/index.ts',
     ],

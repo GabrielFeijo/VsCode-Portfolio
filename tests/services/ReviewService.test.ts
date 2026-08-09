@@ -1,5 +1,8 @@
 import apiFetch from '../../src/services/api/axios-config';
-import type { ApiError } from '../../src/services/api/review/ReviewService';
+import {
+    ApiError,
+    DEFAULT_ERROR_MESSAGE,
+} from '../../src/services/api/review/ReviewService';
 
 jest.mock('../../src/services/api/axios-config', () => ({
     __esModule: true,
@@ -11,6 +14,12 @@ jest.mock('../../src/services/api/axios-config', () => ({
 
 describe('ReviewService', () => {
     afterEach(() => jest.resetAllMocks());
+
+    it('exposes the shared API error contract', () => {
+        expect(new ApiError(DEFAULT_ERROR_MESSAGE)).toEqual(
+            expect.objectContaining({ message: DEFAULT_ERROR_MESSAGE })
+        );
+    });
 
     it('findAll returns data on success', async () => {
         const resp = { data: [{ id: 1 }] };
