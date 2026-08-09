@@ -1,0 +1,89 @@
+{
+	"site": {
+		"author": "Gabriel Feijó",
+		"description": "Portfólio interativo de Gabriel Feijó, desenvolvedor Full Stack especializado em React, TypeScript, Node.js e arquiteturas modernas.",
+		"image": "/og-image.png",
+		"name": "Gabriel Feijó",
+		"title": "Gabriel Feijó | Desenvolvedor Full Stack",
+		"url": "https://www.gabrielfeijo.com.br"
+	},
+	"pages": [
+		{
+			"path": "/",
+			"pt": {
+				"title": "Gabriel Feijó | Desenvolvedor Full Stack",
+				"description": "Portfólio de Gabriel Feijó, desenvolvedor Full Stack em Recife. Conheça projetos, experiência e habilidades em React, TypeScript e Node.js."
+			},
+			"en": {
+				"title": "Gabriel Feijó | Full Stack Developer",
+				"description": "Portfolio of Gabriel Feijó, a Full Stack Developer based in Recife. Explore projects, experience, and skills in React, TypeScript, and Node.js."
+			}
+		},
+		{
+			"path": "/about-me",
+			"pt": {
+				"title": "Sobre Gabriel Feijó | Desenvolvedor Full Stack",
+				"description": "Conheça a trajetória, formação e interesses profissionais de Gabriel Feijó, desenvolvedor Full Stack formado em Análise e Desenvolvimento de Sistemas."
+			},
+			"en": {
+				"title": "About Gabriel Feijó | Full Stack Developer",
+				"description": "Learn about Gabriel Feijó's background, education, and professional interests as a Full Stack Developer with a degree in Systems Analysis and Development."
+			}
+		},
+		{
+			"path": "/skills",
+			"pt": {
+				"title": "Habilidades técnicas | Gabriel Feijó",
+				"description": "Tecnologias e competências de Gabriel Feijó em frontend, backend, bancos de dados, cloud, DevOps e desenvolvimento de software Full Stack."
+			},
+			"en": {
+				"title": "Technical skills | Gabriel Feijó",
+				"description": "Gabriel Feijó's skills across frontend, backend, databases, cloud, DevOps, and Full Stack software development."
+			}
+		},
+		{
+			"path": "/projects",
+			"pt": {
+				"title": "Projetos Full Stack | Gabriel Feijó",
+				"description": "Projetos desenvolvidos por Gabriel Feijó com React, Next.js, NestJS, TypeScript, bancos de dados relacionais, cloud e integrações de APIs."
+			},
+			"en": {
+				"title": "Full Stack projects | Gabriel Feijó",
+				"description": "Projects built by Gabriel Feijó with React, Next.js, NestJS, TypeScript, relational databases, cloud platforms, and API integrations."
+			}
+		},
+		{
+			"path": "/experience",
+			"pt": {
+				"title": "Experiência profissional | Gabriel Feijó",
+				"description": "Experiência profissional de Gabriel Feijó no desenvolvimento de produtos digitais, arquiteturas Full Stack, cloud, integrações e qualidade de software."
+			},
+			"en": {
+				"title": "Professional experience | Gabriel Feijó",
+				"description": "Gabriel Feijó's professional experience building digital products with Full Stack architectures, cloud services, integrations, and software quality practices."
+			}
+		},
+		{
+			"path": "/accomplishments",
+			"pt": {
+				"title": "Conquistas profissionais | Gabriel Feijó",
+				"description": "Conquistas de Gabriel Feijó em tecnologia e inovação, incluindo projetos reconhecidos em programas e competições do Porto Digital."
+			},
+			"en": {
+				"title": "Professional accomplishments | Gabriel Feijó",
+				"description": "Gabriel Feijó's accomplishments in technology and innovation, including recognized projects from Porto Digital programs and competitions."
+			}
+		},
+		{
+			"path": "/certificates",
+			"pt": {
+				"title": "Certificados e formação | Gabriel Feijó",
+				"description": "Formação acadêmica, cursos e certificados de Gabriel Feijó em desenvolvimento de software, lógica de programação, Java, JavaScript, HTML e CSS."
+			},
+			"en": {
+				"title": "Certificates and education | Gabriel Feijó",
+				"description": "Gabriel Feijó's education, courses, and certificates in software development, programming logic, Java, JavaScript, HTML, and CSS."
+			}
+		}
+	]
+}

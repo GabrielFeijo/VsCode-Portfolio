@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom';
+import { TextDecoder, TextEncoder } from 'util';
+
+Object.assign(global, { TextDecoder, TextEncoder });
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: any, opts?: any) => (opts && opts.returnObjects ? [] : k) }),

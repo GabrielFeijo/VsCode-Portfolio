@@ -211,6 +211,11 @@
 	color: #ffffff;
 }
 
+.submitButton:disabled {
+	cursor: wait;
+	opacity: 0.6;
+}
+
 :global(.dark) .submitButton {
 	color: #60a5fa;
 	border-color: #60a5fa;

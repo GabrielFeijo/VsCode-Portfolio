@@ -15,9 +15,10 @@ import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../contexts/ThemeContext';
+import { Language } from '../../domain/page';
 
 interface Props {
-	language: 'pt' | 'en';
+	language: Language;
 	selectedTerminalIndex: number;
 	setSelectedTerminalIndex: React.Dispatch<React.SetStateAction<number>>;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -72,6 +73,7 @@ const Terminal = ({
 				<Cmd
 					setRanking={setRanking}
 					changeLanguage={changeLanguage}
+					language={language}
 				/>
 			),
 		},

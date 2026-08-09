@@ -56,7 +56,7 @@ export default function Sidebar({
 	return (
 		<Box
 			sx={{
-				height: `calc(100vh - 20px)`,
+				height: '100%',
 				backgroundColor: isDarkMode ? '#343746' : '#2c2c2c',
 			}}
 			justifyContent='space-between'
@@ -127,6 +127,7 @@ export default function Sidebar({
 					>
 						<Link
 							target='_blank'
+							rel='noopener noreferrer'
 							href={link.href}
 							underline='none'
 							color='inherit'

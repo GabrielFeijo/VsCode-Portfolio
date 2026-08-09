@@ -1,14 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import KeyboardShortcutsModal from '../../src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 
-const consoleError = console.error;
-beforeAll(() => {
-    console.error = jest.fn();
-});
-afterAll(() => {
-    console.error = consoleError;
-});
-
 jest.mock('framer-motion', () => ({
     motion: {
         div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -42,7 +34,9 @@ describe('KeyboardShortcutsModal', () => {
     });
 
     afterEach(() => {
-        jest.runOnlyPendingTimers();
+        act(() => {
+            jest.runOnlyPendingTimers();
+        });
         jest.useRealTimers();
     });
 
@@ -124,26 +118,40 @@ describe('KeyboardShortcutsModal', () => {
         mockT.mockImplementation((key) => key);
     });
 
-    it('clears timeouts on unmount before show', () => {
+    it('clears the show timeout on unmount', () => {
         const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
 
-        jest.advanceTimersByTime(1000);
+        expect(jest.getTimerCount()).toBe(1);
 
         unmount();
 
-        expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
+        expect(jest.getTimerCount()).toBe(0);
     });
 
-    it('clears hide timeout on unmount after show', () => {
+    it('clears the hide timeout on unmount', () => {
         const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
+
+        act(() => {
+            jest.advanceTimersByTime(2500);
+        });
+        expect(jest.getTimerCount()).toBe(1);
+
+        unmount();
+
+        expect(jest.getTimerCount()).toBe(0);
+    });
+
+    it('hides immediately when visibility is disabled', () => {
+        const { rerender } = render(<KeyboardShortcutsModal visible={true} />);
 
         act(() => {
             jest.advanceTimersByTime(2500);
         });
         expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
 
-        unmount();
+        rerender(<KeyboardShortcutsModal visible={false} />);
 
         expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
+        expect(jest.getTimerCount()).toBe(0);
     });
 });

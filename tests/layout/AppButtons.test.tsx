@@ -5,11 +5,33 @@ jest.mock('@mui/system', () => ({
     styled: jest.fn(() => jest.fn(() => <div />)),
 }));
 
-jest.mock('@mui/material', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-    Box: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    Container: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-}));
+jest.mock('@mui/material', () => {
+    const domProps = ({
+        children,
+        disableElevation,
+        disableFocusRipple,
+        disableGutters,
+        disableRipple,
+        maxWidth,
+        sx,
+        ...props
+    }: any) => ({ children, props });
+
+    return {
+        Button: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <button {...props}>{children}</button>;
+        },
+        Box: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <div {...props}>{children}</div>;
+        },
+        Container: (inputProps: any) => {
+            const { children, props } = domProps(inputProps);
+            return <div {...props}>{children}</div>;
+        },
+    };
+});
 
 
 jest.mock('react-router-dom', () => ({
@@ -50,11 +72,12 @@ const mockConvertFileName = require('src/utils/convertFileName').convertFileName
 
 describe('AppButtons', () => {
     const defaultProps = {
-        pages: [
+    pages: [
             { index: 0, name: 'Home', route: 'home' },
             { index: 1, name: 'About', route: 'about' },
             { index: 2, name: 'Projects', route: 'projects' },
-        ],
+    ],
+	language: 'pt' as const,
         selectedIndex: 0,
         setSelectedIndex: jest.fn(),
         currentComponent: 'Home',
@@ -92,6 +115,15 @@ describe('AppButtons', () => {
         fireEvent.click(aboutButton);
         expect(defaultProps.setSelectedIndex).toHaveBeenCalledWith(1);
         expect(navigate).toHaveBeenCalledWith('/about');
+    });
+
+    it('navigates with the English locale prefix', () => {
+        const navigate = jest.fn();
+        mockUseNavigate.mockReturnValue(navigate);
+        render(<AppButtons {...defaultProps} language="en" />);
+
+        fireEvent.click(screen.getByText('Projects'));
+        expect(navigate).toHaveBeenCalledWith('/en/projects');
     });
 
     it('calls setVisiblePageIndexes when close button is pressed with Enter', () => {

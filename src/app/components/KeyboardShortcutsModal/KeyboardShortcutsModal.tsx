@@ -23,14 +23,21 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 	const { t } = useTranslation();
 
 	useEffect(() => {
-		if (visible) {
-			const timeout = setTimeout(() => {
-				setShow(true);
-				const hideTimeout = setTimeout(() => setShow(false), 5000);
-				return () => clearTimeout(hideTimeout);
-			}, 2500);
-			return () => clearTimeout(timeout);
+		if (!visible) {
+			setShow(false);
+			return;
 		}
+
+		let hideTimeout: ReturnType<typeof setTimeout> | undefined;
+		const showTimeout = setTimeout(() => {
+			setShow(true);
+			hideTimeout = setTimeout(() => setShow(false), 5000);
+		}, 2500);
+
+		return () => {
+			clearTimeout(showTimeout);
+			if (hideTimeout) clearTimeout(hideTimeout);
+		};
 	}, [visible]);
 
 	if (!show || isMobile) return null;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,13 +28,14 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	const reviewSchema = getReviewSchema(t);
 
 	const [error, setError] = useState('');
+	const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const {
 		register,
 		handleSubmit,
 		control,
 		watch,
 		reset,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<ReviewFormData>({
 		resolver: zodResolver(reviewSchema),
 		defaultValues: {
@@ -49,7 +50,11 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 	const showError = (message: string) => {
 		setError(message);
-		setTimeout(() => setError(''), 1500);
+		if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+		errorTimeoutRef.current = setTimeout(() => {
+			setError('');
+			errorTimeoutRef.current = null;
+		}, 1500);
 	};
 
 	const getErrorMessage = (error: ApiError): string => {
@@ -105,10 +110,21 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 	useEffect(() => {
 		if (!ranking) {
+			if (errorTimeoutRef.current) {
+				clearTimeout(errorTimeoutRef.current);
+				errorTimeoutRef.current = null;
+			}
 			reset();
 			setError('');
 		}
 	}, [ranking, reset]);
+
+	useEffect(
+		() => () => {
+			if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
+		},
+		[]
+	);
 
 	return (
 		<AnimatePresence>
@@ -122,6 +138,9 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 				>
 					<motion.div
 						className={styles.modal}
+						role='dialog'
+						aria-modal='true'
+						aria-labelledby='rating-title'
 						variants={{
 							initial: { scale: 0.95, opacity: 0 },
 							animate: { scale: 1, opacity: 1 },
@@ -131,7 +150,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 					>
 						<div className={styles.modalHeader}>
 							<div></div>
-							<h3 className={styles.title}>{t('rating.evaluate')}</h3>
+							<h3 id='rating-title' className={styles.title}>{t('rating.evaluate')}</h3>
 							<button
 								className={styles.closeButton}
 								onClick={() => setRanking(false)}
@@ -222,6 +241,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									type='submit'
 									className={styles.submitButton}
 									aria-label={t('rating.submit') || 'Submit rating'}
+									disabled={isSubmitting}
+									aria-busy={isSubmitting}
 								>
 									{t('rating.submit')}
 								</button>

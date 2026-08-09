@@ -10,13 +10,16 @@ import { CommandService } from '../../../services/api/command/CommandService';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { Language } from '../../../domain/page';
+import { getLocalizedPath } from '../../../config/seo';
 
 interface Props {
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
+	language: Language;
 }
 
-const Cmd = ({ setRanking, changeLanguage }: Props) => {
+const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 	const { t } = useTranslation();
 	const { toggleTheme } = useTheme();
 	const navigate = useNavigate();
@@ -24,12 +27,12 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 	const [results, setResults] = useState<
 		{
 			command: string;
-			response: [string];
+			response: string[];
 			color: string;
 		}[]
 	>([]);
 
-	const saveResult = (response: [string], color: string = '') => {
+	const saveResult = (response: string[], color = '') => {
 		setResults((prevState) => [...prevState, { command, response, color }]);
 	};
 
@@ -52,11 +55,11 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 		const responseData = await ReviewService.findAll();
 
 		if (responseData instanceof Error) {
-			console.error(responseData.message);
+			saveResult([t('terminal.info.error')], '#ed4337');
 			return;
 		}
 
-		const response = ['', ...formatReviewResponse(responseData)] as [string];
+		const response = ['', ...formatReviewResponse(responseData)];
 		saveResult(response);
 	};
 
@@ -80,7 +83,7 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 	};
 
 	const handleRouteCommand = (route: string): void => {
-		navigate(`/${route}`);
+		navigate(getLocalizedPath(`/${route}`, language));
 		saveResult(['']);
 	};
 
@@ -88,7 +91,6 @@ const Cmd = ({ setRanking, changeLanguage }: Props) => {
 		const responseData = await CommandService.getResponse(command);
 
 		if (responseData instanceof Error) {
-			console.error(responseData.message);
 			saveResult([t('terminal.info.error')], '#ed4337');
 			return;
 		}

@@ -1,36 +1,16 @@
+import { Box, Container, Grid } from '@mui/material';
 import {
-	Box,
-	Container,
-	Divider,
-	Grid,
-	Link,
-	Paper,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableFooter,
-	TableHead,
-	TableRow,
-	Typography,
-} from '@mui/material';
-import { ReactNode, useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { useLocation } from 'react-router-dom';
-import rehypeRaw from 'rehype-raw';
-import remarkBreaks from 'remark-breaks';
-import remarkGfm from 'remark-gfm';
-import { Page, StorageService } from '../../services/storageService';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import {
-	materialDark,
-	materialLight,
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
-import ReactSimpleCodeEditor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/themes/prism-tomorrow.css';
-import { useTheme } from '../../contexts/ThemeContext';
+	lazy,
+	Suspense,
+	useCallback,
+	useEffect,
+	useState,
+} from 'react';
+import { Page } from '../../domain/page';
+import { StorageService } from '../../services/storageService';
+import MarkdownRenderer from './MarkdownRenderer';
+
+const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 
 interface Props {
 	path: string;
@@ -38,182 +18,85 @@ interface Props {
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
 
-function MarkdownLink(props: any) {
-	return (
-		<Link
-			href={props.href}
-			target='_blank'
-			underline='hover'
-		>
-			{props.children}
-		</Link>
-	);
-}
-
-function MarkdownTable(props: { children: ReactNode }) {
-	return (
-		<TableContainer component={Paper}>
-			<Table
-				size='small'
-				aria-label='Data table'
-			>
-				{props.children}
-			</Table>
-		</TableContainer>
-	);
-}
-
-function MarkdownTableCell(props: { children: ReactNode }) {
-	return (
-		<TableCell>
-			{props.children}
-		</TableCell>
-	);
-}
-
-function MarkdownCode(
-	props: { children: ReactNode; className?: string },
-	isDarkTheme: boolean
-) {
-	const language = props.className ? props.className.split('-')[1] : 'md';
-	return (
-		<SyntaxHighlighter
-			language={language}
-			style={isDarkTheme ? materialDark : materialLight}
-		>
-			{String(props.children).replace(/\n$/, '')}
-		</SyntaxHighlighter>
-	);
-}
-
-function MarkdownH1(props: { children: ReactNode }) {
-	return (
-		<>
-			<Typography
-				component='h1'
-				variant='h1'
-				sx={{
-					fontSize: '2em',
-					display: 'block',
-					marginBlockStart: '0.67em',
-					marginBlockEnd: '0.3em',
-					fontWeight: 'bold',
-					lineHeight: 1.25,
-				}}
-			>
-				{props.children}
-			</Typography>
-			<Divider />
-		</>
-	);
-}
-
-function MarkdownH2(props: { children: ReactNode }) {
-	return (
-		<>
-			<Typography
-				component='h2'
-				variant='h2'
-				sx={{
-					fontSize: '1.5em',
-					display: 'block',
-					marginBlockStart: '0.83em',
-					marginBlockEnd: '0.3em',
-					fontWeight: 'bold',
-					lineHeight: 1.25,
-				}}
-			>
-				{props.children}
-			</Typography>
-			<Divider />
-		</>
-	);
+function hasEditableContent(page?: Page): page is Page & { content?: string } {
+	return Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
 }
 
 export default function MDContainer({ path, page, setPages }: Props) {
-	const { theme } = useTheme();
-	const isDarkTheme = theme === 'dark';
 	const [content, setContent] = useState('');
-	const [editMode, setEditMode] = useState(false);
-	const { pathname } = useLocation();
+	const editMode = hasEditableContent(page);
 
-	const loadContent = async () => {
-		if (page && 'content' in page) {
+	useEffect(() => {
+		if (editMode) {
 			setContent(page.content || '');
-			setEditMode(true);
 			return;
 		}
 
-		setEditMode(false);
-		try {
-			const response = await fetch(path);
-			const text = await response.text();
-			setContent(text);
-		} catch (error) {
-			console.error('Failed to load markdown content:', error);
-			setContent('# Error\n\nFailed to load content.');
-		}
-	};
+		const controller = new AbortController();
+		void fetch(path, {
+			cache: 'force-cache',
+			signal: controller.signal,
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error(`Failed to load content (${response.status})`);
+				}
+				return response.text();
+			})
+			.then(setContent)
+			.catch((error: unknown) => {
+				if (error instanceof DOMException && error.name === 'AbortError') return;
+				setContent('# Error\n\nFailed to load content.');
+			});
+
+		return () => controller.abort();
+	}, [editMode, page, path]);
+
+	const handleChange = useCallback(
+		(newContent: string) => {
+			setContent(newContent);
+			if (!page) return;
+
+			setPages((currentPages) =>
+				currentPages.map((currentPage) =>
+					currentPage.index === page.index
+						? { ...currentPage, content: newContent, isSaved: false }
+						: currentPage
+				)
+			);
+		},
+		[page, setPages]
+	);
 
 	useEffect(() => {
-		loadContent();
-	}, [path, page]);
+		function savePage(event: KeyboardEvent) {
+			if (!event.ctrlKey || event.key.toLowerCase() !== 's' || !editMode) return;
 
-	useEffect(() => {
-		let title = pathname.substring(1, pathname.length);
-		title = title[0].toUpperCase() + title.substring(1);
-		document.title = `${import.meta.env.VITE_NAME!} | ${title}`;
-	}, [pathname]);
-
-	const handleChange = (code: string) => {
-		const newContent = String(code);
-		setContent(newContent);
-		if (page) {
-			setPages((prev) =>
-				prev.map((p) =>
-					p.index === page.index
-						? { ...p, content: newContent, isSaved: false }
-						: p
+			event.preventDefault();
+			const updatedPage = { ...page, content, isSaved: true };
+			StorageService.saveOrUpdateData(updatedPage);
+			setPages((currentPages) =>
+				currentPages.map((currentPage) =>
+					currentPage.index === page.index ? updatedPage : currentPage
 				)
 			);
 		}
-	};
 
-	useEffect(() => {
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.ctrlKey && e.key.toLowerCase() === 's') {
-				e.preventDefault();
-				if (page && page.hasOwnProperty('content')) {
-					const updatedPage = { ...page, content, isSaved: true };
-					StorageService.saveOrUpdateData(updatedPage);
-					setPages((prev) =>
-						prev.map((p) => (p.index === page.index ? updatedPage : p))
-					);
-				}
-			}
-		}
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => window.removeEventListener('keydown', handleKeyDown);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [path, page, content]);
+		window.addEventListener('keydown', savePage);
+		return () => window.removeEventListener('keydown', savePage);
+	}, [content, editMode, page, setPages]);
 
 	return (
 		<Container
 			sx={{
 				height: '100%',
 				padding: { xs: 1, sm: 2, md: 3 },
-				'& h1, & h2, & h3': {
-					wordBreak: 'break-word',
-				},
+				'& h1, & h2, & h3': { wordBreak: 'break-word' },
 				'& p, & li': {
 					wordBreak: 'break-word',
 					overflowWrap: 'break-word',
 				},
-				'& img': {
-					maxWidth: '100%',
-					height: 'auto',
-				},
+				'& img': { maxWidth: '100%', height: 'auto' },
 			}}
 		>
 			{editMode ? (
@@ -227,23 +110,12 @@ export default function MDContainer({ path, page, setPages }: Props) {
 							xs={5}
 							sx={{ pt: 2 }}
 						>
-							<ReactSimpleCodeEditor
-								value={content}
-								onValueChange={(code) => {
-									handleChange(code);
-								}}
-								highlight={(code) =>
-									highlight(code, languages.markdown, 'markdown')
-								}
-								style={{
-									fontFamily: '"Fira code", "Fira Mono", monospace',
-									fontSize: 14,
-									lineHeight: '1.5',
-									height: '100%',
-								}}
-								textareaClassName='code-editor-textarea'
-								preClassName='code-editor-pre'
-							/>
+							<Suspense fallback={null}>
+								<MarkdownEditor
+									value={content}
+									onChange={handleChange}
+								/>
+							</Suspense>
 						</Grid>
 
 						<Grid
@@ -251,47 +123,14 @@ export default function MDContainer({ path, page, setPages }: Props) {
 							xs={7}
 							sx={{ pl: 2, borderLeft: '1px solid #8686867b' }}
 						>
-							<ReactMarkdown
-								children={content}
-								components={{
-									code: (props: { children: ReactNode; className?: string }) =>
-										MarkdownCode(props, isDarkTheme),
-									a: MarkdownLink,
-									table: MarkdownTable,
-									thead: TableHead,
-									tbody: TableBody,
-									th: MarkdownTableCell,
-									tr: TableRow,
-									td: MarkdownTableCell,
-									tfoot: TableFooter,
-									h1: MarkdownH1,
-									h2: MarkdownH2,
-								}}
-								remarkPlugins={[remarkGfm, remarkBreaks]}
-								rehypePlugins={[rehypeRaw]}
-							/>
+							<MarkdownRenderer content={content} />
 						</Grid>
 					</Grid>
 				</Box>
 			) : (
-				<ReactMarkdown
-					children={content}
-					components={{
-						code: (props: { children: ReactNode; className?: string }) =>
-							MarkdownCode(props, isDarkTheme),
-						a: MarkdownLink,
-						table: MarkdownTable,
-						thead: TableHead,
-						tbody: TableBody,
-						th: MarkdownTableCell,
-						tr: TableRow,
-						td: MarkdownTableCell,
-						tfoot: TableFooter,
-						h1: MarkdownH1,
-						h2: MarkdownH2,
-					}}
-					remarkPlugins={[remarkGfm, remarkBreaks]}
-					rehypePlugins={[rehypeRaw]}
+				<MarkdownRenderer
+					content={content}
+					allowRawHtml
 				/>
 			)}
 		</Container>

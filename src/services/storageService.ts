@@ -1,24 +1,34 @@
+import { isPage, Page } from '../domain/page';
+
 const STORAGE_KEY = 'markdown-editor-data';
 
-export interface Page {
-	index: number;
-	name: string;
-	route: string;
-	content?: string;
-	isSaved?: boolean;
-	isFolder?: boolean;
-	children?: Page[];
+function parseStoredPages(raw: string | null): Page[] {
+	if (!raw) return [];
+
+	try {
+		const parsed: unknown = JSON.parse(raw);
+		if (!Array.isArray(parsed)) return [];
+
+		const pages = parsed.filter(isPage);
+		if (pages.length !== parsed.length) {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+		}
+		return pages;
+	} catch {
+		localStorage.removeItem(STORAGE_KEY);
+		return [];
+	}
 }
+
+export type { Page } from '../domain/page';
 
 export const StorageService = {
 	getData: (): Page[] => {
-		const data = localStorage.getItem(STORAGE_KEY);
-		return data ? JSON.parse(data) : [];
+		return parseStoredPages(localStorage.getItem(STORAGE_KEY));
 	},
 
 	saveOrUpdateData: (data: Page) => {
-		const storageData = localStorage.getItem(STORAGE_KEY);
-		const parsedData = storageData ? JSON.parse(storageData) : [];
+		const parsedData = StorageService.getData();
 
 		const updatedData = parsedData.some(
 			(page: Page) => page.index === data.index
@@ -31,7 +41,7 @@ export const StorageService = {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},
 
-	createFile: (name: string, content: string = '', parentId?: number): Page => {
+	createFile: (name: string, content = ''): Page => {
 		return {
 			index: Date.now(),
 			name,
