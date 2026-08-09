@@ -80,6 +80,95 @@ describe('MDContainer', () => {
 		);
 	});
 
+	it('loads static content when page metadata has no editable content', async () => {
+		global.fetch = jest.fn().mockResolvedValue({
+			ok: true,
+			text: jest.fn().mockResolvedValue('# Static page'),
+		});
+		const page = {
+			index: 10,
+			name: 'about.md',
+			route: 'about-me',
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/about.md'
+					page={page}
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		await waitFor(() =>
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+				'# Static page'
+			)
+		);
+		expect(screen.queryByLabelText('Markdown editor')).not.toBeInTheDocument();
+	});
+
+	it('ignores abort errors while loading static content', async () => {
+		global.fetch = jest
+			.fn()
+			.mockRejectedValue(new DOMException('Request aborted', 'AbortError'));
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/cancelled.md'
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+		expect(screen.getByTestId('markdown-renderer')).not.toHaveTextContent(
+			'Failed to load content.'
+		);
+	});
+
+	it('aborts an active static request on unmount', () => {
+		global.fetch = jest.fn(() => new Promise(() => undefined));
+		const abort = jest.spyOn(AbortController.prototype, 'abort');
+		const { unmount } = render(
+			<MemoryRouter>
+				<MDContainer
+					path='/pending.md'
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		unmount();
+
+		expect(abort).toHaveBeenCalledTimes(1);
+	});
+
+	it('opens editable pages with empty content', async () => {
+		global.fetch = jest.fn();
+		const page = {
+			index: 15,
+			name: 'empty.md',
+			route: 'empty.md',
+			content: undefined,
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/unused'
+					page={page}
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		expect(await screen.findByLabelText('Markdown editor')).toHaveValue('');
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
 	it('edits and persists a custom page without fetching static content', async () => {
 		global.fetch = jest.fn();
 		const savePage = jest
@@ -92,7 +181,14 @@ describe('MDContainer', () => {
 			content: '# Notes',
 			isSaved: true,
 		};
-		let pages = [page];
+		const otherPage = {
+			index: 21,
+			name: 'other.md',
+			route: 'other.md',
+			content: '# Other',
+			isSaved: true,
+		};
+		let pages = [page, otherPage];
 		const setPages = jest.fn((update) => {
 			pages = typeof update === 'function' ? update(pages) : update;
 		});
@@ -114,6 +210,11 @@ describe('MDContainer', () => {
 		expect(pages[0]).toEqual(
 			expect.objectContaining({ content: '# Updated notes', isSaved: false })
 		);
+		expect(pages[1]).toBe(otherPage);
+
+		fireEvent.keyDown(window, { key: 's' });
+		fireEvent.keyDown(window, { key: 'x', ctrlKey: true });
+		expect(savePage).not.toHaveBeenCalled();
 
 		fireEvent.keyDown(window, { key: 's', ctrlKey: true });
 		expect(savePage).toHaveBeenCalledWith(
@@ -126,6 +227,7 @@ describe('MDContainer', () => {
 		expect(pages[0]).toEqual(
 			expect.objectContaining({ content: '# Updated notes', isSaved: true })
 		);
+		expect(pages[1]).toBe(otherPage);
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
 });
