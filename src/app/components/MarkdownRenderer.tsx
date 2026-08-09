@@ -13,8 +13,9 @@ import {
 	Typography,
 } from '@mui/material';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Options as ReactMarkdownOptions } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -25,7 +26,72 @@ interface MarkdownRendererProps {
 }
 
 const markdownPlugins = [remarkGfm, remarkBreaks];
-const rawHtmlPlugins = [rehypeRaw];
+const rawHtmlSchema = {
+	...defaultSchema,
+	tagNames: [...defaultSchema.tagNames!, 'iframe', 'link', 'main'],
+	attributes: {
+		...defaultSchema.attributes,
+		'*': [...defaultSchema.attributes!['*']!, 'className'],
+		iframe: [
+			'src',
+			'title',
+			'width',
+			'height',
+			'frameBorder',
+			'allow',
+			'allowFullScreen',
+		],
+		link: ['href', ['rel', 'stylesheet']],
+	},
+};
+const rawHtmlPlugins: NonNullable<ReactMarkdownOptions['rehypePlugins']> = [
+	rehypeRaw,
+	[rehypeSanitize, rawHtmlSchema],
+];
+
+const allowedEmbedOrigins = new Set([
+	'https://www.youtube.com',
+	'https://www.youtube-nocookie.com',
+]);
+
+const deviconStylesheet =
+	'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
+const deviconIntegrity =
+	'sha384-6iv3tXABd3c9DYulXujJl8n22ahn/12f45MomxoPv6jBX4LBE4gNJjfkx5mAKIqR';
+const allowedStylesheets = new Set([
+	deviconStylesheet,
+	'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0',
+]);
+const localStylesheetPattern = /^\.\.\/\.\.\/styles\/[a-z0-9-]+\.css$/;
+
+export function getAllowedEmbedSource(source?: string): string | null {
+	if (!source) return null;
+
+	try {
+		const url = new URL(source);
+		if (!allowedEmbedOrigins.has(url.origin)) return null;
+		if (!url.pathname.startsWith('/embed/')) return null;
+		return url.toString();
+	} catch {
+		return null;
+	}
+}
+
+function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
+	if (props.rel !== 'stylesheet' || !props.href) return null;
+	const isRemoteStylesheet = allowedStylesheets.has(props.href);
+	if (!isRemoteStylesheet && !localStylesheetPattern.test(props.href)) return null;
+
+	return (
+		<link
+			rel='stylesheet'
+			href={props.href}
+			integrity={props.href === deviconStylesheet ? deviconIntegrity : undefined}
+			crossOrigin={isRemoteStylesheet ? 'anonymous' : undefined}
+			referrerPolicy='no-referrer'
+		/>
+	);
+}
 
 function MarkdownLink(props: ComponentPropsWithoutRef<'a'>) {
 	return (
@@ -53,11 +119,19 @@ function MarkdownImage(props: ComponentPropsWithoutRef<'img'>) {
 }
 
 function MarkdownIframe(props: ComponentPropsWithoutRef<'iframe'>) {
+	const source = getAllowedEmbedSource(props.src);
+	if (!source) return null;
+
 	return (
 		<iframe
 			{...props}
+			src={source}
 			loading='lazy'
 			title={props.title || 'Embedded content'}
+			allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share'
+			allowFullScreen
+			referrerPolicy='strict-origin-when-cross-origin'
+			sandbox='allow-scripts allow-same-origin allow-presentation'
 		/>
 	);
 }
@@ -159,6 +233,7 @@ export default function MarkdownRenderer({
 				a: MarkdownLink,
 				img: MarkdownImage,
 				iframe: MarkdownIframe,
+				link: MarkdownStylesheet,
 				table: MarkdownTable,
 				thead: TableHead,
 				tbody: TableBody,
