@@ -1,3 +1,35 @@
+const fullCoverage = {
+    branches: 100,
+    functions: 100,
+    lines: 100,
+    statements: 100
+};
+
+const interactiveCoverage = {
+    branches: 90,
+    functions: 100,
+    lines: 100,
+    statements: 95
+};
+
+const fullyCoveredModules = [
+    'src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal.tsx',
+    'src/app/components/MarkdownEditor.tsx',
+    'src/app/hooks/useAppKeyboardShortcuts.ts',
+    'src/app/pages/Home.tsx',
+    'src/services/api/axios-config/createApiClient.ts',
+    'src/services/api/review/ReviewService.ts',
+    'src/services/storageService.ts',
+];
+
+const interactiveModules = [
+    'src/app/components/MDContainer.tsx',
+    'src/app/components/MarkdownRenderer.tsx',
+    'src/app/components/Terminal/Cmd.tsx',
+    'src/app/layout/AppTree.tsx',
+    'src/app/layout/Sidebar.tsx',
+];
+
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
@@ -25,11 +57,11 @@ module.exports = {
             lines: 90,
             statements: 90
         },
-        'src/services/api/axios-config/createApiClient.ts': {
-            branches: 100,
-            functions: 100,
-            lines: 100,
-            statements: 100
-        },
+        ...Object.fromEntries(
+            fullyCoveredModules.map((modulePath) => [modulePath, fullCoverage])
+        ),
+        ...Object.fromEntries(
+            interactiveModules.map((modulePath) => [modulePath, interactiveCoverage])
+        ),
     }
 };
