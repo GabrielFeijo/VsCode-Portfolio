@@ -5,13 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { convertFileName } from '../../utils/convertFileName';
 import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
+import { Language, Page } from '../../domain/page';
+import { getLocalizedPath } from '../../config/seo';
 
 interface Props {
-	pages: {
-		index: number;
-		name: string;
-		route: string;
-	}[];
+	pages: Page[];
+	language: Language;
 	selectedIndex: number;
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 	currentComponent: string;
@@ -22,6 +21,7 @@ interface Props {
 
 export default function AppButtons({
 	pages,
+	language,
 	selectedIndex,
 	setSelectedIndex,
 	currentComponent,
@@ -105,7 +105,7 @@ export default function AppButtons({
 			setVisiblePageIndexes([contextMenu.tabIndex]);
 			setSelectedIndex(contextMenu.tabIndex);
 			const page = pages.find((x) => x.index === contextMenu.tabIndex);
-			if (page) navigate(`/${page.route}`);
+			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
 		}
 	};
 
@@ -127,7 +127,7 @@ export default function AppButtons({
 
 	const handleCloseAll = () => {
 		setVisiblePageIndexes([]);
-		navigate('/');
+		navigate(getLocalizedPath('/', language));
 	};
 
 	function renderPageButton(index: number, name: string, route: string) {
@@ -148,7 +148,7 @@ export default function AppButtons({
 					onClick={() => {
 						setSelectedIndex(index);
 						setCurrentComponent('button');
-						navigate(`/${route}`);
+						navigate(getLocalizedPath(`/${route}`, language));
 					}}
 					onContextMenu={(e: React.MouseEvent<Element, MouseEvent>) => handleContextMenu(e, index)}
 					sx={{
@@ -173,7 +173,7 @@ export default function AppButtons({
 					<Box
 						aria-label={`Close ${convertFileName(name)} tab`}
 						tabIndex={0}
-						onKeyDown={(e: any) => {
+						onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
 								e.stopPropagation();
@@ -201,7 +201,7 @@ export default function AppButtons({
 							alignItems: 'center',
 							justifyContent: 'center',
 						}}
-						onClick={(e: any) => {
+						onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 							e.stopPropagation();
 							setVisiblePageIndexes(
 								visiblePageIndexes.filter((x) => x !== index)

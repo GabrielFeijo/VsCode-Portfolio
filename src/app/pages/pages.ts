@@ -1,4 +1,6 @@
-export const pageRoutes = {
+import { Language, Page } from '../../domain/page';
+
+export const pageRoutes: Record<Language, Page[]> = {
 	en: [
 		{ index: 0, name: 'about-me.html', route: 'about-me' },
 		{ index: 1, name: 'skills.html', route: 'skills' },

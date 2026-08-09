@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { CacheService } from '../../services/cacheService';
 import dayjs from 'dayjs';
-import MetadataComponent from '../layout/Metadata';
+import { siteConfig } from '../../config/site';
 
 interface Props {
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -50,19 +50,13 @@ export default function Home({ setSelectedIndex }: Props) {
 
 	const getConnection = async () => {
 		if (!CacheService.has24HoursPassed()) {
-			setLoading(false);
 			return;
 		}
 
-		try {
-			setTimeout(() => {
-				setLoading(false);
-			}, 2500);
-			await HomeService.getResponse();
-			CacheService.setCache({ lastFetch: dayjs().toISOString() });
-		} catch (e) {
-			console.error('Erro ao buscar dados do HomeService:', e);
-		}
+		const response = await HomeService.getResponse();
+		if (response instanceof Error) throw response;
+
+		CacheService.setCache({ lastFetch: dayjs().toISOString() });
 	};
 
 	useEffect(() => {
@@ -70,13 +64,22 @@ export default function Home({ setSelectedIndex }: Props) {
 	}, [setSelectedIndex]);
 
 	useEffect(() => {
-		document.title = import.meta.env.VITE_NAME!;
-		getConnection();
+		let active = true;
+		document.title = siteConfig.name;
+
+		void getConnection()
+			.catch(() => undefined)
+			.finally(() => {
+				if (active) setLoading(false);
+			});
+
+		return () => {
+			active = false;
+		};
 	}, [pathname]);
 
 	return (
 		<>
-			<MetadataComponent />
 			{loading && <Loading></Loading>}
 			<Grid
 				container
@@ -139,13 +142,19 @@ export default function Home({ setSelectedIndex }: Props) {
 												title={link.title}
 												arrow
 											>
-												<Link
-													target='_blank'
-													href={link.href}
+											<Link
+												target='_blank'
+												rel='noopener noreferrer'
+												href={link.href}
 													underline='none'
 													color='inherit'
 												>
-													<IconButton color='inherit'>{link.icon}</IconButton>
+												<IconButton
+													color='inherit'
+													aria-label={link.title}
+												>
+													{link.icon}
+												</IconButton>
 												</Link>
 											</Tooltip>
 										);

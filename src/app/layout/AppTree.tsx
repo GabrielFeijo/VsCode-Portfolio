@@ -14,10 +14,11 @@ import {
 import { convertFileName } from '../../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, InputBase } from '@mui/material';
-import { Page, StorageService } from '../../services/storageService';
+import { StorageService } from '../../services/storageService';
+import { Language, Page } from '../../domain/page';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
-import i18n from '../../i18n';
 import { normalizeFileName } from '../../utils/normalizeFileName';
+import { getBasePath, getLocalizedPath } from '../../config/seo';
 
 interface Props {
 	pages: Page[];
@@ -28,7 +29,7 @@ interface Props {
 	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
 	visiblePageIndexes: number[];
 	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
-	language: string;
+	language: Language;
 }
 
 export default function AppTree({
@@ -40,16 +41,19 @@ export default function AppTree({
 	setCurrentComponent,
 	visiblePageIndexes,
 	setVisiblePageIndexes,
+	language,
 }: Props) {
 	const navigate = useNavigate();
 	const theme = useTheme();
 	const { t } = useTranslation();
-	let { pathname } = useLocation();
+	const { pathname } = useLocation();
 	const [isCreatingFile, setIsCreatingFile] = useState(false);
 	const [newFileName, setNewFileName] = useState('');
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const page: Page = pages.find((x) => x.route === pathname)!;
+	const page: Page | undefined = pages.find(
+		(item) => `/${item.route}` === getBasePath(pathname)
+	);
 
 	useEffect(() => {
 		if (page) {
@@ -98,7 +102,7 @@ export default function AppTree({
 			setVisiblePageIndexes((prev) => [...prev, page.index]);
 		}
 		setSelectedIndex(page.index);
-		navigate(page.route);
+		navigate(getLocalizedPath(`/${page.route}`, language));
 	}
 
 	function createNewFile() {
@@ -142,7 +146,7 @@ export default function AppTree({
 		setVisiblePageIndexes((prev) => prev.filter((x) => x !== pageIndex));
 		StorageService.deleteFile(pageIndex);
 		setSelectedIndex(0);
-		navigate('/about-me');
+		navigate(getLocalizedPath('/about-me', language));
 	};
 
 	const [contextMenu, setContextMenu] = useState<{
@@ -186,8 +190,7 @@ export default function AppTree({
 
 			if (!existingPage) return;
 
-			setSelectedIndex(existingPage.index);
-			navigate(existingPage.route);
+			openFile(existingPage);
 		}
 		handleClose();
 	};
@@ -202,8 +205,9 @@ export default function AppTree({
 			if (!existingPage) return;
 
 			window.open(
-				`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${i18n.language}/${existingPage.name}`,
-				'_blank'
+				`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${language}/${existingPage.name}`,
+				'_blank',
+				'noopener,noreferrer'
 			);
 		}
 		handleClose();
@@ -315,7 +319,7 @@ export default function AppTree({
 									const newIndexes = [...visiblePageIndexes, index];
 									setVisiblePageIndexes(newIndexes);
 								}
-								navigate(`${route}`);
+								navigate(getLocalizedPath(`/${route}`, language));
 								setSelectedIndex(index);
 								setCurrentComponent('tree');
 							}}

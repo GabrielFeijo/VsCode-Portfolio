@@ -34,7 +34,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		control,
 		watch,
 		reset,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<ReviewFormData>({
 		resolver: zodResolver(reviewSchema),
 		defaultValues: {
@@ -122,6 +122,9 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 				>
 					<motion.div
 						className={styles.modal}
+						role='dialog'
+						aria-modal='true'
+						aria-labelledby='rating-title'
 						variants={{
 							initial: { scale: 0.95, opacity: 0 },
 							animate: { scale: 1, opacity: 1 },
@@ -131,7 +134,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 					>
 						<div className={styles.modalHeader}>
 							<div></div>
-							<h3 className={styles.title}>{t('rating.evaluate')}</h3>
+							<h3 id='rating-title' className={styles.title}>{t('rating.evaluate')}</h3>
 							<button
 								className={styles.closeButton}
 								onClick={() => setRanking(false)}
@@ -222,6 +225,8 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 									type='submit'
 									className={styles.submitButton}
 									aria-label={t('rating.submit') || 'Submit rating'}
+									disabled={isSubmitting}
+									aria-busy={isSubmitting}
 								>
 									{t('rating.submit')}
 								</button>

@@ -1,26 +1,34 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	Box,
 	Container,
-	createTheme,
 	CssBaseline,
 	Grid,
 	Stack,
 	ThemeProvider,
 	Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import {
+	lazy,
+	Suspense,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import AppTree from './AppTree';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import {
+	Routes,
+	Route,
+	useLocation,
+	useNavigate,
+	Navigate,
+} from 'react-router-dom';
 import AppButtons from './AppButtons';
-import MDContainer from '../components/MDContainer';
 import Home from '../pages/Home';
 import { motion, AnimatePresence } from 'framer-motion';
 import { isBrowser, isMobile } from 'react-device-detect';
-import Terminal from './Terminal';
-import BoxRating from '../components/Rating/BoxRating';
 import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 import i18n from '../../i18n';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -32,25 +40,36 @@ import {
 	slideInOut,
 	slideUpDown,
 } from '../../utils/motionVariants';
-import { Page, StorageService } from '../../services/storageService';
+import { StorageService } from '../../services/storageService';
+import { Language, Page } from '../../domain/page';
 import MetadataComponent from './Metadata';
+import { createAppTheme } from '../theme/createAppTheme';
+import { useAppKeyboardShortcuts } from '../hooks/useAppKeyboardShortcuts';
+import {
+	getLanguageFromPathname,
+	getLocalizedPath,
+} from '../../config/seo';
+
+const BoxRating = lazy(() => import('../components/Rating/BoxRating'));
+const MDContainer = lazy(() => import('../components/MDContainer'));
+const Terminal = lazy(() => import('./Terminal'));
 
 export function initVisiblePageIndexes(pages: Page[]) {
-	const tabs = [];
-	for (let i = 0; i < pages.length; i++) {
-		const page = pages[i];
-		tabs.push(page.index);
-	}
-	return tabs;
+	return pages.map(({ index }) => index);
+}
+
+function loadPages(language: Language): Page[] {
+	return [...pageRoutes[language], ...StorageService.getData()];
 }
 
 export default function App() {
-	const [language, setLanguage] = useState(i18n.language as 'pt' | 'en');
+	const { pathname } = useLocation();
+	const language = getLanguageFromPathname(pathname);
 	const { theme: paletteType, toggleTheme } = useTheme();
 	const { t } = useTranslation();
 	const isDarkMode = paletteType === 'dark';
 
-	const [pages, setPages] = useState<Page[]>(pageRoutes[language]);
+	const [pages, setPages] = useState<Page[]>(() => loadPages(language));
 	const navigate = useNavigate();
 
 	const [expanded, setExpanded] = useState(isBrowser);
@@ -63,132 +82,108 @@ export default function App() {
 	);
 	const [ranking, setRanking] = useState(false);
 
-	const [visiblePages, setVisiblePages] = useState(pages);
+	const theme = useMemo(
+		() => createAppTheme(paletteType),
+		[paletteType]
+	);
 
-	const theme = createTheme({
-		palette: {
-			mode: paletteType,
-			background: {
-				default: paletteType === 'light' ? '#FFFFFF' : '#282A36',
-			},
-		},
-		components: {
-			MuiDivider: {
-				styleOverrides: {
-					root: {
-						borderColor: 'rgba(255, 255, 255, 0.12)',
-					},
-				},
-			},
-		},
-	});
-
-	function changeLanguage() {
+	const changeLanguage = useCallback(() => {
 		const newLanguage = language === 'pt' ? 'en' : 'pt';
-		const defaultPages = pageRoutes[newLanguage];
-		const pages = StorageService.getData() || [];
-		setPages([...defaultPages, ...pages]);
-		setLanguage(newLanguage);
-		i18n.changeLanguage(newLanguage);
-	}
-
-	const deletedIndex = visiblePages.find(
-		(x) => !visiblePageIndexes.includes(x.index)
-	)?.index;
+		void i18n.changeLanguage(newLanguage);
+		navigate(getLocalizedPath(pathname, newLanguage));
+	}, [language, navigate, pathname]);
 
 	useEffect(() => {
-		const newPages = [];
+		setPages(loadPages(language));
 
-		for (const index of visiblePageIndexes) {
-			const page = pages.find((x) => x.index === index);
-			if (page) newPages.push(page);
+		if (!i18n.language.toLowerCase().startsWith(language)) {
+			void i18n.changeLanguage(language);
 		}
-		setVisiblePages(newPages);
+	}, [language]);
 
+	const visiblePages = useMemo(
+		() =>
+			visiblePageIndexes
+				.map((index) => pages.find((page) => page.index === index))
+				.filter((page): page is Page => page !== undefined),
+		[pages, visiblePageIndexes]
+	);
+
+	useEffect(() => {
 		if (visiblePageIndexes.length === 0) {
 			setSelectedIndex(-1);
-			return navigate('/');
+			navigate(getLocalizedPath('/', language));
+			return;
 		}
 
-		if (deletedIndex === selectedIndex) {
+		if (selectedIndex !== -1 && !visiblePageIndexes.includes(selectedIndex)) {
 			const maxIndex = Math.max(...visiblePageIndexes);
 			const minIndex = Math.min(...visiblePageIndexes);
 
-			const newIndex = deletedIndex > maxIndex ? maxIndex : minIndex;
+			const newIndex = selectedIndex > maxIndex ? maxIndex : minIndex;
 			setSelectedIndex(newIndex);
 
 			const page = pages.find((x) => x.index === newIndex);
-			if (page) navigate(`/${page.route}`);
+			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
 		}
-	}, [visiblePageIndexes, navigate, deletedIndex, selectedIndex, pages]);
+	}, [language, navigate, pages, selectedIndex, visiblePageIndexes]);
 
-	useEffect(() => {
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.ctrlKey && e.key === 'j' && !isMobile) {
-				e.preventDefault();
-				setTerminal((prev) => !prev);
-			}
+	const navigateHome = useCallback(
+		() => navigate(getLocalizedPath('/', language)),
+		[language, navigate]
+	);
+	const toggleExplorer = useCallback(() => setExpanded((value) => !value), []);
+	const toggleTerminal = useCallback(() => setTerminal((value) => !value), []);
 
-			if (e.ctrlKey && e.key.toLowerCase() === 'd') {
-				e.preventDefault();
-				toggleTheme();
-			}
-
-			if (e.ctrlKey && e.key.toLowerCase() === 'l') {
-				e.preventDefault();
-				changeLanguage();
-			}
-
-			if (e.ctrlKey && e.key.toLowerCase() === 'b') {
-				e.preventDefault();
-				setExpanded((prev) => !prev);
-			}
-
-			if (e.ctrlKey && e.key.toLowerCase() === 'h') {
-				e.preventDefault();
-				navigate('/');
-			}
-		}
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [language]);
-
-	useEffect(() => {
-		const defaultPages = pageRoutes[language];
-		const pages = StorageService.getData() || [];
-		if (pages.length === 0) return;
-		setPages([...defaultPages, ...pages]);
-	}, []);
+	useAppKeyboardShortcuts({
+		changeLanguage,
+		navigateHome,
+		terminalEnabled: !isMobile,
+		toggleExplorer,
+		toggleTerminal,
+		toggleTheme,
+	});
 
 	return (
 		<>
 			<MetadataComponent />
-			<BoxRating
-				ranking={ranking}
-				setRanking={setRanking}
-			/>
+			{ranking && (
+				<Suspense fallback={null}>
+					<BoxRating
+						ranking={ranking}
+						setRanking={setRanking}
+					/>
+				</Suspense>
+			)}
 			<KeyboardShortcutsModal visible={true} />
 			{language && (
 				<ThemeProvider theme={theme}>
 					<CssBaseline enableColorScheme />
 					<Container
-						sx={{ m: 0, p: 0, overflowY: 'hidden' }}
+						sx={{
+							m: 0,
+							p: 0,
+							width: '100%',
+							height: 'var(--app-viewport-height)',
+							maxHeight: 'var(--app-viewport-height)',
+							overflow: 'hidden',
+						}}
 						maxWidth={false}
 						disableGutters
 					>
 						<Grid
 							container
-							sx={{ overflow: 'auto', overflowY: 'hidden' }}
+							sx={{ height: '100%', overflow: 'hidden' }}
 						>
 							<Grid
 								container
-								sx={{ overflow: 'auto' }}
+								sx={{ height: 'calc(100% - 20px)', overflow: 'hidden' }}
 							>
 								<Grid
 									item
 									sx={{
 										width: 50,
+										height: '100%',
 										zIndex: isMobile ? 1000 : 2,
 									}}
 								>
@@ -197,6 +192,7 @@ export default function App() {
 										initial='initial'
 										animate='animate'
 										exit='exit'
+										style={{ height: '100%' }}
 									>
 										<Sidebar
 											setExpanded={setExpanded}
@@ -220,7 +216,9 @@ export default function App() {
 												position: isMobile ? 'fixed' : 'relative',
 												left: isMobile ? 50 : 0,
 												top: 0,
-												height: isMobile ? '100vh' : 'auto',
+												height: isMobile
+													? 'calc(var(--app-viewport-height) - 20px)'
+													: '100%',
 												zIndex: isMobile ? 999 : 'auto',
 												boxShadow: isMobile ? '2px 0 8px rgba(0,0,0,0.2)' : 'none',
 											}}
@@ -229,7 +227,8 @@ export default function App() {
 												item
 												sx={{
 													backgroundColor: isDarkMode ? '#21222c' : '#f3f3f3',
-													minHeight: `calc(100vh - 20px)`,
+													height: '100%',
+													minHeight: 0,
 												}}
 											>
 												<Stack>
@@ -282,6 +281,9 @@ export default function App() {
 									sx={{
 										width: '100%',
 										maxWidth: '100%',
+										height: '100%',
+										minHeight: 0,
+										overflow: 'hidden',
 									}}
 								>
 									<Grid
@@ -290,6 +292,7 @@ export default function App() {
 										}}
 									>
 										<AppButtons
+											language={language}
 											pages={visiblePages}
 											selectedIndex={selectedIndex}
 											setSelectedIndex={setSelectedIndex}
@@ -303,7 +306,7 @@ export default function App() {
 									<motion.div
 										initial={false}
 										animate={{
-											height: `calc(100vh - 20px - 33px - ${terminal && !isMobile ? '300px' : '0px'
+											height: `calc(100% - 33px - ${terminal && !isMobile ? '300px' : '0px'
 												})`,
 										}}
 										transition={{
@@ -321,19 +324,21 @@ export default function App() {
 									>
 										<Routes>
 											<Route
-												path='/'
+												path={getLocalizedPath('/', language)}
 												element={<Home setSelectedIndex={setSelectedIndex} />}
 											/>
 											{pages.map(({ index, name, route }) => (
 												<Route
 													key={index}
-													path={`/${route}`}
+													path={getLocalizedPath(`/${route}`, language)}
 													element={
-														<MDContainer
-															path={`./pages/${language.toLowerCase()}/${name}`}
-															page={pages.find((p) => p.index === index)}
-															setPages={setPages}
-														/>
+														<Suspense fallback={null}>
+															<MDContainer
+																path={`/pages/${language.toLowerCase()}/${name}`}
+																page={pages.find((p) => p.index === index)}
+																setPages={setPages}
+															/>
+														</Suspense>
 													}
 												/>
 											))}
@@ -341,7 +346,7 @@ export default function App() {
 												path='*'
 												element={
 													<Navigate
-														to='/'
+														to={getLocalizedPath('/', language)}
 														replace
 													/>
 												}
@@ -399,14 +404,16 @@ export default function App() {
 										animate='animate'
 										exit='exit'
 									>
-										<Terminal
-											language={language}
-											selectedTerminalIndex={selectedTerminalIndex}
-											setSelectedTerminalIndex={setSelectedTerminalIndex}
-											setTerminal={setTerminal}
-											setRanking={setRanking}
-											changeLanguage={changeLanguage}
-										/>
+										<Suspense fallback={null}>
+											<Terminal
+												language={language}
+												selectedTerminalIndex={selectedTerminalIndex}
+												setSelectedTerminalIndex={setSelectedTerminalIndex}
+												setTerminal={setTerminal}
+												setRanking={setRanking}
+												changeLanguage={changeLanguage}
+											/>
+										</Suspense>
 									</motion.div>
 								</motion.div>
 							</Grid>

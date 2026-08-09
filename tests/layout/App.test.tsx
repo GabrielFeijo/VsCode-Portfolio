@@ -68,21 +68,28 @@ jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedI
 });
 jest.mock('src/app/layout/Footer', () => () => <div data-testid="footer" />);
 jest.mock('src/app/layout/Sidebar', () => ({ setExpanded, expanded, terminal, setTerminal, language, changeLanguage }: any) => (
-    <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded}>
+    <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded} data-language={language}>
         <button data-testid="toggle-terminal" onClick={() => setTerminal(!terminal)}>Toggle Terminal</button>
         <button data-testid="change-language" onClick={changeLanguage}>Change Language</button>
     </div>
 ));
+let mockPathname = '/';
 jest.mock('react-router-dom', () => ({
     Routes: ({ children }: any) => <div>{children}</div>,
     Route: ({ element }: any) => element,
     useNavigate: jest.fn(),
+    useLocation: () => ({ pathname: mockPathname }),
     Navigate: () => <div data-testid="navigate" />,
 }));
 jest.mock('src/app/layout/AppButtons', () => ({ pages }: any) => (
     <div data-testid="app-buttons" data-pages={pages ? pages.length : 0} />
 ));
-jest.mock('src/app/components/MDContainer', () => () => <div data-testid="md-container" />);
+jest.mock('src/app/components/MDContainer', () => ({ path }: any) => (
+    <div
+        data-testid="md-container"
+        data-path={path}
+    />
+));
 jest.mock('src/app/pages/Home', () => ({ setSelectedIndex }: any) => <div data-testid="home" onClick={() => setSelectedIndex(0)} />);
 jest.mock('framer-motion', () => ({
     motion: {
@@ -94,7 +101,13 @@ jest.mock('react-device-detect', () => ({
     isBrowser: true,
     isMobile: false,
 }));
-jest.mock('src/app/layout/Terminal', () => () => <div data-testid="terminal" />);
+jest.mock('src/app/layout/Terminal', () => ({ setRanking }: any) => (
+	<div data-testid="terminal">
+		<button data-testid="open-rating" onClick={() => setRanking(true)}>
+			Open rating
+		</button>
+	</div>
+));
 jest.mock('src/app/components/Rating/BoxRating', () => () => <div data-testid="box-rating" />);
 jest.mock('src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal', () => () => <div data-testid="keyboard-shortcuts" />);
 jest.mock('src/i18n', () => ({
@@ -109,10 +122,12 @@ jest.mock('src/app/pages/pages', () => ({
         en: [
             { index: 0, name: 'about-me.html', route: 'about-me' },
             { index: 1, name: 'skills.html', route: 'skills' },
+            { index: 2, name: 'projects.html', route: 'projects' },
         ],
         pt: [
             { index: 0, name: 'sobre-mim.html', route: 'about-me' },
             { index: 1, name: 'habilidades.html', route: 'skills' },
+            { index: 2, name: 'projetos.html', route: 'projects' },
         ],
     },
 }));
@@ -144,6 +159,9 @@ const mockStorageService = require('src/services/storageService').StorageService
 describe('App', () => {
     beforeEach(() => {
         mockCalled = false;
+        mockPathname = '/';
+        mockI18n.language = 'pt';
+        mockI18n.changeLanguage.mockClear();
         mockUseTheme.mockReturnValue({
             theme: 'light',
             toggleTheme: jest.fn(),
@@ -164,7 +182,11 @@ describe('App', () => {
         await waitFor(() => {
             expect(screen.getByTestId('terminal')).toBeInTheDocument();
         });
-        expect(screen.getByTestId('box-rating')).toBeInTheDocument();
+		expect(screen.queryByTestId('box-rating')).not.toBeInTheDocument();
+		fireEvent.click(screen.getByTestId('open-rating'));
+		await waitFor(() => {
+			expect(screen.getByTestId('box-rating')).toBeInTheDocument();
+		});
         expect(screen.getByTestId('keyboard-shortcuts')).toBeInTheDocument();
     });
 
@@ -180,7 +202,7 @@ describe('App', () => {
         await waitFor(() => {
             expect(screen.getByTestId('terminal')).toBeInTheDocument();
         });
-        expect(screen.getByTestId('box-rating')).toBeInTheDocument();
+		expect(screen.queryByTestId('box-rating')).not.toBeInTheDocument();
         expect(screen.getByTestId('keyboard-shortcuts')).toBeInTheDocument();
     });
 
@@ -212,11 +234,26 @@ describe('App', () => {
     });
 
     it('changes language from pt to en on Ctrl+L', () => {
-        mockI18n.language = 'pt';
         render(<App />);
         fireEvent.keyDown(window, { key: 'l', ctrlKey: true });
         expect(mockI18n.changeLanguage).toHaveBeenCalledWith('en');
-        mockI18n.language = 'en';
+        expect(navigateMock).toHaveBeenCalledWith('/en');
+    });
+
+    it('uses English from a localized URL and preserves the page when switching', () => {
+        mockPathname = '/en/projects';
+        render(<App />);
+
+        expect(screen.getByTestId('sidebar')).toHaveAttribute('data-language', 'en');
+        expect(screen.getAllByTestId('md-container')).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    dataset: expect.objectContaining({ path: '/pages/en/projects.html' }),
+                }),
+            ])
+        );
+        fireEvent.click(screen.getByTestId('change-language'));
+        expect(navigateMock).toHaveBeenCalledWith('/projects');
     });
 
     it('navigates to home on Ctrl+H', () => {
@@ -255,7 +292,7 @@ describe('App', () => {
         render(<App />);
         const changeLangBtn = screen.getByTestId('change-language');
         fireEvent.click(changeLangBtn);
-        expect(mockI18n.changeLanguage).toHaveBeenCalledWith('pt');
+        expect(mockI18n.changeLanguage).toHaveBeenCalledWith('en');
 
         const appButtons = screen.getByTestId('app-buttons');
         expect(appButtons).toHaveAttribute('data-pages', '1');

@@ -7,8 +7,8 @@ const Loading = () => {
 	return (
 		<Box
 			zIndex={99}
-			width={'100vw'}
-			height={'100vh'}
+			width={'100%'}
+			height={'var(--app-viewport-height)'}
 			position={'absolute'}
 			top={0}
 			left={0}

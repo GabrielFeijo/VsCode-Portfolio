@@ -11,7 +11,7 @@ import Cmd from '../../src/app/components/Terminal/Cmd';
 
 test('renders Cmd component', () => {
   const { getByTestId } = render(
-    <Cmd setRanking={() => { }} changeLanguage={() => { }} />
+    <Cmd setRanking={() => { }} changeLanguage={() => { }} language="pt" />
   );
   expect(getByTestId('mock-cmd')).toBeTruthy();
 });
