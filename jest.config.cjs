@@ -10,7 +10,13 @@ module.exports = {
         '^.+\\.(png|jpg|jpeg|svg|gif)$': '<rootDir>/__mocks__/fileMock.js'
     },
     collectCoverage: true,
-    collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/index.tsx', '!src/vite-env.d.ts'],
+    collectCoverageFrom: [
+        'src/**/*.{ts,tsx}',
+        '!src/**/index.tsx',
+        '!src/vite-env.d.ts',
+        // Vite composition root: its client factory is covered directly below.
+        '!src/services/api/axios-config/index.ts',
+    ],
     coverageDirectory: 'coverage',
     coverageThreshold: {
         global: {
@@ -18,6 +24,12 @@ module.exports = {
             functions: 90,
             lines: 90,
             statements: 90
+        },
+        'src/services/api/axios-config/createApiClient.ts': {
+            branches: 100,
+            functions: 100,
+            lines: 100,
+            statements: 100
         },
     }
 };

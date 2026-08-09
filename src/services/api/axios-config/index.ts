@@ -1,10 +1,5 @@
-import axios from 'axios';
+import { createApiClient } from './createApiClient';
 
-const apiFetch = axios.create({
-	baseURL: `${import.meta.env.VITE_URL}/v2`,
-	headers: {
-		'Content-Type': 'application/json',
-	},
-});
+const apiFetch = createApiClient(import.meta.env.VITE_URL);
 
 export default apiFetch;
