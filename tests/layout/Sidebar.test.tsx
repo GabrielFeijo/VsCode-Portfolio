@@ -237,7 +237,6 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
         fireEvent.keyDown(settingsButton, { key: 'A' });
-        // No assertion needed, just to cover the code
     });
 
     it('renders collapsed sidebar with dark theme', () => {
@@ -310,5 +309,20 @@ describe('Sidebar', () => {
         });
         render(<Sidebar {...defaultProps} expanded={false} />);
         expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
+    });
+
+    it('uses accessible labels when translations are missing', () => {
+        mockUseTranslation.mockReturnValue({
+            t: () => undefined,
+            i18n: { language: 'en' },
+        });
+
+        render(<Sidebar {...defaultProps} />);
+
+        expect(screen.getByRole('button', { name: 'Close explorer' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close terminal' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Change language' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     });
 });
