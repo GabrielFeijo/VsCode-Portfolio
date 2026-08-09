@@ -9,6 +9,7 @@ const createFile = jest.fn();
 const saveOrUpdateData = jest.fn();
 const deleteFile = jest.fn();
 let pathname = '/about-me';
+let translate = (key: string) => key;
 
 jest.mock('react-router-dom', () => ({
 	useLocation: () => ({ pathname }),
@@ -16,7 +17,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('react-i18next', () => ({
-	useTranslation: () => ({ t: (key: string) => key }),
+	useTranslation: () => ({ t: (key: string) => translate(key) }),
 }));
 
 jest.mock('src/services/storageService', () => ({
@@ -112,18 +113,29 @@ function renderTree(options?: {
 		language: options?.language || ('pt' as const),
 	};
 
-	render(
-		<ThemeProvider theme={createTheme({ palette: { mode: options?.theme || 'dark' } })}>
+	const theme = createTheme({ palette: { mode: options?.theme || 'dark' } });
+	const view = render(
+		<ThemeProvider theme={theme}>
 			<AppTree {...props} />
 		</ThemeProvider>
 	);
-	return props;
+	return {
+		...props,
+		rerenderPages(nextPages: Page[]) {
+			view.rerender(
+				<ThemeProvider theme={theme}>
+					<AppTree {...props} pages={nextPages} />
+				</ThemeProvider>
+			);
+		},
+	};
 }
 
 describe('AppTree', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		pathname = '/about-me';
+		translate = (key) => key;
 		createFile.mockReturnValue({
 			index: 10,
 			name: 'new-file.md',
@@ -273,5 +285,41 @@ describe('AppTree', () => {
 		expect(screen.getByRole('menu')).toBeInTheDocument();
 		fireEvent.contextMenu(page);
 		expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+	});
+
+	it('keeps the context menu open when its page no longer exists', () => {
+		const props = renderTree();
+		fireEvent.contextMenu(screen.getByTestId('tree-item-1'));
+		props.rerenderPages([defaultPages[0]]);
+
+		fireEvent.click(screen.getByRole('button', { name: 'Open file' }));
+
+		expect(screen.getByRole('menu')).toBeInTheDocument();
+		expect(navigate).not.toHaveBeenCalled();
+
+		fireEvent.click(screen.getByRole('button', { name: 'Close menu' }));
+		props.rerenderPages(defaultPages);
+		fireEvent.contextMenu(screen.getByTestId('tree-item-1'));
+		props.rerenderPages([defaultPages[0]]);
+		const open = jest.spyOn(window, 'open').mockImplementation(() => null);
+
+		fireEvent.click(screen.getByRole('button', { name: 'Open on GitHub' }));
+
+		expect(open).not.toHaveBeenCalled();
+		expect(screen.getByRole('menu')).toBeInTheDocument();
+		open.mockRestore();
+	});
+
+	it('uses accessible fallbacks when toolbar translations are missing', () => {
+		translate = () => '';
+		renderTree();
+
+		expect(screen.getByRole('button', { name: 'Create new file' })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Create new folder' })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole('button', { name: 'Create new file' }));
+		expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
 	});
 });
