@@ -168,43 +168,28 @@ export default function AppTree({
 	};
 
 	const handleDelete = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			handleDeleteFile(contextMenu.pageIndex);
-		}
+		handleDeleteFile(contextMenu!.pageIndex!);
 		handleClose();
 	};
 	const handleOpenFile = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
+		const existingPage = pages.find((x) => x.index === contextMenu!.pageIndex);
 
-			if (!existingPage) return;
+		if (!existingPage) return;
 
-			openFile(existingPage);
-		}
+		openFile(existingPage);
 		handleClose();
 	};
 
 	const handleOpenFileOnGithub = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
+		const existingPage = pages.find((x) => x.index === contextMenu!.pageIndex);
 
-			if (!existingPage) return;
+		if (!existingPage) return;
 
-			window.open(
-				`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${language}/${existingPage.name}`,
-				'_blank',
-				'noopener,noreferrer'
-			);
-		}
+		window.open(
+			`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${language}/${existingPage.name}`,
+			'_blank',
+			'noopener,noreferrer'
+		);
 		handleClose();
 	};
 

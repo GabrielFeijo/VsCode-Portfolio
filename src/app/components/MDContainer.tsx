@@ -55,11 +55,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	const handleChange = useCallback(
 		(newContent: string) => {
 			setContent(newContent);
-			if (!page) return;
-
 			setPages((currentPages) =>
 				currentPages.map((currentPage) =>
-					currentPage.index === page.index
+					currentPage.index === page!.index
 						? { ...currentPage, content: newContent, isSaved: false }
 						: currentPage
 				)

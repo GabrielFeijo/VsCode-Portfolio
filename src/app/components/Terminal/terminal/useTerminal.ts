@@ -58,7 +58,6 @@ function normalizePath(base: string, target: string): string {
 
 function listDirectory(path: string): string[] {
 	const entries = VIRTUAL_FS[path];
-	if (!entries) return [];
 
 	return entries.map((entry) => {
 		const suffix = entry.type === 'dir' ? '/' : '';
