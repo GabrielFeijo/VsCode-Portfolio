@@ -26,6 +26,7 @@ const interactiveModules = [
     'src/app/components/MDContainer.tsx',
     'src/app/components/MarkdownRenderer.tsx',
     'src/app/components/Terminal/Cmd.tsx',
+    'src/app/components/Terminal/terminal/useTerminal.ts',
     'src/app/layout/AppTree.tsx',
     'src/app/layout/Sidebar.tsx',
 ];
