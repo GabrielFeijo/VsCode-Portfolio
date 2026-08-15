@@ -1,0 +1,25 @@
+.kbdGroup {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.kbd {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.75rem;
+	padding: 3px 7px;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--kbd-text);
+	background: var(--kbd-bg);
+	border: 1px solid var(--kbd-border);
+	border-bottom-width: 2px;
+	border-radius: 5px;
+	box-shadow: 0 1px 0 var(--kbd-shadow);
+	white-space: nowrap;
+	user-select: none;
+}

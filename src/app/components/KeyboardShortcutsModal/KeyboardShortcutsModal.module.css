@@ -7,27 +7,61 @@
 }
 
 .modal {
-	width: 320px;
-	background-color: #ffffff;
-	color: #1a1a1a;
+	position: relative;
+	width: 340px;
+	background-color: var(--bg-elevated);
+	color: var(--text-primary);
 	border-radius: 12px;
-	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+	box-shadow: var(--modal-shadow);
 	overflow: hidden;
-	border: 1px solid #e5e7eb;
+	border: 1px solid var(--border-color);
+	font-family: var(--font-mono);
+}
+
+.modalAccent {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(
+		90deg,
+		var(--accent-green),
+		var(--accent-cyan),
+		var(--accent),
+		var(--accent-muted),
+		var(--accent-pink)
+	);
 }
 
 .modalHeader {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 16px 20px;
-	border-bottom: 1px solid #f3f4f6;
+	padding: 16px 20px 12px;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.titleGroup {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.titleIcon {
+	width: 18px;
+	height: 18px;
+	color: var(--accent);
+	flex-shrink: 0;
 }
 
 .title {
-	font-size: 16px;
+	font-family: var(--font-mono);
+	font-size: 14px;
 	font-weight: 600;
 	margin: 0;
+	color: var(--text-primary);
+	letter-spacing: -0.01em;
 }
 
 .closeButton {
@@ -36,52 +70,80 @@
 	justify-content: center;
 	background: transparent;
 	border: none;
-	width: 24px;
-	height: 24px;
-	border-radius: 4px;
+	width: 26px;
+	height: 26px;
+	border-radius: 6px;
 	cursor: pointer;
-	color: #64748b;
-	transition: background-color 0.2s, color 0.2s;
+	color: var(--text-secondary);
+	transition: background-color 0.15s, color 0.15s;
 }
 
 .closeButton:hover {
-	background-color: #f1f5f9;
-	color: #0f172a;
+	background-color: var(--bg-hover);
+	color: var(--text-primary);
 }
 
 .modalContent {
-	padding: 8px;
+	padding: 8px 10px 12px;
 }
 
 .shortcutItem {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 10px 12px;
+	padding: 9px 10px;
 	border-radius: 8px;
-	margin-bottom: 4px;
-	transition: background-color 0.2s;
+	margin-bottom: 2px;
+	transition: background-color 0.15s;
+	gap: 12px;
 }
 
 .shortcutItem:hover {
-	background-color: #f8fafc;
+	background-color: var(--bg-hover);
 }
 
 .shortcutInfo {
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	gap: 10px;
+	min-width: 0;
 }
 
 .iconContainer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 32px;
-	height: 32px;
-	background-color: #f1f5f9;
-	border-radius: 8px;
-	color: #475569;
+	width: 30px;
+	height: 30px;
+	flex-shrink: 0;
+	border-radius: 7px;
+	background-color: color-mix(in srgb, var(--icon-accent) 12%, var(--bg-secondary));
+	border: 1px solid color-mix(in srgb, var(--icon-accent) 30%, transparent);
+	color: var(--icon-accent);
+}
+
+.iconContainer[data-accent='green'] {
+	--icon-accent: var(--accent-green);
+}
+
+.iconContainer[data-accent='blue'] {
+	--icon-accent: var(--accent);
+}
+
+.iconContainer[data-accent='cyan'] {
+	--icon-accent: var(--accent-cyan);
+}
+
+.iconContainer[data-accent='yellow'] {
+	--icon-accent: var(--accent-yellow);
+}
+
+.iconContainer[data-accent='mauve'] {
+	--icon-accent: var(--accent-muted);
+}
+
+.iconContainer[data-accent='peach'] {
+	--icon-accent: var(--accent-peach);
 }
 
 .icon {
@@ -90,58 +152,12 @@
 }
 
 .shortcutLabel {
-	font-size: 14px;
-	color: #334155;
-}
-
-.keyBadge {
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-	font-size: 12px;
-	font-weight: 500;
-	padding: 4px 8px;
-	background-color: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 4px;
-	color: #475569;
+	font-family: var(--font-mono);
+	font-size: 13px;
+	color: var(--text-primary);
 	white-space: nowrap;
-}
-
-:global(.dark) .modal {
-	background-color: #282a36;
-	color: #f8fafc;
-	border-color: #334155;
-}
-
-:global(.dark) .modalHeader {
-	border-bottom-color: #334155;
-}
-
-:global(.dark) .shortcutItem:hover {
-	background-color: #282a36;
-}
-
-:global(.dark) .iconContainer {
-	background-color: #313341;
-	color: #e2e8f0;
-}
-
-:global(.dark) .shortcutLabel {
-	color: #e2e8f0;
-}
-
-:global(.dark) .closeButton {
-	color: #94a3b8;
-}
-
-:global(.dark) .closeButton:hover {
-	background-color: #313341;
-	color: #f8fafc;
-}
-
-:global(.dark) .keyBadge {
-	background-color: #313341;
-	border-color: #475569;
-	color: #e2e8f0;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 @keyframes fadeIn {
@@ -166,6 +182,6 @@
 
 	.modal {
 		width: 100%;
-		max-width: 320px;
+		max-width: 340px;
 	}
 }

@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	VscTerminal,
-	VscColorMode,
-	VscHome,
-	VscGlobe,
-	VscChromeClose,
-	VscEditorLayout,
-	VscSave,
-} from 'react-icons/vsc';
+import { VscChromeClose, VscRecordKeys } from 'react-icons/vsc';
 import styles from './KeyboardShortcutsModal.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInOut } from '../../../utils/motionVariants';
 import { isMobile } from 'react-device-detect';
+import { KEYBOARD_SHORTCUTS } from './keyboardShortcuts.config';
+import Kbd from '../ui/Kbd';
 
 interface Props {
 	visible: boolean;
@@ -42,39 +36,6 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 
 	if (!show || isMobile) return null;
 
-	const shortcuts = [
-		{
-			icon: <VscTerminal className={styles.icon} />,
-			key: 'Ctrl + J',
-			label: t('shortcuts.terminal'),
-		},
-		{
-			icon: <VscColorMode className={styles.icon} />,
-			key: 'Ctrl + D',
-			label: t('shortcuts.theme'),
-		},
-		{
-			icon: <VscGlobe className={styles.icon} />,
-			key: 'Ctrl + L',
-			label: t('shortcuts.language'),
-		},
-		{
-			icon: <VscEditorLayout className={styles.icon} />,
-			key: 'Ctrl + B',
-			label: t('shortcuts.sidebar'),
-		},
-		{
-			icon: <VscHome className={styles.icon} />,
-			key: 'Ctrl + H',
-			label: t('shortcuts.home'),
-		},
-		{
-			icon: <VscSave className={styles.icon} />,
-			key: 'Ctrl + S',
-			label: t('shortcuts.save'),
-		},
-	];
-
 	return (
 		<AnimatePresence>
 			{show && (
@@ -94,8 +55,13 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 						}}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
+						<div className={styles.modalAccent} aria-hidden="true" />
+
 						<div className={styles.modalHeader}>
-							<h2 className={styles.title}>{t('shortcuts.title')}</h2>
+							<div className={styles.titleGroup}>
+								<VscRecordKeys className={styles.titleIcon} />
+								<h2 className={styles.title}>{t('shortcuts.title')}</h2>
+							</div>
 							<button
 								className={styles.closeButton}
 								onClick={() => setShow(false)}
@@ -104,22 +70,28 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 								<VscChromeClose />
 							</button>
 						</div>
+
 						<div className={styles.modalContent}>
-							{shortcuts.map((shortcut, index) => (
+							{KEYBOARD_SHORTCUTS.map((shortcut, index) => (
 								<motion.div
-									key={index}
+									key={shortcut.id}
 									className={styles.shortcutItem}
-									initial={{ opacity: 0, y: 20 }}
+									initial={{ opacity: 0, y: 12 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: index * 0.05 }}
 								>
 									<div className={styles.shortcutInfo}>
-										<div className={styles.iconContainer}>{shortcut.icon}</div>
+										<div
+											className={styles.iconContainer}
+											data-accent={shortcut.accent}
+										>
+											{shortcut.icon}
+										</div>
 										<span className={styles.shortcutLabel}>
-											{shortcut.label}
+											{t(shortcut.labelKey)}
 										</span>
 									</div>
-									<div className={styles.keyBadge}>{shortcut.key}</div>
+									<Kbd keys={shortcut.keys} />
 								</motion.div>
 							))}
 						</div>
