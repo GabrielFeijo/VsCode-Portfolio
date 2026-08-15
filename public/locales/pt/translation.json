@@ -19,15 +19,23 @@
             "debug": "Console de Depuração",
             "terminal": "Terminal"
         },
-        "info": {
-            "version": "Versão",
-            "allRightsReserved": "Todos os direitos reservados",
-            "placeholder": "Digite um comando (ajuda para ver todos os comandos)",
-            "error": "Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite 'ajuda' para obter uma lista de comandos disponíveis.",
-            "theme": "Tema alterado com sucesso!",
-            "language": "Idioma alterado com sucesso!",
-            "feedback": "Opinião"
-        },
+		"info": {
+			"version": "Versão",
+			"allRightsReserved": "Todos os direitos reservados",
+			"placeholder": "Digite um comando (help para ver todos)",
+			"welcome": "Digite 'help' ou 'neofetch' para começar · Tab autocompleta · ↑↓ histórico",
+			"error": "Desculpe, não foi possível concluir sua solicitação. O comando que você inseriu não foi reconhecido pelo sistema. Por favor, verifique se o comando está correto e tente novamente. Se precisar de ajuda, digite 'ajuda' para obter uma lista de comandos disponíveis.",
+			"errorShort": "Erro ao conectar com a API. Tente novamente.",
+			"theme": "Tema alterado com sucesso!",
+			"language": "Idioma alterado com sucesso!",
+			"feedback": "Opinião",
+			"noReviews": "Nenhuma avaliação ainda. Seja o primeiro: digite 'avaliar'",
+			"emptyHistory": "Nenhum comando no histórico ainda.",
+			"openRating": "Abrindo formulário de avaliação...",
+			"invalidRoute": "Rota inválida. Páginas disponíveis:",
+			"navigating": "Navegando para /{{route}}...",
+			"exitHint": "Você não pode sair do melhor terminal do portfólio! 😄"
+		},
         "problems": "Não foi detectado nenhum problema no workspace.",
         "debug": "Inicie uma sessão de depuração para avaliar as expressões",
         "output": [

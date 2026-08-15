@@ -15,6 +15,7 @@ import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAppPalette } from '../theme/useAppPalette';
 import { Language } from '../../domain/page';
 
 interface Props {
@@ -36,19 +37,14 @@ const Terminal = ({
 }: Props) => {
 	const { t } = useTranslation();
 	const { theme } = useTheme();
+	const colors = useAppPalette();
 	const isDarkMode = theme === 'dark';
 
 	function renderTerminalBgColor(index: number) {
-		if (isDarkMode) {
-			return selectedTerminalIndex === index ? '#ff79c6' : 'transparent';
-		}
-		return selectedTerminalIndex === index ? '#000' : 'transparent';
+		return selectedTerminalIndex === index ? colors.tabIndicator : 'transparent';
 	}
 	function renderTerminalColor(index: number) {
-		if (isDarkMode) {
-			return selectedTerminalIndex === index ? '#ffffff' : '#b0b8d0';
-		}
-		return selectedTerminalIndex === index ? '#000000' : '#2a2a2a';
+		return selectedTerminalIndex === index ? colors.textPrimary : colors.textSecondary;
 	}
 	const opc = [
 		{
@@ -84,9 +80,8 @@ const Terminal = ({
 			sx={{
 				height: `100%`,
 				width: `100%`,
-				backgroundColor: isDarkMode ? '#282A36' : '#fff',
-				borderTop: `1px solid transparent`,
-				borderColor: isDarkMode ? '#bd93f9' : '#000',
+				backgroundColor: colors.bgTerminal,
+				borderTop: `1px solid ${colors.border}`,
 			}}
 			component={Paper}
 			square
@@ -129,7 +124,7 @@ const Terminal = ({
 								color: renderTerminalColor(index),
 								cursor: 'pointer',
 								'&:hover': {
-									color: isDarkMode ? 'white' : '#000',
+									color: colors.textPrimary,
 								},
 								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 								p: 0.8,
@@ -167,7 +162,7 @@ const Terminal = ({
 							cursor: 'pointer',
 							height: 33,
 							'&:hover': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
@@ -195,7 +190,7 @@ const Terminal = ({
 							height: 33,
 
 							'&:hover': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 							p: 1,
@@ -218,7 +213,7 @@ const Terminal = ({
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 								height: 33,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
@@ -244,7 +239,7 @@ const Terminal = ({
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 								height: 33,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
@@ -270,7 +265,7 @@ const Terminal = ({
 						sx={{
 							cursor: 'pointer',
 							'&:hover ': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 								height: 33,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
@@ -298,7 +293,7 @@ const Terminal = ({
 						sx={{
 							cursor: 'pointer',
 							'&:hover': {
-								backgroundColor: '#383a4294',
+								backgroundColor: colors.bgHover,
 								height: 33,
 							},
 							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
@@ -319,7 +314,8 @@ const Terminal = ({
 				position={'relative'}
 				overflow={'auto'}
 				sx={{
-					px: 2,
+					px: selectedTerminalIndex === 3 ? 0 : 2,
+					backgroundColor: selectedTerminalIndex === 3 ? colors.bgTerminal : 'transparent',
 				}}
 			>
 				{opc[selectedTerminalIndex].element}
