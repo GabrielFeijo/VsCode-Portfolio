@@ -69,6 +69,11 @@ describe('Terminal', () => {
         expect(screen.getByTestId('debug')).toBeInTheDocument();
     });
 
+    it('renders with selectedTerminalIndex 3', () => {
+        render(<Terminal {...defaultProps} selectedTerminalIndex={3} />);
+        expect(screen.getByTestId('cmd')).toBeInTheDocument();
+    });
+
     it('renders with dark theme', () => {
         mockUseTheme.mockReturnValue({
             theme: 'dark',

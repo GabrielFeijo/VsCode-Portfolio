@@ -21,4 +21,13 @@ describe('parseAnsiLine', () => {
 
 		expect(result[0].text).toContain('\x1b[invalid');
 	});
+
+	it('defaults to dark mode when the theme is omitted', () => {
+		const result = parseAnsiLine('\x1b[92mgreen\x1b[0m normal', '#cdd6f4');
+
+		expect(result).toEqual([
+			{ text: 'green', color: '#a6e3a1' },
+			{ text: ' normal', color: '#cdd6f4' },
+		]);
+	});
 });

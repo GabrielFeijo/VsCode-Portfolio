@@ -31,6 +31,7 @@ describe('SEO configuration', () => {
 		expect(getLanguageFromPathname('/projects')).toBe('pt');
 		expect(getLanguageFromPathname('/en/projects')).toBe('en');
 		expect(getBasePath('/en/projects/')).toBe('/projects');
+		expect(getBasePath('/en')).toBe('/');
 		expect(getLocalizedPath('/projects', 'en')).toBe('/en/projects');
 		expect(getLocalizedPath('/en/projects', 'pt')).toBe('/projects');
 		expect(getLocalizedPath('/', 'en')).toBe('/en');

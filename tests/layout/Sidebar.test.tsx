@@ -325,4 +325,21 @@ describe('Sidebar', () => {
         expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     });
+
+    it('uses fallback labels when translations are missing in collapsed state', () => {
+        mockUseTheme.mockReturnValue({
+            theme: 'dark',
+            toggleTheme: jest.fn(),
+        });
+        mockUseTranslation.mockReturnValue({
+            t: () => undefined,
+            i18n: { language: 'en' },
+        });
+
+        render(<Sidebar {...defaultProps} expanded={false} terminal={false} />);
+
+        expect(screen.getByRole('button', { name: 'Open explorer' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Open terminal' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Switch to light theme' })).toBeInTheDocument();
+    });
 });

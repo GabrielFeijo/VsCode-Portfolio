@@ -392,6 +392,12 @@ describe('Cmd', () => {
 		expect(await screen.findByText(/cat: missing\.txt: No such file/)).toBeInTheDocument();
 	});
 
+	it('reports missing files referenced at the filesystem root', async () => {
+		renderCmd();
+		submitCommand('cat /nonexistent');
+		expect(await screen.findByText(/cat: \/nonexistent: No such file/)).toBeInTheDocument();
+	});
+
 	it('runs fun commands locally', async () => {
 		renderCmd();
 		submitCommand('cowsay');

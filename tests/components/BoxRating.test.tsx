@@ -453,4 +453,70 @@ describe('BoxRating component', () => {
         expect(closeButton).toBeInTheDocument();
         expect(submitButton).toBeInTheDocument();
     });
+
+    it('clears the previous error timeout when another failing review is submitted', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('API Error') as any;
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+    });
+
+    it('clears the pending error timer when the modal is closed', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('API Error') as any;
+        mockCreate.mockResolvedValue(error);
+
+        const { rerender } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+
+        rerender(<BoxRating ranking={false} setRanking={setRanking} />);
+        rerender(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        expect(screen.queryByText('rating.errors.unknownError')).not.toBeInTheDocument();
+    });
 });

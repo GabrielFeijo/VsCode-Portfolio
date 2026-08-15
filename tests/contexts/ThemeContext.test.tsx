@@ -146,6 +146,28 @@ describe('ThemeContext', () => {
         });
     });
 
+    test('updates theme to light when media query changes to light and no saved theme', () => {
+        localStorageMock.getItem.mockReturnValue(null);
+        const mediaQuery = { matches: true, addEventListener: jest.fn(), removeEventListener: jest.fn() };
+        matchMediaMock.mockReturnValue(mediaQuery);
+
+        act(() => {
+            render(
+                <ThemeProvider>
+                    <TestComponent />
+                </ThemeProvider>
+            );
+        });
+
+        expect(screen.getByTestId('theme')).toHaveTextContent('dark');
+
+        mediaQuery.matches = false;
+        const changeHandler = mediaQuery.addEventListener.mock.calls.find(call => call[0] === 'change')[1];
+        act(() => changeHandler());
+
+        expect(screen.getByTestId('theme')).toHaveTextContent('light');
+    });
+
     test('does not update theme when media query changes but saved theme exists', () => {
         localStorageMock.getItem.mockReturnValue('light');
         const mediaQuery = { matches: true, addEventListener: jest.fn(), removeEventListener: jest.fn() };
