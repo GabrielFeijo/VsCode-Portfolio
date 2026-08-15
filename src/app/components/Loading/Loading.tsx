@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-
 import Logo from '../../../vscode.svg';
 import './Loading.css';
 
@@ -16,14 +15,9 @@ const Loading = () => {
 			justifyContent={'center'}
 			alignItems={'center'}
 			flexDirection={'column'}
-			sx={{ backgroundColor: '#282a36' }}
+			sx={{ backgroundColor: 'var(--bg-primary)' }}
 		>
-			<img
-				src={Logo}
-				alt='Logo vscode'
-				style={{ height: '20%' }}
-				className='logo'
-			/>
+			<img src={Logo} alt='Logo vscode' style={{ height: '20%' }} className='logo' />
 		</Box>
 	);
 };

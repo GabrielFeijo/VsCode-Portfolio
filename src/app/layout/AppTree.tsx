@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useAppPalette } from '../theme/useAppPalette';
 import {
 	VscMarkdown,
 	VscNewFile,
@@ -44,7 +44,7 @@ export default function AppTree({
 	language,
 }: Props) {
 	const navigate = useNavigate();
-	const theme = useTheme();
+	const colors = useAppPalette();
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
 	const [isCreatingFile, setIsCreatingFile] = useState(false);
@@ -68,19 +68,14 @@ export default function AppTree({
 	}, [isCreatingFile]);
 
 	function renderTreeItemBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#313341' : '#21222c';
-		}
-		return selectedIndex === index ? '#295fbf' : '#f3f3f3';
+		return selectedIndex === index ? colors.bgElevated : colors.bgExplorer;
 	}
 
 	function renderTreeItemColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index && currentComponent === 'tree'
-				? '#ffffff'
-				: '#d0d0d0';
+		if (selectedIndex === index && currentComponent === 'tree') {
+			return colors.textPrimary;
 		}
-		return selectedIndex === index ? '#e2ffff' : '#2a2a2a';
+		return selectedIndex === index ? colors.accent : colors.textSecondary;
 	}
 
 	function handleCreateFile(e: React.MouseEvent) {
@@ -297,7 +292,7 @@ export default function AppTree({
 									{isSaved !== undefined && !isSaved && (
 										<Box
 											sx={{
-												backgroundColor: '#fff',
+												backgroundColor: colors.accentPink,
 												borderRadius: '100%',
 												width: '10px',
 												height: '10px',
@@ -313,7 +308,7 @@ export default function AppTree({
 									backgroundColor: renderTreeItemBgColor(index),
 								},
 							}}
-							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
+							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							onClick={() => {
 								if (!visiblePageIndexes.includes(index)) {
 									const newIndexes = [...visiblePageIndexes, index];
@@ -329,7 +324,7 @@ export default function AppTree({
 					{isCreatingFile && (
 						<TreeItem
 							itemId='-2'
-							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
+							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							label={
 								<Box
 									sx={{

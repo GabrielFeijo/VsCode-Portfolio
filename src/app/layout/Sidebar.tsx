@@ -8,6 +8,7 @@ import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
 import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 import Divider from '@mui/material/Divider';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAppPalette } from '../theme/useAppPalette';
 import { useTranslation } from 'react-i18next';
 import { isMobile } from 'react-device-detect';
 
@@ -29,36 +30,26 @@ export default function Sidebar({
 	changeLanguage,
 }: Props) {
 	const { theme, toggleTheme } = useTheme();
-	const isDarkMode = theme === 'dark';
+	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();
 
 	const contactLinks = [
-		{
-			index: 0,
-			icon: <FaGithub />,
-			title: t('contact.github.title'),
-			href: t('contact.github.href'),
-		},
-		{
-			index: 1,
-			icon: <FaLinkedin />,
-			title: t('contact.linkedin.title'),
-			href: t('contact.linkedin.href'),
-		},
-		{
-			index: 2,
-			icon: <FaEnvelope />,
-			title: t('contact.email.title'),
-			href: t('contact.email.href'),
-		},
+		{ index: 0, icon: <FaGithub />, title: t('contact.github.title'), href: t('contact.github.href') },
+		{ index: 1, icon: <FaLinkedin />, title: t('contact.linkedin.title'), href: t('contact.linkedin.href') },
+		{ index: 2, icon: <FaEnvelope />, title: t('contact.email.title'), href: t('contact.email.href') },
 	];
+
+	const iconSx = {
+		flexGrow: 0,
+		fontSize: 24,
+		color: colors.icon,
+		cursor: 'pointer',
+		'&:hover': { color: colors.iconActive },
+	};
 
 	return (
 		<Box
-			sx={{
-				height: '100%',
-				backgroundColor: isDarkMode ? '#343746' : '#2c2c2c',
-			}}
+			sx={{ height: '100%', backgroundColor: colors.bgSidebar }}
 			justifyContent='space-between'
 			display='flex'
 			flexDirection='column'
@@ -66,29 +57,20 @@ export default function Sidebar({
 			square
 			elevation={0}
 		>
-			<Box
-				sx={{ flexGrow: 0 }}
-				display='flex'
-				justifyContent='center'
-				flexDirection='column'
-			>
+			<Box sx={{ flexGrow: 0 }} display='flex' justifyContent='center' flexDirection='column'>
 				<Box
 					component="button"
 					aria-label={expanded ? (t('sidebar.closeExplorer') || 'Close explorer') : (t('sidebar.openExplorer') || 'Open explorer')}
 					aria-expanded={expanded}
 					tabIndex={0}
-					onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+					onKeyDown={(e) => {
 						if (e.key === 'Enter' || e.key === ' ') {
 							e.preventDefault();
 							setExpanded(!expanded);
 						}
 					}}
 					sx={{
-						borderLeft: expanded
-							? 'solid 0.12em white'
-							: isDarkMode
-								? 'solid 0.12em #343746'
-								: 'solid 0.12em #2c2c2c',
+						borderLeft: expanded ? `solid 0.12em ${colors.accent}` : `solid 0.12em ${colors.bgSidebar}`,
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 						border: 'none',
@@ -100,14 +82,10 @@ export default function Sidebar({
 				>
 					<Box
 						sx={{
-							flexGrow: 0,
+							...iconSx,
 							my: 1.5,
-							color: expanded ? '#ffffff' : '#b0b8d0',
-							fontSize: 24,
+							color: expanded ? colors.iconActive : colors.icon,
 							outline: 'none',
-							'&:hover': {
-								color: '#ffffff',
-							},
 						}}
 						display='flex'
 						justifyContent='center'
@@ -116,15 +94,10 @@ export default function Sidebar({
 					</Box>
 				</Box>
 
-				<Divider sx={{ m: 0.5 }} />
+				<Divider sx={{ m: 0.5, borderColor: colors.divider }} />
 
 				{contactLinks.map((link) => (
-					<Tooltip
-						title={link.title}
-						arrow
-						placement='right'
-						key={link.index}
-					>
+					<Tooltip title={link.title} arrow placement='right' key={link.index}>
 						<Link
 							target='_blank'
 							rel='noopener noreferrer'
@@ -133,20 +106,7 @@ export default function Sidebar({
 							color='inherit'
 							sx={{ WebkitTapHighlightColor: 'rgba(0,0,0,0)' }}
 						>
-							<Box
-								sx={{
-									flexGrow: 0,
-									m: 0.5,
-									color: '#b0b8d0',
-									fontSize: 24,
-									'&:hover': {
-										color: '#ffffff',
-									},
-									cursor: 'pointer',
-								}}
-								display='flex'
-								justifyContent='center'
-							>
+							<Box sx={{ ...iconSx, m: 0.5 }} display='flex' justifyContent='center'>
 								<Box mt={0.7}>{link.icon}</Box>
 							</Box>
 						</Link>
@@ -154,46 +114,23 @@ export default function Sidebar({
 				))}
 			</Box>
 
-			<Box
-				sx={{ flexGrow: 0, pb: 1 }}
-				display='flex'
-				gap={1}
-				justifyContent='center'
-				flexDirection='column'
-			>
+			<Box sx={{ flexGrow: 0, pb: 1 }} display='flex' gap={1} justifyContent='center' flexDirection='column'>
 				{!isMobile && (
-					<Tooltip
-						title={
-							terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')
-						}
-						placement='right'
-						arrow
-					>
+					<Tooltip title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')} placement='right' arrow>
 						<Box
 							component="button"
 							aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
 							aria-expanded={terminal}
 							tabIndex={0}
-							onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+							onKeyDown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
 									setTerminal(!terminal);
 								}
 							}}
 							sx={{
-								flexGrow: 0,
-								fontSize: 24,
-								color: '#b0b8d0',
-								cursor: 'pointer',
-								'&:hover': {
-									color: '#ffffff',
-								},
-								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-								borderLeft: terminal
-									? 'solid 0.12em #ffffff'
-									: isDarkMode
-										? 'solid 0.12em #343746'
-										: 'solid 0.12em #2c2c2c',
+								...iconSx,
+								borderLeft: terminal ? `solid 0.12em ${colors.accent}` : `solid 0.12em ${colors.bgSidebar}`,
 								border: 'none',
 								background: 'transparent',
 								width: '100%',
@@ -203,128 +140,59 @@ export default function Sidebar({
 							display='flex'
 							justifyContent='center'
 						>
-							<Box sx={{ color: terminal ? '#ffffff' : '#b0b8d0' }}>
+							<Box sx={{ color: terminal ? colors.iconActive : colors.icon }}>
 								<TerminalIcon />
 							</Box>
 						</Box>
 					</Tooltip>
 				)}
-				<Tooltip
-					title={t(
-						`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'
-						}`
-					)}
-					placement='right'
-					arrow
-				>
+				<Tooltip title={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`)} placement='right' arrow>
 					<Box
 						component="button"
 						aria-label={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`) || 'Change language'}
 						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
 								changeLanguage();
 							}
 						}}
-						sx={{
-							flexGrow: 0,
-							fontSize: 24,
-							color: '#b0b8d0',
-							cursor: 'pointer',
-							'&:hover': {
-								color: '#ffffff',
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							border: 'none',
-							background: 'transparent',
-							width: '100%',
-							padding: 0,
-						}}
+						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'
 						onClick={changeLanguage}
 					>
-						<Box>
-							<LanguageIcon />
-						</Box>
+						<LanguageIcon />
 					</Box>
 				</Tooltip>
-				<Tooltip
-					title={
-						isDarkMode ? t('sidebar.theme.light') : t('sidebar.theme.dark')
-					}
-					placement='right'
-					arrow
-				>
+				<Tooltip title={theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')} placement='right' arrow>
 					<Box
 						component="button"
-						aria-label={isDarkMode ? (t('sidebar.theme.light') || 'Switch to light theme') : (t('sidebar.theme.dark') || 'Switch to dark theme')}
+						aria-label={theme === 'dark' ? (t('sidebar.theme.light') || 'Switch to light theme') : (t('sidebar.theme.dark') || 'Switch to dark theme')}
 						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
+						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
 								toggleTheme();
 							}
 						}}
-						sx={{
-							flexGrow: 0,
-							fontSize: 24,
-							color: '#b0b8d0',
-							cursor: 'pointer',
-							'&:hover': {
-								color: '#ffffff',
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							border: 'none',
-							background: 'transparent',
-							width: '100%',
-							padding: 0,
-						}}
+						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'
 						onClick={toggleTheme}
 					>
-						{!isDarkMode ? (
-							<Box>
-								<DarkModeOutlinedIcon />
-							</Box>
-						) : (
-							<Box>
-								<LightModeOutlinedIcon />
-							</Box>
-						)}
+						{theme === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
 					</Box>
 				</Tooltip>
 				<Box
 					component="button"
 					aria-label={t('sidebar.settings') || 'Settings'}
 					tabIndex={0}
-					onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-						}
-					}}
-					sx={{
-						flexGrow: 0,
-						fontSize: 24,
-						color: '#b0b8d0',
-						cursor: 'pointer',
-						'&:hover': {
-							color: '#ffffff',
-						},
-						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-						border: 'none',
-						background: 'transparent',
-						width: '100%',
-						padding: 0,
-					}}
+					sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 					display='flex'
 					justifyContent='center'
 				>
-					<Box mt={0.7}>
-						<VscSettingsGear />
-					</Box>
+					<Box mt={0.7}><VscSettingsGear /></Box>
 				</Box>
 			</Box>
 		</Box>

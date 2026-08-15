@@ -10,19 +10,14 @@
 
 .contextMenu {
 	position: absolute;
-	background-color: #ffffff;
+	background-color: var(--bg-elevated);
 	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--modal-shadow);
 	min-width: 200px;
 	overflow: hidden;
 	z-index: 99;
 	pointer-events: auto;
-	border: 1px solid #e5e7eb;
-}
-
-:global(.dark) .contextMenu {
-	background-color: #282a36;
-	border-color: #334155;
+	border: 1px solid var(--border-color);
 }
 
 .menuItems {
@@ -42,23 +37,20 @@
 	transition: background-color 0.2s;
 }
 
-.menuItem:hover {
-	background-color: #f8fafc;
+.menuItem:hover:not(.disabled) {
+	background-color: var(--bg-hover);
 }
 
-:global(.dark) .menuItem:hover {
-	background-color: #313341;
+.menuItem.disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
 }
 
 .iconContainer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #475569;
-}
-
-:global(.dark) .iconContainer {
-	color: #e2e8f0;
+	color: var(--text-secondary);
 }
 
 .icon {
@@ -67,12 +59,9 @@
 }
 
 .menuText {
-	color: #334155;
+	color: var(--text-primary);
 	font-size: 14px;
-}
-
-:global(.dark) .menuText {
-	color: #f8fafc;
+	font-family: var(--font-ui);
 }
 
 @keyframes scaleIn {
@@ -80,7 +69,6 @@
 		transform: scale(0.95);
 		opacity: 0;
 	}
-
 	100% {
 		transform: scale(1);
 		opacity: 1;

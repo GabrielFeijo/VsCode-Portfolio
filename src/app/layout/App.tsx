@@ -44,6 +44,7 @@ import { StorageService } from '../../services/storageService';
 import { Language, Page } from '../../domain/page';
 import MetadataComponent from './Metadata';
 import { createAppTheme } from '../theme/createAppTheme';
+import { getAppPalette } from '../theme/palette';
 import { useAppKeyboardShortcuts } from '../hooks/useAppKeyboardShortcuts';
 import {
 	getLanguageFromPathname,
@@ -68,6 +69,7 @@ export default function App() {
 	const { theme: paletteType, toggleTheme } = useTheme();
 	const { t } = useTranslation();
 	const isDarkMode = paletteType === 'dark';
+	const colors = getAppPalette(paletteType);
 
 	const [pages, setPages] = useState<Page[]>(() => loadPages(language));
 	const navigate = useNavigate();
@@ -226,7 +228,7 @@ export default function App() {
 											<Grid
 												item
 												sx={{
-													backgroundColor: isDarkMode ? '#21222c' : '#f3f3f3',
+													backgroundColor: colors.bgExplorer,
 													height: '100%',
 													minHeight: 0,
 												}}
@@ -268,7 +270,7 @@ export default function App() {
 											left: 0,
 											right: 0,
 											bottom: 0,
-											backgroundColor: 'rgba(0, 0, 0, 0.5)',
+											backgroundColor: colors.bgOverlay,
 											zIndex: 998,
 										}}
 										onClick={() => setExpanded(false)}

@@ -8,14 +8,17 @@ import {
 	VscCheck,
 } from 'react-icons/vsc';
 import { IoIosGitBranch } from 'react-icons/io';
+import { useAppPalette } from '../theme/useAppPalette';
 
 export default function Footer() {
+	const colors = useAppPalette();
+
 	return (
 		<Box
 			component={Paper}
 			square
 			elevation={0}
-			sx={{ height: '20px', color: 'white' }}
+			sx={{ height: '20px', color: colors.textPrimary, bgcolor: colors.bgFooter }}
 			display='flex'
 		>
 			<Grid container>
@@ -26,12 +29,12 @@ export default function Footer() {
 					tabIndex={0}
 					sx={{
 						width: '35px',
-						backgroundColor: '#bd93f9',
+						backgroundColor: colors.footerAccent,
 						justifyContent: 'center',
 						alignItems: 'center',
 						cursor: 'pointer',
 						'&:hover': {
-							background: '#c49ff9',
+							background: colors.accentHover,
 						},
 						border: 'none',
 						padding: 0,
@@ -40,26 +43,20 @@ export default function Footer() {
 				>
 					<VscRemote
 						fontSize='0.9rem'
-						style={{
-							color: 'black',
-						}}
+						style={{ color: colors.textInverse }}
 					/>
 				</Grid>
 				<Grid
 					item
-					sx={{ backgroundColor: '#191a21', width: '200px' }}
+					sx={{ backgroundColor: colors.bgFooter, width: '200px' }}
 					display='flex'
 				>
-					<Stack
-						direction='row'
-						spacing={0.5}
-						sx={{ pl: 1 }}
-					>
+					<Stack direction='row' spacing={0.5} sx={{ pl: 1 }}>
 						<Box
 							component={Link}
 							href='https://github.com/GabrielFeijo'
 							underline='none'
-							color='white'
+							color='inherit'
 							target='_blank'
 							rel="noopener noreferrer"
 							aria-label="View source code on GitHub - main branch"
@@ -68,9 +65,7 @@ export default function Footer() {
 								px: 0.5,
 								justifyContent: 'center',
 								alignItems: 'center',
-								'&:hover': {
-									background: '#1f8ad2',
-								},
+								'&:hover': { background: colors.footerHover },
 							}}
 						>
 							<IoIosGitBranch fontSize='0.9rem' />
@@ -87,50 +82,19 @@ export default function Footer() {
 							sx={{
 								px: 0.5,
 								cursor: 'pointer',
-								'&:hover': {
-									background: '#1f8ad2',
-								},
+								'&:hover': { background: colors.footerHover },
 							}}
 						>
-							<Box
-								display='flex'
-								sx={{
-									justifyContent: 'center',
-									alignItems: 'center',
-									py: 0.3,
-								}}
-							>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', py: 0.3 }}>
 								<VscError fontSize='0.9rem' aria-hidden="true" />
 							</Box>
-							<Box
-								display='flex'
-								sx={{
-									justifyContent: 'center',
-									alignItems: 'center',
-									pt: 0.3,
-								}}
-							>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
 								<Typography sx={{ fontSize: '0.6rem' }} aria-label="Errors count">0</Typography>
 							</Box>
-
-							<Box
-								display='flex'
-								sx={{
-									justifyContent: 'center',
-									alignItems: 'center',
-									py: 0.3,
-								}}
-							>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', py: 0.3 }}>
 								<VscWarning fontSize='0.9rem' aria-hidden="true" />
 							</Box>
-							<Box
-								display='flex'
-								sx={{
-									justifyContent: 'center',
-									alignItems: 'center',
-									pt: 0.3,
-								}}
-							>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
 								<Typography sx={{ fontSize: '0.6rem' }} aria-label="Warnings count">0</Typography>
 							</Box>
 						</Stack>
@@ -138,71 +102,54 @@ export default function Footer() {
 				</Grid>
 				<Grid
 					item
-					sx={{ backgroundColor: '#191a21', minWidth: `calc(100% - 235px)` }}
+					sx={{ backgroundColor: colors.bgFooter, minWidth: `calc(100% - 235px)` }}
 					display='flex'
 					justifyContent='flex-end'
 				>
-					<Box
-						display='flex'
-						justifyContent='flex-end'
-					>
-						<Stack
-							justifyContent='end'
-							direction='row'
-							spacing={0.8}
-							sx={{ pr: 1.5 }}
+					<Stack justifyContent='end' direction='row' spacing={0.8} sx={{ pr: 1.5 }}>
+						<Box
+							display='flex'
+							sx={{
+								px: 0.5,
+								justifyContent: 'center',
+								alignItems: 'center',
+								cursor: 'pointer',
+								'&:hover': { background: colors.footerHover },
+							}}
 						>
-							<Box
-								display='flex'
-								sx={{
-									px: 0.5,
-									justifyContent: 'center',
-									alignItems: 'center',
-									cursor: 'pointer',
-									'&:hover': {
-										background: '#1f8ad2',
-									},
-								}}
-							>
-								<VscCheck fontSize='0.9rem' />
-								<Typography sx={{ ml: 0.5, mt: 0.1, fontSize: '0.6rem' }}>
-									Prettier
-								</Typography>
-							</Box>
-
-							<Box
-								display='flex'
-								sx={{
-									justifyContent: 'center',
-									alignItems: 'center',
-									py: 0.3,
-									px: 0.5,
-									cursor: 'pointer',
-									'&:hover': {
-										background: '#1f8ad2',
-									},
-								}}
-							>
-								<VscFeedback fontSize='0.9rem' />
-							</Box>
-							<Box
-								display='flex'
-								sx={{
-									width: '50%',
-									justifyContent: 'center',
-									alignItems: 'center',
-									py: 0.3,
-									px: 0.5,
-									cursor: 'pointer',
-									'&:hover': {
-										background: '#1f8ad2',
-									},
-								}}
-							>
-								<VscBell fontSize='0.9rem' />
-							</Box>
-						</Stack>
-					</Box>
+							<VscCheck fontSize='0.9rem' />
+							<Typography sx={{ ml: 0.5, mt: 0.1, fontSize: '0.6rem' }}>
+								Prettier
+							</Typography>
+						</Box>
+						<Box
+							display='flex'
+							sx={{
+								justifyContent: 'center',
+								alignItems: 'center',
+								py: 0.3,
+								px: 0.5,
+								cursor: 'pointer',
+								'&:hover': { background: colors.footerHover },
+							}}
+						>
+							<VscFeedback fontSize='0.9rem' />
+						</Box>
+						<Box
+							display='flex'
+							sx={{
+								width: '50%',
+								justifyContent: 'center',
+								alignItems: 'center',
+								py: 0.3,
+								px: 0.5,
+								cursor: 'pointer',
+								'&:hover': { background: colors.footerHover },
+							}}
+						>
+							<VscBell fontSize='0.9rem' />
+						</Box>
+					</Stack>
 				</Grid>
 			</Grid>
 		</Box>

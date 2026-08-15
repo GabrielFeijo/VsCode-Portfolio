@@ -7,6 +7,7 @@ import { convertFileName } from '../../utils/convertFileName';
 import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
 import { Language, Page } from '../../domain/page';
 import { getLocalizedPath } from '../../config/seo';
+import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
 	pages: Page[];
@@ -31,113 +32,24 @@ export default function AppButtons({
 }: Props) {
 	const navigate = useNavigate();
 	const theme = useTheme();
+	const colors = useAppPalette();
 	const [contextMenu, setContextMenu] = useState<{
 		mouseX: number;
 		mouseY: number;
 		tabIndex: number;
 	} | null>(null);
 
-	function renderButtonBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282A36' : '#21222c';
-		}
-		return selectedIndex === index ? '#ffffff' : '#ececec';
-	}
-
-	function renderButtonColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
-	}
-
-	function renderCloseButtonBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282A36' : '#21222c';
-		}
-		return selectedIndex === index ? '#ffffff' : '#ececec';
-	}
-
-	function renderCloseButtonColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
-	}
-
-	function renderCloseButtonHoverBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#333c43' : '#333c43';
-		}
-		return selectedIndex === index ? '#e6e4e5' : '#dadada';
-	}
-
-	function renderCloseButtonHoverColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex !== index ? '#d0d0d0' : '#ffffff';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#1a1a1a';
-	}
-
-	const handleContextMenu = (event: React.MouseEvent, index: number) => {
-		event.preventDefault();
-		setContextMenu({
-			mouseX: event.clientX,
-			mouseY: event.clientY,
-			tabIndex: index,
-		});
-	};
-
-	const handleCloseContextMenu = () => {
-		setContextMenu(null);
-	};
-
-	const handleCloseTab = () => {
-		if (contextMenu) {
-			setVisiblePageIndexes(
-				visiblePageIndexes.filter((x) => x !== contextMenu.tabIndex)
-			);
-		}
-	};
-
-	const handleCloseOthers = () => {
-		if (contextMenu) {
-			setVisiblePageIndexes([contextMenu.tabIndex]);
-			setSelectedIndex(contextMenu.tabIndex);
-			const page = pages.find((x) => x.index === contextMenu.tabIndex);
-			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
-		}
-	};
-
-	const handleCloseToRight = () => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			const newIndexes = visiblePageIndexes.slice(0, currentPosition + 1);
-			setVisiblePageIndexes(newIndexes);
-		}
-	};
-
-	const handleCloseToLeft = () => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			const newIndexes = visiblePageIndexes.slice(currentPosition);
-			setVisiblePageIndexes(newIndexes);
-		}
-	};
-
-	const handleCloseAll = () => {
-		setVisiblePageIndexes([]);
-		navigate(getLocalizedPath('/', language));
-	};
+	const isSelected = (index: number) => selectedIndex === index;
 
 	function renderPageButton(index: number, name: string, route: string) {
+		const selected = isSelected(index);
 		return (
 			<Box
 				key={index}
 				sx={{
 					display: 'inline-block',
 					borderRight: 1,
-					borderColor: theme.palette.mode === 'dark' ? '#252525' : '#f3f3f3',
+					borderColor: colors.border,
 				}}
 			>
 				<Button
@@ -155,18 +67,16 @@ export default function AppButtons({
 						borderRadius: 0,
 						px: 2,
 						textTransform: 'none',
-						backgroundColor: renderButtonBgColor(index),
-						color: renderButtonColor(index),
+						backgroundColor: selected ? colors.bgTabActive : colors.bgTabInactive,
+						color: selected ? colors.textPrimary : colors.textSecondary,
 						'&.MuiButtonBase-root:hover': {
-							bgcolor: renderButtonBgColor(index),
+							bgcolor: selected ? colors.bgTabActive : colors.bgHover,
 						},
 						transition: 'none',
 						pb: 0.2,
 					}}
 				>
-					<Box
-						sx={{ color: '#6997d5', width: 20, height: 20, mr: 0.4, ml: -1 }}
-					>
+					<Box sx={{ color: colors.iconMarkdown, width: 20, height: 20, mr: 0.4, ml: -1 }}>
 						<VscMarkdown />
 					</Box>
 					{convertFileName(name)}
@@ -177,19 +87,17 @@ export default function AppButtons({
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
 								e.stopPropagation();
-								setVisiblePageIndexes(
-									visiblePageIndexes.filter((x) => x !== index)
-								);
+								setVisiblePageIndexes(visiblePageIndexes.filter((x) => x !== index));
 							}
 						}}
 						sx={{
 							ml: 1,
 							mr: -1,
-							backgroundColor: renderCloseButtonBgColor(index),
-							color: renderCloseButtonColor(index),
+							backgroundColor: selected ? colors.bgTabActive : colors.bgTabInactive,
+							color: selected ? colors.textPrimary : colors.textSecondary,
 							'&:hover': {
-								bgcolor: renderCloseButtonHoverBgColor(index),
-								color: renderCloseButtonHoverColor(index),
+								bgcolor: colors.bgHover,
+								color: colors.textPrimary,
 							},
 							width: 20,
 							height: 20,
@@ -203,9 +111,7 @@ export default function AppButtons({
 						}}
 						onClick={(e: React.MouseEvent<HTMLDivElement>) => {
 							e.stopPropagation();
-							setVisiblePageIndexes(
-								visiblePageIndexes.filter((x) => x !== index)
-							);
+							setVisiblePageIndexes(visiblePageIndexes.filter((x) => x !== index));
 						}}
 					>
 						<VscChromeClose />
@@ -214,6 +120,47 @@ export default function AppButtons({
 			</Box>
 		);
 	}
+
+	const handleContextMenu = (event: React.MouseEvent, index: number) => {
+		event.preventDefault();
+		setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, tabIndex: index });
+	};
+
+	const handleCloseContextMenu = () => setContextMenu(null);
+
+	const handleCloseTab = () => {
+		if (contextMenu) {
+			setVisiblePageIndexes(visiblePageIndexes.filter((x) => x !== contextMenu.tabIndex));
+		}
+	};
+
+	const handleCloseOthers = () => {
+		if (contextMenu) {
+			setVisiblePageIndexes([contextMenu.tabIndex]);
+			setSelectedIndex(contextMenu.tabIndex);
+			const page = pages.find((x) => x.index === contextMenu.tabIndex);
+			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
+		}
+	};
+
+	const handleCloseToRight = () => {
+		if (contextMenu) {
+			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+			setVisiblePageIndexes(visiblePageIndexes.slice(0, currentPosition + 1));
+		}
+	};
+
+	const handleCloseToLeft = () => {
+		if (contextMenu) {
+			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+			setVisiblePageIndexes(visiblePageIndexes.slice(currentPosition));
+		}
+	};
+
+	const handleCloseAll = () => {
+		setVisiblePageIndexes([]);
+		navigate(getLocalizedPath('/', language));
+	};
 
 	return (
 		<>
@@ -225,19 +172,12 @@ export default function AppButtons({
 					overflowX: 'auto',
 					overflowY: 'hidden',
 					whiteSpace: 'nowrap',
-					backgroundColor: theme.palette.mode === 'dark' ? '#191a21' : '#f3f3f3',
-					'&::-webkit-scrollbar': {
-						height: '3px',
-					},
-					'&::-webkit-scrollbar-thumb': {
-						backgroundColor:
-							theme.palette.mode === 'dark' ? '#535353' : '#8c8c8c',
-					},
+					backgroundColor: colors.bgTabs,
+					'&::-webkit-scrollbar': { height: '3px' },
+					'&::-webkit-scrollbar-thumb': { backgroundColor: colors.scrollbar },
 				}}
 			>
-				{pages.map(({ index, name, route }) =>
-					renderPageButton(index, name, route)
-				)}
+				{pages.map(({ index, name, route }) => renderPageButton(index, name, route))}
 			</Container>
 
 			<TabContextMenu

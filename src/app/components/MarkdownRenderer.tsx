@@ -19,6 +19,7 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../contexts/ThemeContext';
+import { fonts } from '../theme/typography';
 
 interface MarkdownRendererProps {
 	allowRawHtml?: boolean;
@@ -182,9 +183,9 @@ function MarkdownCode({
 				overflowX: 'auto',
 				p: 2,
 				borderRadius: 1,
-				backgroundColor: isDarkTheme ? '#1e1e1e' : '#f5f5f5',
-				color: isDarkTheme ? '#d4d4d4' : '#24292f',
-				fontFamily: '"Fira Code", "Fira Mono", monospace',
+				backgroundColor: 'var(--bg-tertiary)',
+				color: 'var(--text-primary)',
+				fontFamily: fonts.mono,
 				fontSize: 14,
 			}}
 		>

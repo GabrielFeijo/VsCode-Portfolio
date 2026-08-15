@@ -94,6 +94,7 @@ function renderTree(options?: {
 	language?: 'pt' | 'en';
 	visiblePageIndexes?: number[];
 	theme?: 'dark' | 'light';
+	currentComponent?: string;
 }) {
 	const pages = options?.pages || defaultPages;
 	const visiblePageIndexes = options?.visiblePageIndexes || [0];
@@ -104,7 +105,7 @@ function renderTree(options?: {
 		),
 		selectedIndex: 0,
 		setSelectedIndex: jest.fn(),
-		currentComponent: 'tree',
+		currentComponent: options?.currentComponent || 'tree',
 		setCurrentComponent: jest.fn(),
 		visiblePageIndexes,
 		setVisiblePageIndexes: jest.fn((update: SetStateAction<number[]>) =>
@@ -150,6 +151,13 @@ describe('AppTree', () => {
 
 		await waitFor(() => expect(props.setSelectedIndex).toHaveBeenCalledWith(0));
 		expect(screen.getByText('projects.md')).toBeInTheDocument();
+	});
+
+	it('highlights the selected item when the editor is focused', () => {
+		renderTree({ currentComponent: 'editor' });
+
+		expect(screen.getByTestId('tree-item-0')).toBeInTheDocument();
+		expect(screen.getByTestId('tree-item-1')).toBeInTheDocument();
 	});
 
 	it('opens a page and adds a hidden tab to the visible list', () => {

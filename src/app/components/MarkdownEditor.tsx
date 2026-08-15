@@ -2,6 +2,7 @@ import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/themes/prism-tomorrow.css';
+import { fonts } from '../theme/typography';
 
 interface Props {
 	value: string;
@@ -15,7 +16,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 			onValueChange={onChange}
 			highlight={(code) => highlight(code, languages.markdown, 'markdown')}
 			style={{
-				fontFamily: '"Fira Code", "Fira Mono", monospace',
+				fontFamily: fonts.mono,
 				fontSize: 14,
 				lineHeight: '1.5',
 				height: '100%',
