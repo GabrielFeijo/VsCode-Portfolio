@@ -37,6 +37,8 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
     roots: ['<rootDir>/tests', '<rootDir>/src'],
     moduleNameMapper: {
+        // Browser-only Vite import.meta.glob module, never executed in tests.
+        '^./projectFilesGlob$': '<rootDir>/tests/mocks/projectFilesGlob.ts',
         '^src/(.*)$': '<rootDir>/src/$1',
         '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
         '^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
@@ -49,6 +51,8 @@ module.exports = {
         '!src/**/*.d.ts',
         // Vite composition root: its client factory is covered directly below.
         '!src/services/api/axios-config/index.ts',
+        // Browser-only import.meta.glob glue, not executable in Jest.
+        '!src/services/terminal/projectFilesGlob.ts',
     ],
     coverageDirectory: 'coverage',
     coverageThreshold: {

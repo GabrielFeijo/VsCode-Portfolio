@@ -10,8 +10,8 @@ import { IRate, ReviewService } from '../../../../services/api/review/ReviewServ
 import {
 	LOCAL_COMMANDS,
 	PAGE_ROUTES,
+	PROJECT_FS,
 	TERMINAL_DEFAULT_PATH,
-	VIRTUAL_FS,
 	getTerminalColors,
 } from './terminalConfig';
 
@@ -57,7 +57,7 @@ function normalizePath(base: string, target: string): string {
 }
 
 function listDirectory(path: string): string[] {
-	const entries = VIRTUAL_FS[path];
+	const entries = PROJECT_FS[path];
 
 	return entries.map((entry) => {
 		const suffix = entry.type === 'dir' ? '/' : '';
@@ -270,7 +270,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 					return true;
 				}
 			const newPath = normalizePath(cwd, arg);
-			if (!VIRTUAL_FS[newPath]) {
+			if (!PROJECT_FS[newPath]) {
 					addEntry(trimmed, [`\x1b[91mcd: ${arg}: No such file or directory\x1b[0m`], terminalColors.error);
 					return true;
 				}
@@ -286,7 +286,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 				const filePath = normalizePath(cwd, arg);
 				const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 				const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-				const dirEntries = VIRTUAL_FS[parent];
+				const dirEntries = PROJECT_FS[parent];
 				const file = dirEntries?.find((e) => e.name === fileName && e.type === 'file');
 				if (!file?.content) {
 					addEntry(trimmed, [`\x1b[91mcat: ${arg}: No such file\x1b[0m`], terminalColors.error);
