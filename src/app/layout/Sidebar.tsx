@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Box, Link, Paper, Tooltip } from '@mui/material';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
@@ -26,18 +26,20 @@ export default function Sidebar({
 	setExpanded,
 	terminal,
 	setTerminal,
-	language,
 	changeLanguage,
 }: Props) {
 	const { theme, toggleTheme } = useTheme();
 	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();
 
-	const contactLinks = [
-		{ index: 0, icon: <FaGithub />, title: t('contact.github.title'), href: t('contact.github.href') },
-		{ index: 1, icon: <FaLinkedin />, title: t('contact.linkedin.title'), href: t('contact.linkedin.href') },
-		{ index: 2, icon: <FaEnvelope />, title: t('contact.email.title'), href: t('contact.email.href') },
-	];
+	const contactLinks = useMemo(
+		() => [
+			{ index: 0, icon: <FaGithub />, title: t('contact.github.title'), href: t('contact.github.href') },
+			{ index: 1, icon: <FaLinkedin />, title: t('contact.linkedin.title'), href: t('contact.linkedin.href') },
+			{ index: 2, icon: <FaEnvelope />, title: t('contact.email.title'), href: t('contact.email.href') },
+		],
+		[t],
+	);
 
 	const iconSx = {
 		flexGrow: 0,

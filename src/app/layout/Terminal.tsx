@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import {
 	VscAdd,
@@ -20,8 +20,6 @@ import { Language } from '../../domain/page';
 
 interface Props {
 	language: Language;
-	selectedTerminalIndex: number;
-	setSelectedTerminalIndex: React.Dispatch<React.SetStateAction<number>>;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
@@ -29,8 +27,6 @@ interface Props {
 
 const Terminal = ({
 	language,
-	selectedTerminalIndex,
-	setSelectedTerminalIndex,
 	setTerminal,
 	setRanking,
 	changeLanguage,
@@ -38,15 +34,9 @@ const Terminal = ({
 	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const colors = useAppPalette();
-	const isDarkMode = theme === 'dark';
-
-	function renderTerminalBgColor(index: number) {
-		return selectedTerminalIndex === index ? colors.tabIndicator : 'transparent';
-	}
-	function renderTerminalColor(index: number) {
-		return selectedTerminalIndex === index ? colors.textPrimary : colors.textSecondary;
-	}
-	const opc = [
+	// Tab selection is local state — no reason to lift this to App.tsx
+	const [selectedTerminalIndex, setSelectedTerminalIndex] = useState(3);
+	const terminalTabs = useMemo(() => [
 		{
 			index: 0,
 			name: t('terminal.tabs.problems'),
@@ -73,7 +63,15 @@ const Terminal = ({
 				/>
 			),
 		},
-	];
+	], [t, language, setRanking, changeLanguage]);
+
+
+	function renderTerminalBgColor(index: number) {
+		return selectedTerminalIndex === index ? colors.tabIndicator : 'transparent';
+	}
+	function renderTerminalColor(index: number) {
+		return selectedTerminalIndex === index ? colors.textPrimary : colors.textSecondary;
+	}
 
 	return (
 		<Box
@@ -101,7 +99,7 @@ const Terminal = ({
 					spacing={2}
 					role="tablist"
 				>
-					{opc.map(({ index, name }) => (
+					{terminalTabs.map(({ index, name }) => (
 						<Box
 							key={index}
 							component="button"
@@ -318,7 +316,7 @@ const Terminal = ({
 					backgroundColor: selectedTerminalIndex === 3 ? colors.bgTerminal : 'transparent',
 				}}
 			>
-				{opc[selectedTerminalIndex].element}
+				{terminalTabs[selectedTerminalIndex].element}
 			</Box>
 		</Box>
 	);

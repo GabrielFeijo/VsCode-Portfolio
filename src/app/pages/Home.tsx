@@ -7,7 +7,7 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import logo from '../../static/favicon.png';
 import { useLocation } from 'react-router-dom';
 import Loading from '../components/Loading/Loading';
@@ -27,7 +27,7 @@ export default function Home({ setSelectedIndex }: Props) {
 	const { pathname } = useLocation();
 	const [loading, setLoading] = useState(true);
 
-	const contactLinks = [
+	const contactLinks = useMemo(() => [
 		{
 			index: 0,
 			icon: <FaGithub />,
@@ -46,9 +46,9 @@ export default function Home({ setSelectedIndex }: Props) {
 			title: t('contact.email.title'),
 			href: t('contact.email.href'),
 		},
-	];
+	], [t]);
 
-	const getConnection = async () => {
+	const warmupServer = async () => {
 		if (!CacheService.has24HoursPassed()) {
 			return;
 		}
@@ -67,7 +67,7 @@ export default function Home({ setSelectedIndex }: Props) {
 		let active = true;
 		document.title = siteConfig.name;
 
-		void getConnection()
+		void warmupServer()
 			.catch(() => undefined)
 			.finally(() => {
 				if (active) setLoading(false);
