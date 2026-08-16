@@ -191,7 +191,7 @@ export default function AppTree({ language }: Props) {
 		if (!existingPage) return;
 
 		window.open(
-			`${siteConfig.repoUrl}/tree/main/public/pages/${language}/${existingPage.name}`,
+			`${siteConfig.repoUrl}/tree/main/src/pages/${language}/${existingPage.name}`,
 			'_blank',
 			'noopener,noreferrer'
 		);

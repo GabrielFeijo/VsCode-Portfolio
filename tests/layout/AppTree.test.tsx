@@ -289,7 +289,7 @@ describe('AppTree', () => {
 		fireEvent.contextMenu(page, { clientX: 20, clientY: 30 });
 		fireEvent.click(screen.getByRole('button', { name: 'Open on GitHub' }));
 		expect(open).toHaveBeenCalledWith(
-			expect.stringContaining('/public/pages/pt/projects.html'),
+			expect.stringContaining('/src/pages/pt/projects.html'),
 			'_blank',
 			'noopener,noreferrer'
 		);

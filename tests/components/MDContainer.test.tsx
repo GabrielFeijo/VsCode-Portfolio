@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom';
 import MDContainer from '../../src/app/components/MDContainer';
 import { StorageService } from '../../src/services/storageService';
+import { PAGE_FILES } from '../mocks/pageContentGlob';
 
 jest.mock('../../src/app/components/MarkdownRenderer', () => ({
 	__esModule: true,
@@ -29,6 +30,30 @@ jest.mock('../../src/app/components/MarkdownEditor', () => ({
 describe('MDContainer', () => {
 	beforeEach(() => {
 		jest.restoreAllMocks();
+		for (const key of Object.keys(PAGE_FILES)) {
+			delete PAGE_FILES[key];
+		}
+	});
+
+	it('loads and renders content from bundled static pages without network fetch', async () => {
+		PAGE_FILES['../pages/pt/sobre-mim.html'] = '# Bundled static content';
+		global.fetch = jest.fn();
+
+		render(
+			<MemoryRouter initialEntries={['/about-me']}>
+				<MDContainer
+					path='/pages/pt/sobre-mim.html'
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		await waitFor(() =>
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+				'# Bundled static content'
+			)
+		);
+		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it('loads and renders content from a static page', async () => {

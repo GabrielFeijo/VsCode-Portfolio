@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { Page } from '@/domain/page';
 import { StorageService } from '@/services/storageService';
+import { getStaticPageContent } from '@/services/pageContentService';
 import MarkdownRenderer from './MarkdownRenderer';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
@@ -80,6 +81,12 @@ export default function MDContainer({ path, page, setPages }: Props) {
 			const stored = getStoredPageContent(page);
 			if (stored !== null) {
 				setContent(stored);
+				return;
+			}
+
+			const staticContent = getStaticPageContent(path);
+			if (staticContent !== null) {
+				setContent(staticContent);
 				return;
 			}
 
