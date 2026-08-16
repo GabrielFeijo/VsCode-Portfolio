@@ -16,6 +16,33 @@ interface NanoEditorProps {
 	isDark: boolean;
 }
 
+const DEFAULT_PAGE_MAP: Record<string, { index: number; route: string }> = {
+	'sobre-mim.html': { index: 0, route: 'about-me' },
+	'sobre-mim': { index: 0, route: 'about-me' },
+	'about-me.html': { index: 0, route: 'about-me' },
+	'about-me': { index: 0, route: 'about-me' },
+	'habilidades.html': { index: 1, route: 'skills' },
+	'habilidades': { index: 1, route: 'skills' },
+	'skills.html': { index: 1, route: 'skills' },
+	'skills': { index: 1, route: 'skills' },
+	'projetos.html': { index: 2, route: 'projects' },
+	'projetos': { index: 2, route: 'projects' },
+	'projects.html': { index: 2, route: 'projects' },
+	'projects': { index: 2, route: 'projects' },
+	'experiencia.html': { index: 3, route: 'experience' },
+	'experiencia': { index: 3, route: 'experience' },
+	'experience.html': { index: 3, route: 'experience' },
+	'experience': { index: 3, route: 'experience' },
+	'conquistas.html': { index: 4, route: 'accomplishments' },
+	'conquistas': { index: 4, route: 'accomplishments' },
+	'accomplishments.html': { index: 4, route: 'accomplishments' },
+	'accomplishments': { index: 4, route: 'accomplishments' },
+	'certificados.html': { index: 5, route: 'certificates' },
+	'certificados': { index: 5, route: 'certificates' },
+	'certificates.html': { index: 5, route: 'certificates' },
+	'certificates': { index: 5, route: 'certificates' },
+};
+
 export function syncPageStorage(fileName: string, content: string): void {
 	const storedPages = StorageService.getData();
 	const baseName = fileName.replace(/\.md$/, '').replace(/\.html$/, '');
@@ -24,6 +51,7 @@ export function syncPageStorage(fileName: string, content: string): void {
 			p.name === fileName ||
 			p.name === baseName ||
 			p.name === `${baseName}.md` ||
+			p.name === `${baseName}.html` ||
 			p.route === baseName ||
 			p.route === `/${baseName}`,
 	);
@@ -32,8 +60,18 @@ export function syncPageStorage(fileName: string, content: string): void {
 		StorageService.saveOrUpdateData({
 			...targetPage,
 			content,
+			isSaved: true,
 		});
-	} else if (fileName.endsWith('.md')) {
+	} else if (DEFAULT_PAGE_MAP[fileName] || DEFAULT_PAGE_MAP[baseName]) {
+		const meta = DEFAULT_PAGE_MAP[fileName] || DEFAULT_PAGE_MAP[baseName];
+		StorageService.saveOrUpdateData({
+			index: meta.index,
+			name: fileName,
+			route: meta.route,
+			content,
+			isSaved: true,
+		});
+	} else {
 		const newPage = StorageService.createFile(fileName, content);
 		StorageService.saveOrUpdateData(newPage);
 	}

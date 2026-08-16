@@ -242,6 +242,17 @@ describe('NanoEditor', () => {
 			name: 'sobre-mim.md',
 			route: 'sobre-mim',
 			content: 'new content',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([]);
+		syncPageStorage('sobre-mim.html', '<p>New html</p>');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: '<p>New html</p>',
+			isSaved: true,
 		});
 
 		(StorageService.getData as jest.Mock).mockReturnValue([]);
