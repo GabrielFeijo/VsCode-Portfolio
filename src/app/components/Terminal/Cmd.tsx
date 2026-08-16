@@ -1,11 +1,12 @@
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Language } from '../../../domain/page';
-import { fonts } from '../../theme/typography';
+import { Language } from '@/domain/page';
+import { fonts } from '@/app/theme/typography';
 import styles from './Cmd.module.css';
 import TerminalLine from './terminal/TerminalLine';
 import TerminalPrompt from './terminal/TerminalPrompt';
-import { useTheme } from '../../../contexts/ThemeContext';
+import NanoEditor from './terminal/NanoEditor';
+import { useTheme } from '@/contexts/ThemeContext';
 import { getTerminalColors } from './terminal/terminalConfig';
 import { useTerminal } from './terminal/useTerminal';
 
@@ -25,6 +26,10 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 		command,
 		setCommand,
 		isDark,
+		fs,
+		setFs,
+		activeEditor,
+		closeEditor,
 		inputRef,
 		scrollRef,
 		handleKeyDown,
@@ -53,6 +58,30 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 		}
 		await submitCommand();
 	};
+
+	if (activeEditor) {
+		return (
+			<Box
+				id="cmd-terminal"
+				sx={{
+					height: '100%',
+					borderRadius: '4px',
+					overflow: 'hidden',
+				}}
+			>
+				<NanoEditor
+					fileName={activeEditor.fileName}
+					filePath={activeEditor.filePath}
+					initialContent={activeEditor.initialContent}
+					cwd={cwd}
+					fs={fs}
+					setFs={setFs}
+					onClose={closeEditor}
+					isDark={isDark}
+				/>
+			</Box>
+		);
+	}
 
 	return (
 		<Box

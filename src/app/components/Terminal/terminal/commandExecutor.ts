@@ -2,7 +2,7 @@ import { Language } from '@/domain/page';
 import { getLocalizedPath } from '@/config/seo';
 import { ReviewService } from '@/services/api/review/ReviewService';
 import { PAGE_ROUTES, PROJECT_ROOT } from './terminalConfig';
-import { TerminalColors, TerminalEntry, VirtualDirectory } from './types';
+import { ActiveEditorSession, TerminalColors, TerminalEntry, VirtualDirectory } from './types';
 import { calculate, formatResult } from './utils/calculator';
 import { generateTree, listDirectory, normalizePath } from './utils/pathUtils';
 import { buildHelp, buildNeofetch, formatReviews, formatUptime } from './utils/formatters';
@@ -28,6 +28,7 @@ export interface CommandExecutionContext {
 	fs: VirtualDirectory;
 	setFs: React.Dispatch<React.SetStateAction<VirtualDirectory>>;
 	apiCommandList?: string[];
+	openEditor?: (session: ActiveEditorSession) => void;
 }
 
 function parseFlagsAndArgs(rawArgs: string): { flags: Set<string>; args: string[] } {
@@ -241,6 +242,39 @@ export async function executeLocalCommand(
 			}
 			setPreviousCwd(cwd);
 			setCwd(newPath);
+			return true;
+		}
+
+		case 'nano':
+		case 'vim':
+		case 'vi': {
+			const targetArg = arg.trim();
+			if (!targetArg) {
+				addEntry(trimmed, [`\x1b[33mUsage: ${cmd} <filename>\x1b[0m`]);
+				return true;
+			}
+			const filePath = normalizePath(cwd, targetArg);
+			if (fs[filePath]) {
+				addEntry(trimmed, [`\x1b[91m${cmd}: ${targetArg}: Is a directory\x1b[0m`], terminalColors.error);
+				return true;
+			}
+
+			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
+			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+			let fileContent = '';
+			const existing = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+			if (existing?.content) {
+				fileContent = existing.content.join('\n');
+			}
+
+			if (ctx.openEditor) {
+				ctx.openEditor({
+					fileName,
+					filePath,
+					initialContent: fileContent,
+				});
+			}
 			return true;
 		}
 

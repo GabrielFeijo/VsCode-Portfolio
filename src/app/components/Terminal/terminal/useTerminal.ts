@@ -10,7 +10,7 @@ import {
 	TERMINAL_DEFAULT_PATH,
 	getTerminalColors,
 } from './terminalConfig';
-import { TerminalEntry, UseTerminalOptions, VirtualDirectory } from './types';
+import { ActiveEditorSession, TerminalEntry, UseTerminalOptions, VirtualDirectory } from './types';
 import { executeLocalCommand } from './commandExecutor';
 import { getCompletionState, getCompletions as getCompletionsUtil } from './utils/autocomplete';
 
@@ -38,6 +38,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 	const [history, setHistory] = useState<string[]>([]);
 	const historyRef = useRef<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [activeEditor, setActiveEditor] = useState<ActiveEditorSession | null>(null);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -98,6 +99,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 			fs,
 			setFs,
 			apiCommandList: allCommandNames,
+			openEditor: (session) => setActiveEditor(session),
 		});
 
 		if (handled) return;
@@ -199,6 +201,10 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 		setCommand: setCommandValue,
 		history,
 		isDark,
+		fs,
+		setFs,
+		activeEditor,
+		closeEditor: () => setActiveEditor(null),
 		inputRef,
 		scrollRef,
 		handleKeyDown,

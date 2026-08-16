@@ -6,8 +6,8 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { Page } from '../../domain/page';
-import { StorageService } from '../../services/storageService';
+import { Page } from '@/domain/page';
+import { StorageService } from '@/services/storageService';
 import MarkdownRenderer from './MarkdownRenderer';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
@@ -29,6 +29,14 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	useEffect(() => {
 		if (editMode) {
 			setContent(page.content || '');
+			return;
+		}
+
+		const stored = StorageService.getData().find(
+			(p) => page && (p.name === page.name || p.index === page.index || p.route === page.route),
+		);
+		if (stored?.content !== undefined) {
+			setContent(stored.content);
 			return;
 		}
 
@@ -66,71 +74,78 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		[page, setPages]
 	);
 
+	const handleSave = useCallback(() => {
+		if (!page) return;
+
+		const updatedPage = {
+			...page,
+			content,
+			isSaved: true,
+		};
+
+		StorageService.saveOrUpdateData(updatedPage);
+
+		setPages((currentPages) =>
+			currentPages.map((currentPage) =>
+				currentPage.index === page.index ? updatedPage : currentPage
+			)
+		);
+	}, [content, page, setPages]);
+
 	useEffect(() => {
-		function savePage(event: KeyboardEvent) {
-			if (!event.ctrlKey || event.key.toLowerCase() !== 's' || !editMode) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.ctrlKey && event.key === 's') {
+				event.preventDefault();
+				handleSave();
+			}
+		};
 
-			event.preventDefault();
-			const updatedPage = { ...page, content, isSaved: true };
-			StorageService.saveOrUpdateData(updatedPage);
-			setPages((currentPages) =>
-				currentPages.map((currentPage) =>
-					currentPage.index === page.index ? updatedPage : currentPage
-				)
-			);
-		}
-
-		window.addEventListener('keydown', savePage);
-		return () => window.removeEventListener('keydown', savePage);
-	}, [content, editMode, page, setPages]);
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [handleSave]);
 
 	return (
 		<Container
+			maxWidth={false}
 			sx={{
 				height: '100%',
-				padding: { xs: 1, sm: 2, md: 3 },
-				'& h1, & h2, & h3': { wordBreak: 'break-word' },
-				'& p, & li': {
-					wordBreak: 'break-word',
-					overflowWrap: 'break-word',
-				},
-				'& img': { maxWidth: '100%', height: 'auto' },
+				width: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				padding: '0 !important',
 			}}
 		>
-			{editMode ? (
-				<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+			<Grid container sx={{ flex: 1, height: '100%', overflow: 'hidden' }}>
+				{editMode && (
 					<Grid
-						container
-						sx={{ height: '100%', pt: 2, pb: 2 }}
+						item
+						xs={12}
+						md={6}
+						sx={{
+							height: '100%',
+							borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+						}}
 					>
-						<Grid
-							item
-							xs={5}
-							sx={{ pt: 2 }}
-						>
-							<Suspense fallback={null}>
-								<MarkdownEditor
-									value={content}
-									onChange={handleChange}
-								/>
-							</Suspense>
-						</Grid>
-
-						<Grid
-							item
-							xs={7}
-							sx={{ pl: 2, borderLeft: '1px solid #8686867b' }}
-						>
-							<MarkdownRenderer content={content} />
-						</Grid>
+						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>
+							<MarkdownEditor
+								value={content}
+								onChange={handleChange}
+							/>
+						</Suspense>
 					</Grid>
-				</Box>
-			) : (
-				<MarkdownRenderer
-					content={content}
-					allowRawHtml
-				/>
-			)}
+				)}
+				<Grid
+					item
+					xs={12}
+					md={editMode ? 6 : 12}
+					sx={{
+						height: '100%',
+						overflowY: 'auto',
+					}}
+				>
+					<MarkdownRenderer content={content} allowRawHtml={!editMode} />
+				</Grid>
+			</Grid>
 		</Container>
 	);
 }

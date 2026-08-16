@@ -1,4 +1,4 @@
-import { Language } from '../../../../domain/page';
+import { Language } from '@/domain/page';
 
 export interface TerminalEntry {
 	id: string;
@@ -43,4 +43,10 @@ export interface CompletionState {
 	candidates: string[];
 	list: string[];
 	isPath: boolean;
+}
+
+export interface ActiveEditorSession {
+	fileName: string;
+	filePath: string;
+	initialContent: string;
 }

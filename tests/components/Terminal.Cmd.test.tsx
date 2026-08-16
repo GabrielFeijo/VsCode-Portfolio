@@ -632,6 +632,23 @@ describe('Cmd', () => {
 		expect(await screen.findByText(/cat: src: Is a directory/)).toBeInTheDocument();
 	});
 
+	it('supports nano and vim editor launching and error handling', async () => {
+		renderCmd();
+		submitCommand('nano');
+		expect(await screen.findByText(/Usage: nano <filename>/)).toBeInTheDocument();
+
+		submitCommand('nano src');
+		expect(await screen.findByText(/nano: src: Is a directory/)).toBeInTheDocument();
+
+		submitCommand('nano test-file.md');
+		expect(await screen.findByText('GNU nano 7.2')).toBeInTheDocument();
+		expect(await screen.findByText('File: test-file.md')).toBeInTheDocument();
+
+		const textarea = screen.getByRole('textbox');
+		fireEvent.keyDown(textarea, { key: 'x', ctrlKey: true });
+		expect(await screen.findByRole('textbox', { name: 'terminal.info.placeholder' })).toBeInTheDocument();
+	});
+
 	it('supports head and tail commands and error handling', async () => {
 		renderCmd();
 		submitCommand('head -n 2 package.json');

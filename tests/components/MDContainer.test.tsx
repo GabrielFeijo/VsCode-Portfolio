@@ -109,6 +109,34 @@ describe('MDContainer', () => {
 		expect(screen.queryByLabelText('Markdown editor')).not.toBeInTheDocument();
 	});
 
+	it('loads content from storage if present for non-editable page metadata', async () => {
+		jest.spyOn(StorageService, 'getData').mockReturnValue([
+			{ index: 10, name: 'about.md', route: 'about-me', content: '# From storage' },
+		]);
+		global.fetch = jest.fn();
+
+		const page = {
+			index: 10,
+			name: 'about.md',
+			route: 'about-me',
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/about.md'
+					page={page}
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+			'# From storage'
+		);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
 	it('ignores abort errors while loading static content', async () => {
 		global.fetch = jest
 			.fn()
