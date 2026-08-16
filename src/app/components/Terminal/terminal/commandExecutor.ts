@@ -50,6 +50,38 @@ function parseFlagsAndArgs(rawArgs: string): { flags: Set<string>; args: string[
 	return { flags, args };
 }
 
+function getFileLines(fs: VirtualDirectory, parent: string, fileName: string): string[] | null {
+	const baseName = fileName.replace(/\.(html|md)$/, '');
+	const stored = StorageService.getData().find(
+		(p) =>
+			p.name === fileName ||
+			p.name === `${baseName}.md` ||
+			p.name === `${baseName}.html` ||
+			p.name === baseName ||
+			p.route === baseName,
+	);
+	if (stored?.content !== undefined) {
+		return stored.content.split('\n');
+	}
+
+	const exact = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+	if (exact?.content) {
+		return exact.content;
+	}
+
+	const altHtml = fs[parent]?.find((e) => e.name === `${baseName}.html` && e.type === 'file');
+	if (altHtml?.content) {
+		return altHtml.content;
+	}
+
+	const altMd = fs[parent]?.find((e) => e.name === `${baseName}.md` && e.type === 'file');
+	if (altMd?.content) {
+		return altMd.content;
+	}
+
+	return null;
+}
+
 export async function executeLocalCommand(
 	rawCommand: string,
 	ctx: CommandExecutionContext,
@@ -263,11 +295,8 @@ export async function executeLocalCommand(
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
 
-			let fileContent = '';
-			const existing = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
-			if (existing?.content) {
-				fileContent = existing.content.join('\n');
-			}
+			const fileLines = getFileLines(fs, parent, fileName);
+			const fileContent = fileLines ? fileLines.join('\n') : '';
 
 			if (ctx.openEditor) {
 				ctx.openEditor({
@@ -329,14 +358,14 @@ export async function executeLocalCommand(
 
 				const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 				const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-				const file = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+				const lines = getFileLines(fs, parent, fileName);
 
-				if (!file?.content) {
+				if (!lines) {
 					addEntry(trimmed, [`\x1b[91mcat: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
 					return true;
 				}
 
-				const formatted = formatFileContent(fileName, file.content, {
+				const formatted = formatFileContent(fileName, lines, {
 					plain: flags.has('p'),
 					showLineNumbers: true,
 				});
@@ -372,15 +401,15 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const file = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+			const lines = getFileLines(fs, parent, fileName);
 
-			if (!file?.content) {
+			if (!lines) {
 				addEntry(trimmed, [`\x1b[91m${cmd}: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
 				return true;
 			}
 
-			const lines = cmd === 'head' ? file.content.slice(0, count) : file.content.slice(-count);
-			addEntry(trimmed, lines);
+			const sliced = cmd === 'head' ? lines.slice(0, count) : lines.slice(-count);
+			addEntry(trimmed, sliced);
 			return true;
 		}
 
@@ -396,9 +425,9 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const file = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+			const lines = getFileLines(fs, parent, fileName);
 
-			if (!file?.content) {
+			if (!lines) {
 				addEntry(trimmed, [`\x1b[91mgrep: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
 				return true;
 			}
@@ -407,7 +436,7 @@ export async function executeLocalCommand(
 			const regex = new RegExp(patternStr, isCaseInsensitive ? 'i' : '');
 			const matchedLines: string[] = [];
 
-			file.content.forEach((line, idx) => {
+			lines.forEach((line, idx) => {
 				if (regex.test(line)) {
 					const highlighted = line.replace(
 						regex,
@@ -432,16 +461,16 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const file = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
+			const lines = getFileLines(fs, parent, fileName);
 
-			if (!file?.content) {
+			if (!lines) {
 				addEntry(trimmed, [`\x1b[91mwc: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
 				return true;
 			}
 
-			const linesCount = file.content.length;
-			const wordsCount = file.content.join(' ').split(/\s+/).filter(Boolean).length;
-			const bytesCount = file.content.join('\n').length;
+			const linesCount = lines.length;
+			const wordsCount = lines.join(' ').split(/\s+/).filter(Boolean).length;
+			const bytesCount = lines.join('\n').length;
 
 			if (flags.has('l')) {
 				addEntry(trimmed, [`${String(linesCount).padStart(6)} ${fileArg}`]);
