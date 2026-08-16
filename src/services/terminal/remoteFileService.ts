@@ -1,3 +1,5 @@
+import { stripFileExtension } from '@/utils/stripFileExtension';
+
 const contentCache = new Map<string, string>();
 
 function getCandidateUrls(normalized: string, language: string): string[] {
@@ -8,7 +10,7 @@ function getCandidateUrls(normalized: string, language: string): string[] {
 		return [`/${normalized}`];
 	}
 
-	const baseName = normalized.replace(/\.(html|md)$/, '');
+	const baseName = stripFileExtension(normalized);
 	return [
 		`/pages/${language}/${baseName}.html`,
 		`/pages/${language === 'pt' ? 'en' : 'pt'}/${baseName}.html`,

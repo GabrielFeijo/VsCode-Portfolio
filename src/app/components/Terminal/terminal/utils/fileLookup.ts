@@ -1,5 +1,6 @@
 import { StorageService } from '@/services/storageService';
 import { fetchFileContent } from '@/services/terminal/remoteFileService';
+import { stripFileExtension } from '@/utils/stripFileExtension';
 import { VirtualDirectory } from '../types';
 
 export function hasContent(lines: string[] | undefined): boolean {
@@ -12,7 +13,7 @@ export async function getFileLinesAsync(
 	fileName: string,
 	language = 'pt',
 ): Promise<string[] | null> {
-	const baseName = fileName.replace(/\.(html|md)$/, '');
+	const baseName = stripFileExtension(fileName);
 	const stored = StorageService.getData().find(
 		(p) =>
 			p.name === fileName ||

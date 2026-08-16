@@ -19,11 +19,13 @@ interface NanoEditorProps {
 	isDark: boolean;
 }
 
+import { stripFileExtension } from '@/utils/stripFileExtension';
+
 function buildPageMap(): Record<string, { index: number; route: string }> {
 	const map: Record<string, { index: number; route: string }> = {};
 	for (const pages of Object.values(pageRoutes)) {
 		for (const page of pages) {
-			const base = page.name.replace(/\.(html|md)$/, '');
+			const base = stripFileExtension(page.name);
 			const entry = { index: page.index, route: page.route };
 			map[page.name] = entry;
 			map[base] = entry;
@@ -36,7 +38,7 @@ const PAGE_MAP = buildPageMap();
 
 function resolvePageData(fileName: string, content: string): Page {
 	const storedPages = StorageService.getData();
-	const baseName = fileName.replace(/\.md$/, '').replace(/\.html$/, '');
+	const baseName = stripFileExtension(fileName);
 	const targetPage = storedPages.find(
 		(p) =>
 			p.name === fileName ||

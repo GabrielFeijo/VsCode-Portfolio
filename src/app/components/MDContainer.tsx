@@ -19,6 +19,8 @@ interface Props {
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
 
+import { stripFileExtension } from '../../utils/stripFileExtension';
+
 const DEFAULT_PAGE_NAMES = new Set([
 	'about-me',
 	'skills',
@@ -35,7 +37,7 @@ const DEFAULT_PAGE_NAMES = new Set([
 ]);
 
 function isDefaultPage(page?: Page): boolean {
-	const baseName = page?.name.replace(/\.(html|md)$/, '').toLowerCase() || '';
+	const baseName = stripFileExtension(page?.name || '').toLowerCase();
 	const baseRoute = page?.route.replace(/^\//, '').toLowerCase() || '';
 	return DEFAULT_PAGE_NAMES.has(baseName) || DEFAULT_PAGE_NAMES.has(baseRoute);
 }
@@ -46,7 +48,7 @@ function hasEditableContent(page?: Page): page is Page & { content?: string } {
 
 function getStoredPageContent(page?: Page): string | null {
 	if (!page) return null;
-	const baseName = page.name.replace(/\.(html|md)$/, '');
+	const baseName = stripFileExtension(page.name);
 	const stored = StorageService.getData().find(
 		(p) =>
 			p.name === page.name ||

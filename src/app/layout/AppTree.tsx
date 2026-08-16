@@ -22,6 +22,8 @@ import { getBasePath, getLocalizedPath } from '../../config/seo';
 import { siteConfig } from '../../config/site';
 import { useEditorContext } from '../../contexts/EditorContext';
 
+import { stripFileExtension } from '../../utils/stripFileExtension';
+
 interface Props {
 	language: Language;
 }
@@ -107,7 +109,7 @@ export default function AppTree({ language }: Props) {
 			return;
 		}
 
-		const baseName = rawName.replace(/\.(md|html)$/i, '');
+		const baseName = stripFileExtension(rawName);
 		const normalizedName = normalizeFileName(baseName);
 		const fullFileName = `${normalizedName || 'novo-arquivo'}.md`;
 		const existingPage = pages.find(

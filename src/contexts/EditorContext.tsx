@@ -13,12 +13,14 @@ import { pageRoutes } from '../app/pages/pages';
 import { StorageService } from '../services/storageService';
 import { getLocalizedPath } from '../config/seo';
 
+import { stripFileExtension } from '../utils/stripFileExtension';
+
 export function loadPages(language: Language): Page[] {
   const defaultPages = pageRoutes[language];
   const storedPages = StorageService.getData();
 
   const mergedDefaults = defaultPages.map((defPage) => {
-    const baseName = defPage.name.replace(/\.(html|md)$/, '');
+    const baseName = stripFileExtension(defPage.name);
     const stored = storedPages.find(
       (s) =>
         s.index === defPage.index ||
@@ -40,8 +42,7 @@ export function loadPages(language: Language): Page[] {
           d.index === s.index ||
           d.route === s.route ||
           d.name === s.name ||
-          d.name.replace(/\.(html|md)$/, '') ===
-            s.name.replace(/\.(html|md)$/, ''),
+          stripFileExtension(d.name) === stripFileExtension(s.name),
       ),
   );
 
@@ -200,7 +201,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
       }
 
       const currentPages = loadPages(language);
-      const base = target.replace(/\.(html|md)$/, '').replace(/^\//, '');
+      const base = stripFileExtension(target).replace(/^\//, '');
       const matched = currentPages.find(
         (p) =>
           p.name === target ||
@@ -225,7 +226,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
   const updatePageContent = useCallback(
     (fileName: string, content: string) => {
       setPages((prev) => {
-        const baseName = fileName.replace(/\.(html|md)$/, '');
+        const baseName = stripFileExtension(fileName);
         const idx = prev.findIndex(
           (p) =>
             p.name === fileName ||
