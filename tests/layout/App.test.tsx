@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
 import App, { initVisiblePageIndexes } from '../../src/app/layout/App';
@@ -383,12 +383,18 @@ describe('App', () => {
     it('handles open-tab custom events for workspace and specific pages', async () => {
         render(<App />);
 
-        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+        });
         expect(navigateMock).toHaveBeenCalledWith('/');
 
-        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: 'sobre-mim.html' } }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: 'sobre-mim.html' } }));
+        });
         expect(navigateMock).toHaveBeenCalledWith('/about-me');
 
-        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '' } }));
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '' } }));
+        });
     });
 });
