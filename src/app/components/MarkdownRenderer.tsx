@@ -20,6 +20,7 @@ import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../contexts/ThemeContext';
 import { fonts } from '../theme/typography';
+import { getStyleContent } from '@/services/styleContentService';
 
 interface MarkdownRendererProps {
 	allowRawHtml?: boolean;
@@ -34,6 +35,7 @@ const rawHtmlSchema = {
 		...defaultSchema.tagNames!,
 		'iframe',
 		'link',
+		'style',
 		'main',
 		'section',
 		'header',
@@ -132,6 +134,13 @@ function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
 	if (props.rel !== 'stylesheet' || !props.href) return null;
 	const isRemoteStylesheet = allowedStylesheets.has(props.href);
 	if (!isRemoteStylesheet && !localStylesheetPattern.test(props.href)) return null;
+
+	if (!isRemoteStylesheet && localStylesheetPattern.test(props.href)) {
+		const localContent = getStyleContent(props.href);
+		if (localContent) {
+			return <style data-stylesheet={props.href}>{localContent}</style>;
+		}
+	}
 
 	return (
 		<link
