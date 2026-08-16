@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const consoleError = console.error;
 beforeAll(() => {
@@ -67,6 +68,21 @@ jest.mock('react-i18next', () => ({
 }));
 
 import BoxRating from '../../src/app/components/Rating/BoxRating';
+
+const createWrapper = () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
+    });
+    return ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+};
+
+const render = (ui: React.ReactElement, options = {}) =>
+    rtlRender(ui, { wrapper: createWrapper(), ...options });
 
 describe('BoxRating', () => {
     const defaultProps = {

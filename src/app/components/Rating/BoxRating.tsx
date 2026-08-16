@@ -6,7 +6,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getReviewSchema } from './schemas/BoxRatingSchema';
 import styles from './BoxRating.module.css';
-import { ApiError, ReviewService } from '@/services/api/review/ReviewService';
+import { ApiError } from '@/services/api/review/ReviewService';
+import { useCreateReviewMutation } from '@/hooks/queries/useReviewsQuery';
 import { fadeInOut } from '@/utils/motionVariants';
 import { Rating } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
@@ -24,6 +25,7 @@ interface ReviewFormData {
 
 export default function BoxRating({ ranking, setRanking }: Props) {
 	const { t } = useTranslation();
+	const createReviewMutation = useCreateReviewMutation();
 
 	const reviewSchema = getReviewSchema(t);
 
@@ -92,20 +94,18 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	};
 
 	const onSubmit = async (data: ReviewFormData) => {
-		const response = await ReviewService.create({
-			username: data.username.trim(),
-			comment: data.comment.trim(),
-			stars: data.stars,
-		});
-
-		if (response instanceof Error) {
-			const errorMessage = getErrorMessage(response);
+		try {
+			await createReviewMutation.mutateAsync({
+				username: data.username.trim(),
+				comment: data.comment.trim(),
+				stars: data.stars,
+			});
+			reset();
+			setRanking(false);
+		} catch (response) {
+			const errorMessage = getErrorMessage(response as ApiError);
 			showError(errorMessage);
-			return;
 		}
-
-		reset();
-		setRanking(false);
 	};
 
 	useEffect(() => {

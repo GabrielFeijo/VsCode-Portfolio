@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockCreate = jest.fn();
 jest.mock('../../src/services/api/review/ReviewService', () => ({
@@ -24,6 +25,21 @@ jest.mock('react-i18next', () => ({
 
 const { useTheme } = require('../../src/contexts/ThemeContext');
 import BoxRating from '../../src/app/components/Rating/BoxRating';
+
+const createWrapper = () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
+    });
+    return ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+};
+
+const render = (ui: React.ReactElement, options = {}) =>
+    rtlRender(ui, { wrapper: createWrapper(), ...options });
 
 describe('BoxRating component', () => {
     beforeEach(() => {
