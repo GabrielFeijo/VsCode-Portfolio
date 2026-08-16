@@ -66,6 +66,118 @@ function listDirectory(path: string): string[] {
 	});
 }
 
+const PATH_COMMANDS = ['cd', 'cat', 'ls', 'echo'];
+
+function completePathArgument(arg: string, cwd: string): string[] {
+	const lastSlash = arg.lastIndexOf('/');
+	const base = lastSlash >= 0 ? arg.slice(0, lastSlash + 1) : '';
+	const prefix = lastSlash >= 0 ? arg.slice(lastSlash + 1) : arg;
+
+	const dirPath = base.startsWith('/')
+		? base.replace(/\/+$/, '') || '/'
+		: base
+			? normalizePath(cwd, base)
+			: cwd;
+
+	const entries = PROJECT_FS[dirPath];
+	if (!entries) return [];
+
+	return entries
+		.filter((entry) => entry.name.startsWith(prefix))
+		.map((entry) => base + entry.name + (entry.type === 'dir' ? '/' : ''));
+}
+
+function calculate(expression: string): number | null {
+	const tokens: string[] = [];
+	let i = 0;
+
+	while (i < expression.length) {
+		const ch = expression[i];
+		if (/\s/.test(ch)) {
+			i += 1;
+			continue;
+		}
+		if (/[0-9.]/.test(ch)) {
+			let num = '';
+			while (i < expression.length && /[0-9.]/.test(expression[i])) {
+				num += expression[i];
+				i += 1;
+			}
+			tokens.push(num);
+			continue;
+		}
+		if ('+-*/%^()'.includes(ch)) {
+			tokens.push(ch);
+			i += 1;
+			continue;
+		}
+		return null;
+	}
+
+	let pos = 0;
+	const peek = (): string | undefined => tokens[pos];
+	const next = (): string | undefined => tokens[pos++];
+
+	function parseFactor(): number {
+		const token = next();
+		if (token === '(') {
+			const value = parseExpression();
+			if (peek() !== ')') return NaN;
+			next();
+			return value;
+		}
+		if (token === '+' || token === '-') {
+			const value = parseFactor();
+			return token === '-' ? -value : value;
+		}
+		const num = Number(token);
+		return Number.isFinite(num) ? num : NaN;
+	}
+
+	function parsePower(): number {
+		const value = parseFactor();
+		if (peek() === '^') {
+			next();
+			return Math.pow(value, parsePower());
+		}
+		return value;
+	}
+
+	function parseTerm(): number {
+		let value = parsePower();
+		while (peek() === '*' || peek() === '/' || peek() === '%') {
+			const op = next();
+			const rhs = parsePower();
+			if (op === '*') value *= rhs;
+			else if (op === '/') value = rhs === 0 ? NaN : value / rhs;
+			else value %= rhs;
+		}
+		return value;
+	}
+
+	function parseExpression(): number {
+		let value = parseTerm();
+		while (peek() === '+' || peek() === '-') {
+			const op = next();
+			const rhs = parseTerm();
+			value = op === '+' ? value + rhs : value - rhs;
+		}
+		return value;
+	}
+
+	if (tokens.length === 0) return null;
+
+	const result = parseExpression();
+	if (pos !== tokens.length || Number.isNaN(result) || !Number.isFinite(result)) {
+		return null;
+	}
+	return result;
+}
+
+function formatResult(value: number): string {
+	return Number.isInteger(value) ? String(value) : String(parseFloat(value.toFixed(6)));
+}
+
 export function useTerminal({ language, setRanking, changeLanguage }: UseTerminalOptions) {
 	const { t } = useTranslation();
 	const { theme, toggleTheme } = useTheme();
@@ -211,6 +323,24 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 			case 'echo':
 				addEntry(trimmed, [arg || '']);
 				return true;
+
+			case 'calc':
+			case 'calcular': {
+				if (!arg) {
+					addEntry(trimmed, [
+						'\x1b[33mUsage: calc <expression>\x1b[0m',
+						'\x1b[90m  e.g. calc 2 + 2 * 3  ·  calc (10 - 4) / 2  ·  calc 2^8\x1b[0m',
+					]);
+					return true;
+				}
+				const result = calculate(arg);
+				if (result === null) {
+					addEntry(trimmed, [`\x1b[91mcalc: invalid expression: ${arg}\x1b[0m`], terminalColors.error);
+					return true;
+				}
+				addEntry(trimmed, [`${arg} = \x1b[92m${formatResult(result)}\x1b[0m`]);
+				return true;
+			}
 
 			case 'neofetch':
 				addEntry(trimmed, buildNeofetch());
@@ -411,17 +541,32 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 
 	const allCommands = Array.from(new Set([...LOCAL_COMMANDS, ...apiCommands]));
 
-	const getCompletion = (input: string): string | null => {
-		if (!input) return null;
-		const matches = allCommands.filter((c) => c.startsWith(input.toLowerCase()));
-		if (matches.length === 1) return matches[0];
-		return null;
+	const getCompletionState = (
+		input: string,
+	): { value: string | null; candidates: string[]; list: string[]; isPath: boolean } => {
+		if (!input) return { value: null, candidates: [], list: [], isPath: false };
+		const trimmed = input.trim();
+		const spaceIdx = trimmed.indexOf(' ');
+		const cmd = spaceIdx > 0 ? trimmed.slice(0, spaceIdx).toLowerCase() : '';
+		const arg = spaceIdx > 0 ? trimmed.slice(spaceIdx + 1) : '';
+		const isPath = PATH_COMMANDS.includes(cmd);
+
+		const raw = isPath
+			? completePathArgument(arg, cwd)
+			: allCommands.filter((c) => c.startsWith(trimmed.toLowerCase()));
+
+		if (raw.length === 0) return { value: null, candidates: [], list: [], isPath };
+		const candidates = isPath ? raw.map((c) => `${cmd} ${c}`) : raw;
+
+		if (raw.length === 1) {
+			const full = candidates[0];
+			const value = isPath && full.endsWith('/') ? full : full + ' ';
+			return { value, candidates, list: raw, isPath };
+		}
+		return { value: null, candidates, list: raw, isPath };
 	};
 
-	const getCompletions = (input: string): string[] => {
-		if (!input) return [];
-		return allCommands.filter((c) => c.startsWith(input.toLowerCase()));
-	};
+	const getCompletions = (input: string): string[] => getCompletionState(input).candidates;
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === 'l' && e.ctrlKey) {
@@ -432,10 +577,17 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 
 		if (e.key === 'Tab') {
 			e.preventDefault();
-			const completion = getCompletion(command.trim());
-			if (completion) {
-				commandRef.current = completion + ' ';
-				setCommand(completion + ' ');
+			const state = getCompletionState(command);
+			if (state.value !== null) {
+				commandRef.current = state.value;
+				setCommand(state.value);
+			} else if (state.list.length > 1 && command.trim() !== '') {
+				const lines = state.isPath
+					? state.list.map((c) =>
+							c.endsWith('/') ? `\x1b[94m${c}\x1b[0m` : `\x1b[92m${c}\x1b[0m`,
+						)
+					: state.list.map((c) => `\x1b[94m${c}\x1b[0m`);
+				addEntry(`${command.trim()} <TAB>`, ['', ...lines]);
 			}
 			return;
 		}

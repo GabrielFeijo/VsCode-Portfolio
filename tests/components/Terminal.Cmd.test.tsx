@@ -237,6 +237,41 @@ describe('Cmd', () => {
 		expect(await screen.findByText('rix')).toBeInTheDocument();
 	});
 
+	it('completes a directory path with a trailing slash', async () => {
+		renderCmd();
+		const input = getInput();
+		typeInInput('cd src');
+		fireEvent.keyDown(input, { key: 'Tab', preventDefault: jest.fn() });
+		expect(input).toHaveValue('cd src/');
+	});
+
+	it('completes a file path with a trailing space', async () => {
+		renderCmd();
+		const input = getInput();
+		typeInInput('cat REA');
+		fireEvent.keyDown(input, { key: 'Tab', preventDefault: jest.fn() });
+		expect(input).toHaveValue('cat README.md ');
+	});
+
+	it('completes paths nested inside a directory', async () => {
+		renderCmd();
+		const input = getInput();
+		typeInInput('cat src/i');
+		fireEvent.keyDown(input, { key: 'Tab', preventDefault: jest.fn() });
+		expect(input).toHaveValue('cat src/index.tsx ');
+	});
+
+	it('lists candidates like zsh when the path is not unique', async () => {
+		renderCmd();
+		const input = getInput();
+		typeInInput('ls p');
+		fireEvent.keyDown(input, { key: 'Tab', preventDefault: jest.fn() });
+		expect(input).toHaveValue('ls p');
+		expect(await screen.findByText('ls p <TAB>')).toBeInTheDocument();
+		expect(await screen.findByText('package.json')).toBeInTheDocument();
+		expect(await screen.findByText('public/')).toBeInTheDocument();
+	});
+
 	it('executes portuguese aliases for help and clear', async () => {
 		renderCmd();
 		submitCommand('ajuda');
@@ -396,6 +431,52 @@ describe('Cmd', () => {
 		renderCmd();
 		submitCommand('cat /nonexistent');
 		expect(await screen.findByText(/cat: \/nonexistent: No such file/)).toBeInTheDocument();
+	});
+
+	it('evaluates math expressions with calc locally', async () => {
+		renderCmd();
+		submitCommand('calc 2 + 2 * 3');
+		expect(await screen.findByText('2 + 2 * 3 =')).toBeInTheDocument();
+
+		submitCommand('calc (10 - 4) / 2');
+		expect(await screen.findByText('(10 - 4) / 2 =')).toBeInTheDocument();
+
+		submitCommand('calc 2^8');
+		expect(await screen.findByText('2^8 =')).toBeInTheDocument();
+		expect(screen.getByText('256')).toBeInTheDocument();
+
+		submitCommand('calcular 7 % 3');
+		expect(await screen.findByText('7 % 3 =')).toBeInTheDocument();
+		expect(screen.getByText('1')).toBeInTheDocument();
+
+		submitCommand('calc -5 + 3');
+		expect(await screen.findByText('-5 + 3 =')).toBeInTheDocument();
+		expect(screen.getByText('-2')).toBeInTheDocument();
+
+		submitCommand('calc +2 * 4');
+		expect(await screen.findByText('+2 * 4 =')).toBeInTheDocument();
+
+		submitCommand('calc 10 / 4');
+		expect(await screen.findByText('10 / 4 =')).toBeInTheDocument();
+		expect(screen.getByText('2.5')).toBeInTheDocument();
+
+		expect(screen.getAllByText('8')).toHaveLength(2);
+
+		expect(getResponse).not.toHaveBeenCalled();
+	});
+
+	it('handles calc usage and invalid expressions', async () => {
+		renderCmd();
+		submitCommand('calc');
+		expect(await screen.findByText(/Usage: calc <expression>/)).toBeInTheDocument();
+
+		submitCommand('calc 2 +');
+		expect(await screen.findByText(/calc: invalid expression: 2 \+/)).toBeInTheDocument();
+
+		submitCommand('calc abc');
+		expect(await screen.findByText(/calc: invalid expression: abc/)).toBeInTheDocument();
+
+		expect(getResponse).not.toHaveBeenCalled();
 	});
 
 	it('runs fun commands locally', async () => {
