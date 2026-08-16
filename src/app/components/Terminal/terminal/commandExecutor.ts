@@ -4,7 +4,7 @@ import { ReviewService } from '@/services/api/review/ReviewService';
 import { StorageService } from '@/services/storageService';
 import { fetchFileContent } from '@/services/terminal/remoteFileService';
 import { PAGE_ROUTES, PROJECT_FS, PROJECT_ROOT } from './terminalConfig';
-import { ActiveEditorSession, TerminalColors, TerminalEntry, VirtualDirectory } from './types';
+import { ActiveEditorSession, TerminalColors, VirtualDirectory } from './types';
 import { calculate, formatResult } from './utils/calculator';
 import { generateTree, listDirectory, normalizePath } from './utils/pathUtils';
 import { buildHelp, buildNeofetch, formatReviews, formatUptime } from './utils/formatters';
@@ -39,7 +39,7 @@ function parseFlagsAndArgs(rawArgs: string): { flags: Set<string>; args: string[
 	const args: string[] = [];
 
 	for (const token of tokens) {
-		if (token.startsWith('-') && token.length > 1 && !/^[0-9]/.test(token.slice(1))) {
+		if (token.startsWith('-') && token.length > 1 && !/^\d/.test(token.slice(1))) {
 			for (const char of token.slice(1)) {
 				flags.add(char);
 			}
@@ -49,6 +49,10 @@ function parseFlagsAndArgs(rawArgs: string): { flags: Set<string>; args: string[
 	}
 
 	return { flags, args };
+}
+
+function hasContent(lines: string[] | undefined): boolean {
+	return lines != null && lines.length > 0 && lines.some((l) => l.length > 0);
 }
 
 async function getFileLinesAsync(
@@ -71,18 +75,18 @@ async function getFileLinesAsync(
 	}
 
 	const exact = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
-	if (exact?.content && exact.content.length > 0 && exact.content.some((line) => line.length > 0)) {
-		return exact.content;
+	if (hasContent(exact?.content)) {
+		return exact!.content!;
 	}
 
 	const altHtml = fs[parent]?.find((e) => e.name === `${baseName}.html` && e.type === 'file');
-	if (altHtml?.content && altHtml.content.length > 0 && altHtml.content.some((line) => line.length > 0)) {
-		return altHtml.content;
+	if (hasContent(altHtml?.content)) {
+		return altHtml!.content!;
 	}
 
 	const altMd = fs[parent]?.find((e) => e.name === `${baseName}.md` && e.type === 'file');
-	if (altMd?.content && altMd.content.length > 0 && altMd.content.some((line) => line.length > 0)) {
-		return altMd.content;
+	if (hasContent(altMd?.content)) {
+		return altMd!.content!;
 	}
 
 	const remote = await fetchFileContent(fileName, language);

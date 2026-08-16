@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { StorageService } from '@/services/storageService';
 import { fonts } from '@/app/theme/typography';
+import { pageRoutes } from '@/app/pages/pages';
 import { VirtualDirectory } from './types';
 import { normalizePath } from './utils/pathUtils';
 
@@ -13,35 +14,24 @@ interface NanoEditorProps {
 	fs: VirtualDirectory;
 	setFs: React.Dispatch<React.SetStateAction<VirtualDirectory>>;
 	onClose: () => void;
+	onSave?: (fileName: string, content: string) => void;
 	isDark: boolean;
 }
 
-const DEFAULT_PAGE_MAP: Record<string, { index: number; route: string }> = {
-	'sobre-mim.html': { index: 0, route: 'about-me' },
-	'sobre-mim': { index: 0, route: 'about-me' },
-	'about-me.html': { index: 0, route: 'about-me' },
-	'about-me': { index: 0, route: 'about-me' },
-	'habilidades.html': { index: 1, route: 'skills' },
-	'habilidades': { index: 1, route: 'skills' },
-	'skills.html': { index: 1, route: 'skills' },
-	'skills': { index: 1, route: 'skills' },
-	'projetos.html': { index: 2, route: 'projects' },
-	'projetos': { index: 2, route: 'projects' },
-	'projects.html': { index: 2, route: 'projects' },
-	'projects': { index: 2, route: 'projects' },
-	'experiencia.html': { index: 3, route: 'experience' },
-	'experiencia': { index: 3, route: 'experience' },
-	'experience.html': { index: 3, route: 'experience' },
-	'experience': { index: 3, route: 'experience' },
-	'conquistas.html': { index: 4, route: 'accomplishments' },
-	'conquistas': { index: 4, route: 'accomplishments' },
-	'accomplishments.html': { index: 4, route: 'accomplishments' },
-	'accomplishments': { index: 4, route: 'accomplishments' },
-	'certificados.html': { index: 5, route: 'certificates' },
-	'certificados': { index: 5, route: 'certificates' },
-	'certificates.html': { index: 5, route: 'certificates' },
-	'certificates': { index: 5, route: 'certificates' },
-};
+function buildPageMap(): Record<string, { index: number; route: string }> {
+	const map: Record<string, { index: number; route: string }> = {};
+	for (const pages of Object.values(pageRoutes)) {
+		for (const page of pages) {
+			const base = page.name.replace(/\.(html|md)$/, '');
+			const entry = { index: page.index, route: page.route };
+			map[page.name] = entry;
+			map[base] = entry;
+		}
+	}
+	return map;
+}
+
+const PAGE_MAP = buildPageMap();
 
 export function syncPageStorage(fileName: string, content: string): void {
 	const storedPages = StorageService.getData();
@@ -62,8 +52,8 @@ export function syncPageStorage(fileName: string, content: string): void {
 			content,
 			isSaved: true,
 		});
-	} else if (DEFAULT_PAGE_MAP[fileName] || DEFAULT_PAGE_MAP[baseName]) {
-		const meta = DEFAULT_PAGE_MAP[fileName] || DEFAULT_PAGE_MAP[baseName];
+	} else if (PAGE_MAP[fileName] || PAGE_MAP[baseName]) {
+		const meta = PAGE_MAP[fileName] || PAGE_MAP[baseName];
 		StorageService.saveOrUpdateData({
 			index: meta.index,
 			name: fileName,
@@ -86,6 +76,7 @@ export default function NanoEditor({
 	fs,
 	setFs,
 	onClose,
+	onSave,
 	isDark,
 }: NanoEditorProps) {
 	const [content, setContent] = useState(initialContent);
@@ -133,6 +124,7 @@ export default function NanoEditor({
 		});
 
 		syncPageStorage(name, textToSave);
+		onSave?.(name, textToSave);
 		setIsModified(false);
 		setStatus(`[ Wrote ${lines.length} lines to ${name} ]`);
 	};
@@ -151,7 +143,7 @@ export default function NanoEditor({
 				onClose();
 				return;
 			}
-			if (e.key === 'c' && e.ctrlKey || e.key === 'Escape') {
+			if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
 				e.preventDefault();
 				setPromptSave(false);
 				setStatus('[ Cancelled ]');
@@ -161,7 +153,7 @@ export default function NanoEditor({
 			return;
 		}
 
-		if (e.key === 'o' && e.ctrlKey || e.key === 's' && e.ctrlKey) {
+		if ((e.key === 'o' && e.ctrlKey) || (e.key === 's' && e.ctrlKey)) {
 			e.preventDefault();
 			saveContent();
 			return;
