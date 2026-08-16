@@ -58,7 +58,6 @@ describe('Terminal', () => {
 
     it('renders terminal tab (index 3) by default', () => {
         render(<Terminal {...defaultProps} />);
-        // Default selectedTerminalIndex is 3 (terminal tab)
         expect(screen.getByTestId('cmd')).toBeInTheDocument();
     });
 
@@ -109,7 +108,6 @@ describe('Terminal', () => {
         render(<Terminal {...defaultProps} />);
         const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
         fireEvent.keyDown(problemsTab, { key: 'A' });
-        // Default tab (cmd) should still be active
         expect(screen.getByTestId('cmd')).toBeInTheDocument();
     });
 

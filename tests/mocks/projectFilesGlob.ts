@@ -1,6 +1,3 @@
-// Jest mock for src/services/terminal/projectFilesGlob.ts (which relies on
-// Vite's import.meta.glob and is never executed in tests). Keys are paths
-// relative to PROJECT_ROOT; contents are raw text split on newlines.
 export const PROJECT_FILES: Record<string, string> = {
 	'package.json': '{\n  "name": "vscode-portfolio",\n  "version": "1.0.0"\n}',
 	'README.md': '# VsCode Portfolio\n\nInteractive portfolio by Gabriel Feijó.',

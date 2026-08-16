@@ -50,7 +50,6 @@ describe('useTerminalHistory', () => {
 		});
 		expect(prev).toBe('cmd 1');
 
-		// Clamped at earliest
 		act(() => {
 			prev = result.current.navigateUp();
 		});
