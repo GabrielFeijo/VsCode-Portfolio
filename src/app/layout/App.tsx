@@ -50,7 +50,6 @@ import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { LAYOUT } from '../../constants/layout';
 
-// Re-export for backward compatibility with existing tests
 export { loadPages, initVisiblePageIndexes } from '../../contexts/EditorContext';
 
 const BoxRating = lazy(() => import('../components/Rating/BoxRating'));
@@ -102,7 +101,6 @@ function AppContent({ changeLanguage }: AppContentProps) {
 		toggleTheme,
 	});
 
-	// Delegate the legacy open-tab window event to the context method
 	useEffect(() => {
 		const handleOpenTab = (event: Event) => {
 			const customEvent = event as CustomEvent<{ target?: string }>;

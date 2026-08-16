@@ -34,7 +34,6 @@ const Terminal = ({
 	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const colors = useAppPalette();
-	// Tab selection is local state — no reason to lift this to App.tsx
 	const [selectedTerminalIndex, setSelectedTerminalIndex] = useState(3);
 	const terminalTabs = useMemo(() => [
 		{

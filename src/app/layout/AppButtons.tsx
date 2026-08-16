@@ -90,7 +90,6 @@ function PageTab({
 				{displayName}
 			</Button>
 
-			{/* Close button is a sibling, NOT nested inside the Button */}
 			<Box
 				component="span"
 				role="button"
