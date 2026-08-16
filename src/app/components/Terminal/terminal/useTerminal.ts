@@ -13,6 +13,7 @@ import {
 import { ActiveEditorSession, TerminalEntry, UseTerminalOptions, VirtualDirectory } from './types';
 import { executeLocalCommand } from './commandExecutor';
 import { getCompletionState, getCompletions as getCompletionsUtil } from './utils/autocomplete';
+import { useTerminalHistory } from './hooks/useTerminalHistory';
 
 export type { TerminalEntry };
 
@@ -35,12 +36,17 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 	const [entries, setEntries] = useState<TerminalEntry[]>([]);
 	const [command, setCommand] = useState('');
 	const commandRef = useRef('');
-	const [history, setHistory] = useState<string[]>([]);
-	const historyRef = useRef<string[]>([]);
-	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [activeEditor, setActiveEditor] = useState<ActiveEditorSession | null>(null);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
+
+	const {
+		history,
+		historyRef,
+		addToHistory,
+		navigateUp,
+		navigateDown,
+	} = useTerminalHistory();
 
 	const isDark = theme === 'dark';
 
@@ -72,12 +78,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 		const trimmed = rawCommand.trim();
 		if (trimmed.length <= 1) return;
 
-		setHistory((prev) => {
-			const next = [...prev.filter((h) => h !== trimmed), trimmed];
-			historyRef.current = next;
-			return next;
-		});
-		setHistoryIndex(-1);
+		addToHistory(trimmed);
 
 		const handled = await executeLocalCommand(trimmed, {
 			language,
@@ -159,26 +160,20 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 
 		if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			if (history.length === 0) return;
-			const newIndex = historyIndex < 0 ? history.length - 1 : Math.max(0, historyIndex - 1);
-			setHistoryIndex(newIndex);
-			commandRef.current = history[newIndex];
-			setCommand(history[newIndex]);
+			const previous = navigateUp();
+			if (previous !== null) {
+				commandRef.current = previous;
+				setCommand(previous);
+			}
 			return;
 		}
 
 		if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			if (historyIndex < 0) return;
-			const newIndex = historyIndex + 1;
-			if (newIndex >= history.length) {
-				setHistoryIndex(-1);
-				commandRef.current = '';
-				setCommand('');
-			} else {
-				setHistoryIndex(newIndex);
-				commandRef.current = history[newIndex];
-				setCommand(history[newIndex]);
+			const next = navigateDown();
+			if (next !== null) {
+				commandRef.current = next;
+				setCommand(next);
 			}
 		}
 	};
