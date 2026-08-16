@@ -37,8 +37,18 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
     roots: ['<rootDir>/tests', '<rootDir>/src'],
     moduleNameMapper: {
-        // Browser-only Vite import.meta.glob module, never executed in tests.
         '^./projectFilesGlob$': '<rootDir>/tests/mocks/projectFilesGlob.ts',
+        '^@/(.*)$': '<rootDir>/src/$1',
+        '^@app/(.*)$': '<rootDir>/src/app/$1',
+        '^@components/(.*)$': '<rootDir>/src/app/components/$1',
+        '^@layout/(.*)$': '<rootDir>/src/app/layout/$1',
+        '^@pages/(.*)$': '<rootDir>/src/app/pages/$1',
+        '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
+        '^@contexts/(.*)$': '<rootDir>/src/contexts/$1',
+        '^@services/(.*)$': '<rootDir>/src/services/$1',
+        '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+        '^@domain/(.*)$': '<rootDir>/src/domain/$1',
+        '^@config/(.*)$': '<rootDir>/src/config/$1',
         '^src/(.*)$': '<rootDir>/src/$1',
         '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
         '^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
@@ -49,9 +59,7 @@ module.exports = {
         'src/**/*.{ts,tsx}',
         '!src/**/index.tsx',
         '!src/**/*.d.ts',
-        // Vite composition root: its client factory is covered directly below.
         '!src/services/api/axios-config/index.ts',
-        // Browser-only import.meta.glob glue, not executable in Jest.
         '!src/services/terminal/projectFilesGlob.ts',
     ],
     coverageDirectory: 'coverage',
