@@ -1,7 +1,23 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App, { initVisiblePageIndexes } from '../../src/app/layout/App';
+
+const createWrapper = () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
+    });
+    return ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+};
+
+const render = (ui: React.ReactElement, options = {}) =>
+    rtlRender(ui, { wrapper: createWrapper(), ...options });
 
 jest.mock('@mui/material', () => {
     const filterProps = (props: any) => {

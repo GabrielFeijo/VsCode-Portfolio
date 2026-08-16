@@ -1,21 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Home from '../../src/app/pages/Home';
 
-const has24HoursPassed = jest.fn();
-const setCache = jest.fn();
-const getResponse = jest.fn();
+const useHomeQueryMock = jest.fn();
 
-jest.mock('src/services/cacheService', () => ({
-	CacheService: {
-		has24HoursPassed: () => has24HoursPassed(),
-		setCache: (value: unknown) => setCache(value),
-	},
-}));
-
-jest.mock('src/services/api/home/HomeService', () => ({
-	HomeService: {
-		getResponse: () => getResponse(),
-	},
+jest.mock('@/hooks/queries/useHomeQuery', () => ({
+	useHomeQuery: () => useHomeQueryMock(),
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -47,39 +36,42 @@ jest.mock('src/app/components/Loading/Loading', () => () => (
 describe('Home', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		has24HoursPassed.mockReturnValue(false);
-		getResponse.mockResolvedValue({ connected: true });
+		useHomeQueryMock.mockReturnValue({
+			data: { connected: true },
+			isLoading: false,
+			isError: false,
+		});
 	});
 
-	it('renders localized content and skips a cached health check', async () => {
+	it('renders localized content and sets selected index to -1', () => {
 		const setSelectedIndex = jest.fn();
 		render(<Home setSelectedIndex={setSelectedIndex} />);
 
 		expect(screen.getByRole('heading', { name: 'Gabriel Feijó' })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
 			'href',
-			'https://github.com/GabrielFeijo'
+			'https://github.com/GabrielFeijo',
+		);
+		expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
+			'href',
+			'https://linkedin.com/in/gabriel-feijo',
+		);
+		expect(screen.getByRole('link', { name: 'Email' })).toHaveAttribute(
+			'href',
+			'mailto:test@example.com',
 		);
 		expect(setSelectedIndex).toHaveBeenCalledWith(-1);
-		await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
-		expect(getResponse).not.toHaveBeenCalled();
+		expect(screen.queryByRole('status')).not.toBeInTheDocument();
 	});
 
-	it('refreshes and stores a successful health check', async () => {
-		has24HoursPassed.mockReturnValue(true);
+	it('renders loading state when query is loading', () => {
+		useHomeQueryMock.mockReturnValue({
+			data: null,
+			isLoading: true,
+			isError: false,
+		});
+
 		render(<Home setSelectedIndex={jest.fn()} />);
-
-		await waitFor(() => expect(getResponse).toHaveBeenCalledTimes(1));
-		expect(setCache).toHaveBeenCalledWith({ lastFetch: expect.any(String) });
-		await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
-	});
-
-	it('stops loading when the health check fails', async () => {
-		has24HoursPassed.mockReturnValue(true);
-		getResponse.mockResolvedValue(new Error('offline'));
-		render(<Home setSelectedIndex={jest.fn()} />);
-
-		await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
-		expect(setCache).not.toHaveBeenCalled();
+		expect(screen.getByRole('status')).toBeInTheDocument();
 	});
 });
