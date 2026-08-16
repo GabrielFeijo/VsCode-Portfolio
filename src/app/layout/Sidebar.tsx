@@ -11,23 +11,17 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useAppPalette } from '../theme/useAppPalette';
 import { useTranslation } from 'react-i18next';
 import { isMobile } from 'react-device-detect';
+import { useLayoutContext } from '../../contexts/LayoutContext';
 
 interface Props {
-	expanded: boolean;
-	setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
-	terminal: boolean;
-	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	language: string;
 	changeLanguage: () => void;
 }
 
 export default function Sidebar({
-	expanded,
-	setExpanded,
-	terminal,
-	setTerminal,
 	changeLanguage,
 }: Props) {
+	const { expanded, setExpanded, terminal, setTerminal } = useLayoutContext();
 	const { theme, toggleTheme } = useTheme();
 	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();

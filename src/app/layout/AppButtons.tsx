@@ -7,16 +7,10 @@ import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
 import { Language, Page } from '../../domain/page';
 import { getLocalizedPath } from '../../config/seo';
 import { useAppPalette } from '../theme/useAppPalette';
+import { useEditorContext } from '../../contexts/EditorContext';
 
 interface Props {
-	pages: Page[];
 	language: Language;
-	selectedIndex: number;
-	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	currentComponent: string;
-	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-	visiblePageIndexes: number[];
-	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 interface PageTabProps {
@@ -134,16 +128,16 @@ function PageTab({
 	);
 }
 
-export default function AppButtons({
-	pages,
-	language,
-	selectedIndex,
-	setSelectedIndex,
-	currentComponent: _currentComponent,
-	setCurrentComponent,
-	visiblePageIndexes,
-	setVisiblePageIndexes,
-}: Props) {
+export default function AppButtons({ language }: Props) {
+	const {
+		visiblePages,
+		pages,
+		selectedIndex,
+		setSelectedIndex,
+		setCurrentComponent,
+		visiblePageIndexes,
+		setVisiblePageIndexes,
+	} = useEditorContext();
 	const navigate = useNavigate();
 	const colors = useAppPalette();
 	const [contextMenu, setContextMenu] = useState<{
@@ -209,7 +203,7 @@ export default function AppButtons({
 					'&::-webkit-scrollbar-thumb': { backgroundColor: colors.scrollbar },
 				}}
 			>
-				{pages.map((page) => (
+				{visiblePages.map((page) => (
 					<PageTab
 						key={page.index}
 						page={page}

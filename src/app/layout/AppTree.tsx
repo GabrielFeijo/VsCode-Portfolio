@@ -20,30 +20,23 @@ import ContextMenu from '../components/ContextMenu/ContextMenu';
 import { normalizeFileName } from '../../utils/normalizeFileName';
 import { getBasePath, getLocalizedPath } from '../../config/seo';
 import { siteConfig } from '../../config/site';
+import { useEditorContext } from '../../contexts/EditorContext';
 
 interface Props {
-	pages: Page[];
-	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
-	selectedIndex: number;
-	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	currentComponent: string;
-	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-	visiblePageIndexes: number[];
-	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 	language: Language;
 }
 
-export default function AppTree({
-	pages,
-	setPages,
-	selectedIndex,
-	setSelectedIndex,
-	currentComponent,
-	setCurrentComponent,
-	visiblePageIndexes,
-	setVisiblePageIndexes,
-	language,
-}: Props) {
+export default function AppTree({ language }: Props) {
+	const {
+		pages,
+		setPages,
+		selectedIndex,
+		setSelectedIndex,
+		currentComponent,
+		setCurrentComponent,
+		visiblePageIndexes,
+		setVisiblePageIndexes,
+	} = useEditorContext();
 	const navigate = useNavigate();
 	const colors = useAppPalette();
 	const { t } = useTranslation();
