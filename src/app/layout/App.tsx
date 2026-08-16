@@ -59,8 +59,36 @@ export function initVisiblePageIndexes(pages: Page[]) {
 	return pages.map(({ index }) => index);
 }
 
-function loadPages(language: Language): Page[] {
-	return [...pageRoutes[language], ...StorageService.getData()];
+export function loadPages(language: Language): Page[] {
+	const defaultPages = pageRoutes[language];
+	const storedPages = StorageService.getData();
+
+	const mergedDefaults = defaultPages.map((defPage) => {
+		const baseName = defPage.name.replace(/\.(html|md)$/, '');
+		const stored = storedPages.find(
+			(s) =>
+				s.index === defPage.index ||
+				s.name === defPage.name ||
+				s.name === `${baseName}.md` ||
+				s.name === `${baseName}.html` ||
+				s.name === baseName ||
+				s.route === defPage.route,
+		);
+		return stored ? { ...defPage, ...stored, index: defPage.index, route: defPage.route } : defPage;
+	});
+
+	const customStored = storedPages.filter(
+		(s) =>
+			!defaultPages.some(
+				(d) =>
+					d.index === s.index ||
+					d.route === s.route ||
+					d.name === s.name ||
+					d.name.replace(/\.(html|md)$/, '') === s.name.replace(/\.(html|md)$/, ''),
+			),
+	);
+
+	return [...mergedDefaults, ...customStored];
 }
 
 export default function App() {
@@ -96,11 +124,18 @@ export default function App() {
 	}, [language, navigate, pathname]);
 
 	useEffect(() => {
+		const handleStorage = () => {
+			setPages(loadPages(language));
+		};
+
 		setPages(loadPages(language));
 
 		if (!i18n.language.toLowerCase().startsWith(language)) {
 			void i18n.changeLanguage(language);
 		}
+
+		window.addEventListener('storage', handleStorage);
+		return () => window.removeEventListener('storage', handleStorage);
 	}, [language]);
 
 	const visiblePages = useMemo(
