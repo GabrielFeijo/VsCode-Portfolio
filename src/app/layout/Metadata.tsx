@@ -39,7 +39,7 @@ export default function MetadataComponent() {
 					addressCountry: 'BR',
 				},
 				sameAs: [
-					'https://github.com/GabrielFeijo',
+					siteConfig.githubUrl,
 					'https://www.linkedin.com/in/gabriel-feijo/',
 				],
 				knowsAbout: [

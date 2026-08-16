@@ -19,6 +19,7 @@ import { Language, Page } from '../../domain/page';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
 import { normalizeFileName } from '../../utils/normalizeFileName';
 import { getBasePath, getLocalizedPath } from '../../config/seo';
+import { siteConfig } from '../../config/site';
 
 interface Props {
 	pages: Page[];
@@ -197,7 +198,7 @@ export default function AppTree({
 		if (!existingPage) return;
 
 		window.open(
-			`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${language}/${existingPage.name}`,
+			`${siteConfig.repoUrl}/tree/main/public/pages/${language}/${existingPage.name}`,
 			'_blank',
 			'noopener,noreferrer'
 		);

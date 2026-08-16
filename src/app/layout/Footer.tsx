@@ -9,6 +9,7 @@ import {
 } from 'react-icons/vsc';
 import { IoIosGitBranch } from 'react-icons/io';
 import { useAppPalette } from '../theme/useAppPalette';
+import { siteConfig } from '../../config/site';
 
 export default function Footer() {
 	const colors = useAppPalette();
@@ -25,6 +26,7 @@ export default function Footer() {
 				<Grid
 					item
 					component="button"
+					role="button"
 					aria-label="Remote connection status"
 					tabIndex={0}
 					sx={{
@@ -32,12 +34,10 @@ export default function Footer() {
 						backgroundColor: colors.footerAccent,
 						justifyContent: 'center',
 						alignItems: 'center',
-						cursor: 'pointer',
-						'&:hover': {
-							background: colors.accentHover,
-						},
-						border: 'none',
 						padding: 0,
+						border: 'none',
+						cursor: 'pointer',
+						'&:hover': { opacity: 0.85 },
 					}}
 					display='flex'
 				>
@@ -54,7 +54,7 @@ export default function Footer() {
 					<Stack direction='row' spacing={0.5} sx={{ pl: 1 }}>
 						<Box
 							component={Link}
-							href='https://github.com/GabrielFeijo'
+							href={siteConfig.githubUrl}
 							underline='none'
 							color='inherit'
 							target='_blank'
@@ -81,8 +81,6 @@ export default function Footer() {
 							aria-label="Errors and warnings count"
 							sx={{
 								px: 0.5,
-								cursor: 'pointer',
-								'&:hover': { background: colors.footerHover },
 							}}
 						>
 							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', py: 0.3 }}>
@@ -113,8 +111,6 @@ export default function Footer() {
 								px: 0.5,
 								justifyContent: 'center',
 								alignItems: 'center',
-								cursor: 'pointer',
-								'&:hover': { background: colors.footerHover },
 							}}
 						>
 							<VscCheck fontSize='0.9rem' />
@@ -129,8 +125,6 @@ export default function Footer() {
 								alignItems: 'center',
 								py: 0.3,
 								px: 0.5,
-								cursor: 'pointer',
-								'&:hover': { background: colors.footerHover },
 							}}
 						>
 							<VscFeedback fontSize='0.9rem' />
@@ -143,8 +137,6 @@ export default function Footer() {
 								alignItems: 'center',
 								py: 0.3,
 								px: 0.5,
-								cursor: 'pointer',
-								'&:hover': { background: colors.footerHover },
 							}}
 						>
 							<VscBell fontSize='0.9rem' />
