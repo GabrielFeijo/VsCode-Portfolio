@@ -51,7 +51,8 @@ export interface VirtualDirectory {
 export const LOCAL_COMMANDS = [
 	'help', 'ajuda', 'ls', 'cd', 'pwd', 'whoami', 'date', 'uptime', 'history',
 	'echo', 'cat', 'head', 'tail', 'tree', 'grep', 'wc', 'touch', 'mkdir', 'rm',
-	'nano', 'vim', 'vi',
+	'nano', 'vim', 'vi', 'code',
+	'reset', 'reset-data', 'restore',
 	'clear', 'limpar', 'neofetch', 'reviews', 'avaliacoes',
 	'evaluate', 'avaliar', 'changetheme', 'mudartema', 'changelanguage', 'mudaridioma',
 	'route', 'rota', 'theme', 'tema', 'lang', 'idioma', 'matrix', 'cowsay',

@@ -91,4 +91,13 @@ describe('StorageService', () => {
 
 		expect(StorageService.getData()).toEqual([page]);
 	});
+
+	it('clearData removes markdown editor data from localStorage', () => {
+		const page: Page = { index: 10, name: 'one', route: 'one' };
+		StorageService.saveOrUpdateData(page);
+		expect(StorageService.getData()).toHaveLength(1);
+
+		StorageService.clearData();
+		expect(StorageService.getData()).toHaveLength(0);
+	});
 });

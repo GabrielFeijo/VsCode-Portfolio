@@ -53,7 +53,7 @@ export function buildHelp(apiCommandList: string[] = []): string[] {
 	return [
 		'\x1b[1;36m╭─ Portfolio Terminal ──────────────────────────────────╮\x1b[0m',
 		'\x1b[1;36m│\x1b[0m \x1b[33mSystem\x1b[0m    ls, cd, pwd, whoami, date, uptime, clear',
-		'\x1b[1;36m│\x1b[0m \x1b[33mFiles\x1b[0m     nano, vim, cat, head, tail, tree, grep, wc, touch, mkdir, rm',
+		'\x1b[1;36m│\x1b[0m \x1b[33mFiles\x1b[0m     code, nano, vim, cat, head, tail, tree, grep, wc, touch, rm, reset',
 		'\x1b[1;36m│\x1b[0m \x1b[33mPortfolio\x1b[0m neofetch, reviews, evaluate, route <page>',
 		'\x1b[1;36m│\x1b[0m \x1b[33mSettings\x1b[0m  theme, lang, changelanguage, changetheme',
 		'\x1b[1;36m│\x1b[0m \x1b[33mFun\x1b[0m       matrix, cowsay, banner, ping, curl',

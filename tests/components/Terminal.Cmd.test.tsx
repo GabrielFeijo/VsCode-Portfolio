@@ -649,6 +649,27 @@ describe('Cmd', () => {
 		expect(await screen.findByRole('textbox', { name: 'terminal.info.placeholder' })).toBeInTheDocument();
 	});
 
+	it('supports code command to open workspace and files in editor', async () => {
+		const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+		renderCmd();
+
+		submitCommand('code');
+		expect(await screen.findByText(/Opening workspace in VSCode editor\.\.\./)).toBeInTheDocument();
+
+		submitCommand('code .');
+		expect((await screen.findAllByText(/Opening workspace in VSCode editor\.\.\./)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('code sobre-mim.md');
+		expect(await screen.findByText(/Opening sobre-mim\.md in editor\.\.\./)).toBeInTheDocument();
+		expect(dispatchSpy).toHaveBeenCalled();
+	});
+
+	it('supports reset command to clear storage and restore virtual files', async () => {
+		renderCmd();
+		submitCommand('reset');
+		expect(await screen.findByText(/Portfolio data and files have been reset to factory defaults\./)).toBeInTheDocument();
+	});
+
 	it('supports head and tail commands and error handling', async () => {
 		renderCmd();
 		submitCommand('head -n 2 package.json');

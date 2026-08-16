@@ -379,4 +379,16 @@ describe('App', () => {
         mockStorage.getData.mockReturnValue([]);
         appTreeMode = 'default';
     });
+
+    it('handles open-tab custom events for workspace and specific pages', async () => {
+        render(<App />);
+
+        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+        expect(navigateMock).toHaveBeenCalledWith('/');
+
+        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: 'sobre-mim.html' } }));
+        expect(navigateMock).toHaveBeenCalledWith('/about-me');
+
+        window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '' } }));
+    });
 });

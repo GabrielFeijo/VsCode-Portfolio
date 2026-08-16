@@ -71,4 +71,8 @@ export const StorageService = {
 		});
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},
+
+	clearData: () => {
+		localStorage.removeItem(STORAGE_KEY);
+	},
 };

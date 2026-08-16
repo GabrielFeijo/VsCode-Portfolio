@@ -1,7 +1,8 @@
 import { Language } from '@/domain/page';
 import { getLocalizedPath } from '@/config/seo';
 import { ReviewService } from '@/services/api/review/ReviewService';
-import { PAGE_ROUTES, PROJECT_ROOT } from './terminalConfig';
+import { StorageService } from '@/services/storageService';
+import { PAGE_ROUTES, PROJECT_FS, PROJECT_ROOT } from './terminalConfig';
 import { ActiveEditorSession, TerminalColors, TerminalEntry, VirtualDirectory } from './types';
 import { calculate, formatResult } from './utils/calculator';
 import { generateTree, listDirectory, normalizePath } from './utils/pathUtils';
@@ -275,6 +276,38 @@ export async function executeLocalCommand(
 					initialContent: fileContent,
 				});
 			}
+			return true;
+		}
+
+		case 'code': {
+			const targetArg = arg.trim();
+			if (!targetArg || targetArg === '.') {
+				window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+				addEntry(trimmed, ['\x1b[92mOpening workspace in VSCode editor...\x1b[0m']);
+				return true;
+			}
+
+			const filePath = normalizePath(cwd, targetArg);
+			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+			window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: fileName } }));
+			addEntry(trimmed, [`\x1b[92mOpening ${fileName} in editor...\x1b[0m`]);
+			return true;
+		}
+
+		case 'reset':
+		case 'reset-data':
+		case 'restore': {
+			StorageService.clearData();
+			setFs(PROJECT_FS);
+			setCwd(PROJECT_ROOT);
+			setPreviousCwd(PROJECT_ROOT);
+			window.dispatchEvent(new Event('storage'));
+			window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+			addEntry(trimmed, [
+				'\x1b[92m✔ Portfolio data and files have been reset to factory defaults.\x1b[0m',
+				'\x1b[90mAll virtual files and local editor data restored.\x1b[0m',
+			]);
 			return true;
 		}
 

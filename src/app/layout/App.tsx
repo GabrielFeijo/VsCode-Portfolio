@@ -138,6 +138,43 @@ export default function App() {
 		return () => window.removeEventListener('storage', handleStorage);
 	}, [language]);
 
+	useEffect(() => {
+		const handleOpenTab = (event: Event) => {
+			const customEvent = event as CustomEvent<{ target?: string }>;
+			const target = customEvent.detail?.target;
+			if (!target) return;
+
+			if (target === '.' || target === '/' || target === 'home') {
+				setSelectedIndex(-1);
+				navigate(getLocalizedPath('/', language));
+				return;
+			}
+
+			const currentPages = loadPages(language);
+			const base = target.replace(/\.(html|md)$/, '').replace(/^\//, '');
+			const matched = currentPages.find(
+				(p) =>
+					p.name === target ||
+					p.name === `${base}.md` ||
+					p.name === `${base}.html` ||
+					p.name === base ||
+					p.route === base ||
+					p.route === `/${base}`,
+			);
+
+			if (matched) {
+				setVisiblePageIndexes((prev) =>
+					prev.includes(matched.index) ? prev : [...prev, matched.index],
+				);
+				setSelectedIndex(matched.index);
+				navigate(getLocalizedPath(`/${matched.route}`, language));
+			}
+		};
+
+		window.addEventListener('open-tab', handleOpenTab);
+		return () => window.removeEventListener('open-tab', handleOpenTab);
+	}, [language, navigate]);
+
 	const visiblePages = useMemo(
 		() =>
 			visiblePageIndexes
