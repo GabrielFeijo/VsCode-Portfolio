@@ -267,6 +267,12 @@ describe('MDContainer', () => {
 			</MemoryRouter>
 		);
 
+		await waitFor(() =>
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+				'# Content'
+			)
+		);
+
 		fireEvent.keyDown(window, { key: 's', ctrlKey: true });
 	});
 
