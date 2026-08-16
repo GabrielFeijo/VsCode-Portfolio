@@ -79,7 +79,7 @@ export function formatFileContent(
 		return contentLines;
 	}
 
-	const ext = fileName.includes('.') ? fileName.split('.').pop()?.toLowerCase() || '' : '';
+	const ext = fileName.includes('.') ? fileName.split('.').pop()!.toLowerCase() : '';
 	const totalLines = contentLines.length;
 
 	const gutterWidth = Math.max(3, String(totalLines).length);

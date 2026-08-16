@@ -15,7 +15,6 @@ export function buildFileSystem(files: RawFileMap, root = PROJECT_ROOT): Virtual
 		const childName = rootParts[i];
 		const nextAncestor = `${currentAncestor}/${childName}`;
 
-		fs[parentPath] ??= [];
 		if (!fs[parentPath].some((e) => e.name === childName && e.type === 'dir')) {
 			fs[parentPath].push({ name: childName, type: 'dir' });
 		}

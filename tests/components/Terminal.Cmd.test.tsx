@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Cmd from '../../src/app/components/Terminal/Cmd';
+import { StorageService } from '../../src/services/storageService';
 
 const navigate = jest.fn();
 const toggleTheme = jest.fn();
@@ -91,6 +92,7 @@ function submitCommand(command: string) {
 describe('Cmd', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
+		global.fetch = jest.fn().mockRejectedValue(new Error('not found'));
 		currentTheme = 'dark';
 		translate = defaultTranslate;
 		findAll.mockResolvedValue([]);
@@ -630,12 +632,32 @@ describe('Cmd', () => {
 
 		submitCommand('cat src');
 		expect(await screen.findByText(/cat: src: Is a directory/)).toBeInTheDocument();
+
+		global.fetch = jest.fn().mockResolvedValue({
+			ok: true,
+			text: async () => '<h1>Remote About</h1>',
+		} as Response);
+
+		submitCommand('cat sobre-mim.html');
+		expect(await screen.findByText(/Remote About/)).toBeInTheDocument();
+
+		jest.spyOn(StorageService, 'getData').mockReturnValue([
+			{ index: 99, name: 'custom.txt', route: 'custom.txt', content: 'Custom Stored Text' },
+		]);
+		submitCommand('cat custom.txt');
+		expect(await screen.findByText(/Custom Stored Text/)).toBeInTheDocument();
 	});
 
-	it('supports nano and vim editor launching and error handling', async () => {
+	it('supports nano, vim and vi commands to open internal editor', async () => {
 		renderCmd();
 		submitCommand('nano');
 		expect(await screen.findByText(/Usage: nano <filename>/)).toBeInTheDocument();
+
+		submitCommand('vim');
+		expect(await screen.findByText(/Usage: vim <filename>/)).toBeInTheDocument();
+
+		submitCommand('vi');
+		expect(await screen.findByText(/Usage: vi <filename>/)).toBeInTheDocument();
 
 		submitCommand('nano src');
 		expect(await screen.findByText(/nano: src: Is a directory/)).toBeInTheDocument();
@@ -653,6 +675,11 @@ describe('Cmd', () => {
 		const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
 		renderCmd();
 
+		const terminalBox = document.getElementById('cmd-terminal');
+		if (terminalBox) {
+			fireEvent.click(terminalBox);
+		}
+
 		submitCommand('code');
 		expect(await screen.findByText(/Opening workspace in VSCode editor\.\.\./)).toBeInTheDocument();
 
@@ -664,10 +691,16 @@ describe('Cmd', () => {
 		expect(dispatchSpy).toHaveBeenCalled();
 	});
 
-	it('supports reset command to clear storage and restore virtual files', async () => {
+	it('supports reset, reset-data and restore commands to clear storage and restore virtual files', async () => {
 		renderCmd();
 		submitCommand('reset');
 		expect(await screen.findByText(/Portfolio data and files have been reset to factory defaults\./)).toBeInTheDocument();
+
+		submitCommand('reset-data');
+		expect((await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./)).length).toBeGreaterThanOrEqual(2);
+
+		submitCommand('restore');
+		expect((await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./)).length).toBeGreaterThanOrEqual(3);
 	});
 
 	it('supports head and tail commands and error handling', async () => {

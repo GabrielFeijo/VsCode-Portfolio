@@ -59,4 +59,13 @@ describe('buildFileSystem', () => {
 		const fs = buildFileSystem({ 'src/a.ts': '1', 'src/b.ts': '2' });
 		expect(fs[PROJECT_ROOT]).toEqual([{ name: 'src', type: 'dir' }]);
 	});
+
+	it('handles files with empty content strings', () => {
+		const fs = buildFileSystem({ 'empty.txt': '' });
+		expect(fs[PROJECT_ROOT]).toContainEqual({
+			name: 'empty.txt',
+			type: 'file',
+			content: undefined,
+		});
+	});
 });

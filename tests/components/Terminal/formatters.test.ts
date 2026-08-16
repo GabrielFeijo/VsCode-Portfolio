@@ -28,6 +28,9 @@ describe('formatters', () => {
 		const help = buildHelp();
 		expect(help.some((line) => line.includes('Portfolio Terminal'))).toBe(true);
 		expect(help.some((line) => line.includes('neofetch'))).toBe(true);
+
+		const customHelp = buildHelp(['custom1', 'custom2']);
+		expect(customHelp.some((line) => line.includes('custom1, custom2...'))).toBe(true);
 	});
 
 	it('formats reviews when empty and when populated', () => {

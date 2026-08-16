@@ -82,9 +82,9 @@ describe('NanoEditor', () => {
 		expect(screen.getByText(/Wrote 2 lines to test\.md/)).toBeInTheDocument();
 	});
 
-	it('saves with Ctrl+S shortcut', () => {
+	it('saves content with Ctrl+O or Ctrl+S', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn();
+		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
 
 		render(
 			<NanoEditor
@@ -106,7 +106,7 @@ describe('NanoEditor', () => {
 
 	it('exits immediately on Ctrl+X if unmodified', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn();
+		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
 
 		render(
 			<NanoEditor
@@ -126,9 +126,9 @@ describe('NanoEditor', () => {
 		expect(onClose).toHaveBeenCalledTimes(1);
 	});
 
-	it('prompts to save on Ctrl+X if modified, and handles Y/N/Ctrl+C', () => {
+	it('prompts to save on Ctrl+X if modified, and handles Y/N/Ctrl+C and ignored keys', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn();
+		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
 
 		const { unmount } = render(
 			<NanoEditor
@@ -149,6 +149,9 @@ describe('NanoEditor', () => {
 		fireEvent.keyDown(textarea, { key: 'x', ctrlKey: true });
 		expect(screen.getByText('Save modified buffer? (Y/N/Ctrl+C)')).toBeInTheDocument();
 
+		fireEvent.keyDown(textarea, { key: 'z' });
+		expect(screen.getByText('Save modified buffer? (Y/N/Ctrl+C)')).toBeInTheDocument();
+
 		fireEvent.keyDown(textarea, { key: 'c', ctrlKey: true });
 		expect(screen.getByText('[ Cancelled ]')).toBeInTheDocument();
 		expect(onClose).not.toHaveBeenCalled();
@@ -162,8 +165,8 @@ describe('NanoEditor', () => {
 		const onClose2 = jest.fn();
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
+				fileName="newfile.md"
+				filePath="/home/gabriel/newfile.md"
 				initialContent="hello"
 				cwd="/home/gabriel"
 				fs={defaultFs}

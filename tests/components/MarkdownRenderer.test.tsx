@@ -31,6 +31,8 @@ jest.mock('react-markdown', () => {
 				React.createElement(components.code, null, 'plain code'),
 				React.createElement(components.img, { src: '/profile.webp', alt: 'Profile', className: 'profile' }),
 				React.createElement(components.img, { src: '/project.png', alt: 'Project' }),
+				React.createElement(components.img, { src: '../../gabrielfeijo.webp', alt: 'Relative' }),
+				React.createElement(components.img, { src: undefined, alt: 'NoSrc' }),
 				React.createElement(components.iframe, { src: mockIframeSource }),
 				React.createElement(components.link, {
 					href: mockStylesheetHref,

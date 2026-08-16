@@ -137,6 +137,44 @@ describe('MDContainer', () => {
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
+	it('matches stored page by exact name, html extension, base name or route', () => {
+		jest.spyOn(StorageService, 'getData').mockReturnValue([
+			{ index: 99, name: 'skills.html', route: 'skills', content: '# Skills html' },
+		]);
+
+		const page1 = { index: 1, name: 'skills.md', route: 'skills' };
+		const { unmount } = render(
+			<MemoryRouter>
+				<MDContainer path='/skills.md' page={page1} setPages={jest.fn()} />
+			</MemoryRouter>
+		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Skills html');
+		unmount();
+
+		jest.spyOn(StorageService, 'getData').mockReturnValue([
+			{ index: 99, name: 'projects', route: 'projects', content: '# Projects base' },
+		]);
+		const page2 = { index: 2, name: 'projects.html', route: 'projects' };
+		const { unmount: unmount2 } = render(
+			<MemoryRouter>
+				<MDContainer path='/projects.html' page={page2} setPages={jest.fn()} />
+			</MemoryRouter>
+		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Projects base');
+		unmount2();
+
+		jest.spyOn(StorageService, 'getData').mockReturnValue([
+			{ index: 3, name: 'other.md', route: 'other-route', content: '# By route' },
+		]);
+		const page3 = { index: 99, name: 'unmatched.html', route: 'other-route' };
+		render(
+			<MemoryRouter>
+				<MDContainer path='/unmatched.html' page={page3} setPages={jest.fn()} />
+			</MemoryRouter>
+		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# By route');
+	});
+
 	it('loads content from page.content when page is a default page', async () => {
 		jest.spyOn(StorageService, 'getData').mockReturnValue([]);
 		global.fetch = jest.fn();

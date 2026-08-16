@@ -54,5 +54,8 @@ describe('remoteFileService', () => {
 
 		const stylesContent = await fetchFileContent('styles/about.css');
 		expect(stylesContent).toBe(mockCss);
+
+		const enContent = await fetchFileContent('about-me.html', 'en');
+		expect(enContent).toBe(mockCss);
 	});
 });

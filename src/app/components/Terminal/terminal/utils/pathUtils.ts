@@ -63,7 +63,7 @@ export function listDirectory(
 	const target = argPath ? normalizePath(cwd, argPath) : cwd;
 
 	if (fs[target]) {
-		const rawEntries = fs[target] || [];
+		const rawEntries = fs[target];
 		const entries = options.showAll
 			? [
 					{ name: '.', type: 'dir' as const },

@@ -209,6 +209,17 @@ describe('AppTree', () => {
 		expect(createFile).toHaveBeenCalledWith('notes.md');
 	});
 
+	it('creates file with fallback name when input contains only special characters', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: '$$$' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.confirm' }));
+
+		expect(createFile).toHaveBeenCalledWith('novo-arquivo.md');
+	});
+
 	it('cancels file creation using cancel button', () => {
 		renderTree();
 		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));

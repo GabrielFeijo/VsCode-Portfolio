@@ -397,4 +397,12 @@ describe('App', () => {
             window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '' } }));
         });
     });
+
+    it('reloads pages on storage event', () => {
+        render(<App />);
+        act(() => {
+            window.dispatchEvent(new Event('storage'));
+        });
+        expect(screen.getByTestId('app-tree')).toBeInTheDocument();
+    });
 });

@@ -34,6 +34,10 @@ describe('useCommandsQuery', () => {
 				category: 'portfolio',
 				response: ['skill 1', 'skill 2'],
 			},
+			{
+				command: 'help',
+				response: ['help info'],
+			},
 		]);
 
 		const { result } = renderHook(() => useCommandsQuery(), {
@@ -42,11 +46,12 @@ describe('useCommandsQuery', () => {
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-		expect(result.current.commands).toHaveLength(1);
+		expect(result.current.commands).toHaveLength(2);
 		expect(result.current.commandMap.get('skills')).toEqual(['skill 1', 'skill 2']);
 		expect(result.current.commandMap.get('habilidades')).toEqual(['skill 1', 'skill 2']);
-		expect(result.current.allCommandNames).toEqual(['skills', 'habilidades', 'stack']);
+		expect(result.current.allCommandNames).toEqual(['skills', 'habilidades', 'stack', 'help']);
 		expect(result.current.commandsByCategory['portfolio']).toHaveLength(1);
+		expect(result.current.commandsByCategory['general']).toHaveLength(1);
 	});
 
 	it('handles Error responses by returning empty list', async () => {
