@@ -40,7 +40,7 @@ export default function MetadataComponent() {
 				},
 				sameAs: [
 					siteConfig.githubUrl,
-					'https://www.linkedin.com/in/gabriel-feijo/',
+					siteConfig.linkedinUrl,
 				],
 				knowsAbout: [
 					'React',
