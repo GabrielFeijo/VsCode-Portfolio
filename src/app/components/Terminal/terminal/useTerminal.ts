@@ -147,7 +147,9 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 			if (state.value !== null) {
 				commandRef.current = state.value;
 				setCommand(state.value);
-			} else if (state.list.length > 1 && command.trim() !== '') {
+				return;
+			}
+			if (state.list.length > 1 && command.trim() !== '') {
 				const lines = state.isPath
 					? state.list.map((c) =>
 							c.endsWith('/') ? `\x1b[94m${c}\x1b[0m` : `\x1b[92m${c}\x1b[0m`,

@@ -3,6 +3,29 @@ import { getFileLinesAsync } from '../utils/fileLookup';
 import { normalizePath } from '../utils/pathUtils';
 import { ICommandDefinition } from './command.types';
 
+function parseHeadTailOptions(tokens: string[]): { count: number; fileArg: string } {
+	let count = 10;
+	let fileArg = '';
+
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i];
+		if (token === '-n' && tokens[i + 1]) {
+			count = parseInt(tokens[i + 1], 10) || 10;
+			i += 1;
+			continue;
+		}
+		if (token.startsWith('-n') && token.length > 2) {
+			count = parseInt(token.slice(2), 10) || 10;
+			continue;
+		}
+		if (!fileArg) {
+			fileArg = token;
+		}
+	}
+
+	return { count, fileArg };
+}
+
 export const textUtilsCommands: ICommandDefinition[] = [
 	{
 		name: 'head',
@@ -11,19 +34,7 @@ export const textUtilsCommands: ICommandDefinition[] = [
 		execute: async (arg, ctx, rawCommand) => {
 			const cmd = rawCommand.trim().split(/\s+/)[0].toLowerCase();
 			const tokens = arg.split(/\s+/).filter(Boolean);
-			let count = 10;
-			let fileArg = '';
-
-			for (let i = 0; i < tokens.length; i++) {
-				if (tokens[i] === '-n' && tokens[i + 1]) {
-					count = parseInt(tokens[i + 1], 10) || 10;
-					i += 1;
-				} else if (tokens[i].startsWith('-n') && tokens[i].length > 2) {
-					count = parseInt(tokens[i].slice(2), 10) || 10;
-				} else if (!fileArg) {
-					fileArg = tokens[i];
-				}
-			}
+			const { count, fileArg } = parseHeadTailOptions(tokens);
 
 			if (!fileArg) {
 				ctx.addEntry(rawCommand, [`\x1b[33mUsage: ${cmd} [-n lines] <filename>\x1b[0m`]);

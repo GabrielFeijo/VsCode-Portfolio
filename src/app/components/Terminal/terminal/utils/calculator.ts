@@ -59,9 +59,17 @@ export function calculate(expression: string): number | null {
 		while (peek() === '*' || peek() === '/' || peek() === '%') {
 			const op = next();
 			const rhs = parsePower();
-			if (op === '*') value *= rhs;
-			else if (op === '/') value = rhs === 0 ? NaN : value / rhs;
-			else value %= rhs;
+			switch (op) {
+				case '*':
+					value *= rhs;
+					break;
+				case '/':
+					value = rhs === 0 ? NaN : value / rhs;
+					break;
+				case '%':
+					value %= rhs;
+					break;
+			}
 		}
 		return value;
 	}

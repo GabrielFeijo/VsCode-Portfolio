@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import { Page } from '@/domain/page';
 import { StorageService } from '@/services/storageService';
 import { fonts } from '@/app/theme/typography';
 import { pageRoutes } from '@/app/pages/pages';
@@ -33,7 +34,7 @@ function buildPageMap(): Record<string, { index: number; route: string }> {
 
 const PAGE_MAP = buildPageMap();
 
-export function syncPageStorage(fileName: string, content: string): void {
+function resolvePageData(fileName: string, content: string): Page {
 	const storedPages = StorageService.getData();
 	const baseName = fileName.replace(/\.md$/, '').replace(/\.html$/, '');
 	const targetPage = storedPages.find(
@@ -47,24 +48,26 @@ export function syncPageStorage(fileName: string, content: string): void {
 	);
 
 	if (targetPage) {
-		StorageService.saveOrUpdateData({
-			...targetPage,
-			content,
-			isSaved: true,
-		});
-	} else if (PAGE_MAP[fileName] || PAGE_MAP[baseName]) {
-		const meta = PAGE_MAP[fileName] || PAGE_MAP[baseName];
-		StorageService.saveOrUpdateData({
+		return { ...targetPage, content, isSaved: true };
+	}
+
+	const meta = PAGE_MAP[fileName] || PAGE_MAP[baseName];
+	if (meta) {
+		return {
 			index: meta.index,
 			name: fileName,
 			route: meta.route,
 			content,
 			isSaved: true,
-		});
-	} else {
-		const newPage = StorageService.createFile(fileName, content);
-		StorageService.saveOrUpdateData(newPage);
+		};
 	}
+
+	return StorageService.createFile(fileName, content);
+}
+
+export function syncPageStorage(fileName: string, content: string): void {
+	const pageData = resolvePageData(fileName, content);
+	StorageService.saveOrUpdateData(pageData);
 	window.dispatchEvent(new Event('storage'));
 }
 

@@ -2,6 +2,48 @@ import { PAGE_ROUTES } from '../terminalConfig';
 import { CompletionState, VirtualDirectory } from '../types';
 import { PATH_COMMANDS, completePathArgument } from './pathUtils';
 
+const STATIC_COMPLETIONS: Record<string, readonly string[]> = {
+	route: PAGE_ROUTES,
+	rota: PAGE_ROUTES,
+	theme: ['dark', 'light'],
+	tema: ['dark', 'light'],
+	lang: ['pt', 'en'],
+	idioma: ['pt', 'en'],
+};
+
+function resolveCandidates(
+	cmd: string,
+	arg: string,
+	trimmed: string,
+	spaceIdx: number,
+	cwd: string,
+	allCommands: string[],
+	fs: VirtualDirectory,
+	isPath: boolean,
+): string[] {
+	if (isPath) {
+		return completePathArgument(arg, cwd, fs);
+	}
+
+	const staticOptions = STATIC_COMPLETIONS[cmd];
+	if (staticOptions) {
+		const lowerArg = arg.toLowerCase();
+		return staticOptions.filter((opt) => opt.startsWith(lowerArg));
+	}
+
+	if (cmd === 'man') {
+		const lowerArg = arg.toLowerCase();
+		return allCommands.filter((c) => c.startsWith(lowerArg));
+	}
+
+	if (spaceIdx === -1) {
+		const lowerTrimmed = trimmed.toLowerCase();
+		return allCommands.filter((c) => c.startsWith(lowerTrimmed));
+	}
+
+	return [];
+}
+
 export function getCompletionState(
 	input: string,
 	cwd: string,
@@ -16,21 +58,7 @@ export function getCompletionState(
 	const arg = spaceIdx > 0 ? trimmed.slice(spaceIdx + 1) : '';
 	const isPath = PATH_COMMANDS.includes(cmd);
 
-	let raw: string[] = [];
-
-	if (isPath) {
-		raw = completePathArgument(arg, cwd, fs);
-	} else if (cmd === 'route' || cmd === 'rota') {
-		raw = PAGE_ROUTES.filter((r) => r.startsWith(arg.toLowerCase()));
-	} else if (cmd === 'theme' || cmd === 'tema') {
-		raw = ['dark', 'light'].filter((t) => t.startsWith(arg.toLowerCase()));
-	} else if (cmd === 'lang' || cmd === 'idioma') {
-		raw = ['pt', 'en'].filter((l) => l.startsWith(arg.toLowerCase()));
-	} else if (cmd === 'man') {
-		raw = allCommands.filter((c) => c.startsWith(arg.toLowerCase()));
-	} else if (spaceIdx === -1) {
-		raw = allCommands.filter((c) => c.startsWith(trimmed.toLowerCase()));
-	}
+	const raw = resolveCandidates(cmd, arg, trimmed, spaceIdx, cwd, allCommands, fs, isPath);
 
 	if (raw.length === 0) return { value: null, candidates: [], list: [], isPath };
 	const isSubcommand = isPath || cmd !== '';

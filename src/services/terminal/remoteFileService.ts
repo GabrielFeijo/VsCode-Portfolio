@@ -1,5 +1,21 @@
 const contentCache = new Map<string, string>();
 
+function getCandidateUrls(normalized: string, language: string): string[] {
+	if (normalized.startsWith('public/')) {
+		return [`/${normalized.replace(/^public\//, '')}`];
+	}
+	if (normalized.startsWith('pages/') || normalized.startsWith('styles/')) {
+		return [`/${normalized}`];
+	}
+
+	const baseName = normalized.replace(/\.(html|md)$/, '');
+	return [
+		`/pages/${language}/${baseName}.html`,
+		`/pages/${language === 'pt' ? 'en' : 'pt'}/${baseName}.html`,
+		`/${normalized}`,
+	];
+}
+
 export async function fetchFileContent(
 	filePathOrName: string,
 	language = 'pt',
@@ -9,19 +25,7 @@ export async function fetchFileContent(
 		return contentCache.get(normalized) ?? null;
 	}
 
-	const candidates: string[] = [];
-	if (normalized.startsWith('public/')) {
-		candidates.push(`/${normalized.replace(/^public\//, '')}`);
-	} else if (normalized.startsWith('pages/') || normalized.startsWith('styles/')) {
-		candidates.push(`/${normalized}`);
-	} else {
-		const baseName = normalized.replace(/\.(html|md)$/, '');
-		candidates.push(
-			`/pages/${language}/${baseName}.html`,
-			`/pages/${language === 'pt' ? 'en' : 'pt'}/${baseName}.html`,
-			`/${normalized}`,
-		);
-	}
+	const candidates = getCandidateUrls(normalized, language);
 
 	for (const url of candidates) {
 		try {
