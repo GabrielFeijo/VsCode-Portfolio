@@ -69,15 +69,6 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 				overflow: 'hidden',
 			}}
 		>
-			<Box className={styles.welcome} sx={{ px: 1.5, pt: 1, pb: 0.5 }}>
-				<TerminalLine
-					lines={[
-						`\x1b[96m╭─\x1b[0m \x1b[1;92mOh My Portfolio!\x1b[0m \x1b[90m— zsh 5.9\x1b[0m`,
-						`\x1b[96m╰─\x1b[0m \x1b[90m${t('terminal.info.welcome')}\x1b[0m`,
-					]}
-				/>
-			</Box>
-
 			<Box
 				ref={scrollRef}
 				className={styles.output}
