@@ -3,11 +3,13 @@ import { buildFileSystem, PROJECT_ROOT } from '../../../src/services/terminal/pr
 describe('buildFileSystem', () => {
 	it('creates the home directory containing the project root', () => {
 		const fs = buildFileSystem({});
+		expect(fs['/']).toEqual([{ name: 'home', type: 'dir' }]);
+		expect(fs['/home']).toEqual([{ name: 'gabriel', type: 'dir' }]);
 		expect(fs['/home/gabriel']).toEqual([{ name: 'vscode-portfolio', type: 'dir' }]);
 		expect(fs[PROJECT_ROOT]).toEqual([]);
 	});
 
-	it('does not create a home directory when the root has no parent', () => {
+	it('does not create extra ancestors when the root has no parent', () => {
 		const fs = buildFileSystem({}, '/');
 		expect(fs['/']).toEqual([]);
 		expect(fs['/home']).toBeUndefined();
@@ -36,8 +38,21 @@ describe('buildFileSystem', () => {
 	});
 
 	it('sorts directories before files and alphabetically', () => {
-		const fs = buildFileSystem({ 'b.txt': 'x', 'a.txt': 'y', 'src/app.ts': 'z' });
-		expect(fs[PROJECT_ROOT].map((entry) => entry.name)).toEqual(['src', 'a.txt', 'b.txt']);
+		const fs1 = buildFileSystem({
+			'b.txt': 'x',
+			'a.txt': 'y',
+			'src/app.ts': 'z',
+			'docs/intro.md': 'w',
+		});
+		expect(fs1[PROJECT_ROOT].map((entry) => entry.name)).toEqual(['docs', 'src', 'a.txt', 'b.txt']);
+
+		const fs2 = buildFileSystem({
+			'alpha/file.ts': '1',
+			'beta.txt': '2',
+			'gamma/file.ts': '3',
+			'delta.txt': '4',
+		});
+		expect(fs2[PROJECT_ROOT].map((entry) => entry.name)).toEqual(['alpha', 'gamma', 'beta.txt', 'delta.txt']);
 	});
 
 	it('does not duplicate directory entries', () => {

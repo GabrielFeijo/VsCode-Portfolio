@@ -6,8 +6,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getReviewSchema } from './schemas/BoxRatingSchema';
 import styles from './BoxRating.module.css';
-import { ApiError, ReviewService } from '../../../services/api/review/ReviewService';
-import { fadeInOut } from '../../../utils/motionVariants';
+import { ApiError, ReviewService } from '@/services/api/review/ReviewService';
+import { fadeInOut } from '@/utils/motionVariants';
 import { Rating } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
 

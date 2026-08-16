@@ -58,6 +58,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 		<Box
 			id="cmd-terminal"
 			className={styles.terminal}
+			onClick={() => inputRef.current?.focus()}
 			sx={{
 				height: '100%',
 				display: 'flex',

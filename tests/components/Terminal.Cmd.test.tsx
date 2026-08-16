@@ -45,15 +45,24 @@ jest.mock('dayjs', () => ({
 	default: () => ({ format: () => '01/01/2026 10:30:00' }),
 }));
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 function renderCmd(language: 'pt' | 'en' = 'pt') {
 	const setRanking = jest.fn();
 	const changeLanguage = jest.fn();
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: { retry: false },
+		},
+	});
 	render(
-		<Cmd
-			setRanking={setRanking}
-			changeLanguage={changeLanguage}
-			language={language}
-		/>
+		<QueryClientProvider client={queryClient}>
+			<Cmd
+				setRanking={setRanking}
+				changeLanguage={changeLanguage}
+				language={language}
+			/>
+		</QueryClientProvider>
 	);
 	return { changeLanguage, setRanking };
 }
@@ -84,10 +93,7 @@ describe('Cmd', () => {
 		jest.clearAllMocks();
 		currentTheme = 'dark';
 		translate = defaultTranslate;
-		findAll.mockImplementation(() => ({
-			then: (resolve: (value: { command: string }[]) => void) =>
-				resolve([{ command: 'projects' }]),
-		}));
+		findAll.mockResolvedValue([]);
 		findAllReviews.mockResolvedValue([]);
 		getResponse.mockResolvedValue({ response: ['command response'] });
 	});
@@ -111,6 +117,17 @@ describe('Cmd', () => {
 		submitCommand('projects');
 		await waitFor(() => expect(getResponse).toHaveBeenCalledWith('projects'));
 		expect(await screen.findByText('command response')).toBeInTheDocument();
+	});
+
+	it('executes a cached server command instantly without getResponse API call', async () => {
+		findAll.mockResolvedValue([
+			{ command: 'cachedcmd', response: ['cached response line'] },
+		]);
+		renderCmd();
+		await waitFor(() => expect(findAll).toHaveBeenCalled());
+		submitCommand('cachedcmd');
+		expect(await screen.findByText('cached response line')).toBeInTheDocument();
+		expect(getResponse).not.toHaveBeenCalled();
 	});
 
 	it('prints command not found when API fails', async () => {
@@ -394,7 +411,7 @@ describe('Cmd', () => {
 
 	it('rejects an unknown root directory', async () => {
 		renderCmd();
-		submitCommand('cd /');
+		submitCommand('cd /does-not-exist');
 		expect(await screen.findByText(/No such file or directory/)).toBeInTheDocument();
 	});
 
@@ -575,5 +592,124 @@ describe('Cmd', () => {
 		renderCmd();
 
 		expect(screen.getByRole('textbox', { name: 'Terminal command input' })).toBeInTheDocument();
+	});
+
+	it('supports cd with no args and cd - navigation', async () => {
+		renderCmd();
+		submitCommand('cd /home/gabriel');
+		submitCommand('cd -');
+		expect((await screen.findAllByText(/vscode-portfolio/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('cd');
+		submitCommand('pwd');
+		expect((await screen.findAllByText('/home/gabriel')).length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('supports ls flags and error cases', async () => {
+		renderCmd();
+		submitCommand('ls -la');
+		expect((await screen.findAllByText(/drwxr-xr-x/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('ls /does-not-exist');
+		expect(await screen.findByText(/ls: cannot access/)).toBeInTheDocument();
+	});
+
+	it('supports tree command and errors', async () => {
+		renderCmd();
+		submitCommand('tree');
+		expect((await screen.findAllByText(/vscode-portfolio/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('tree /does-not-exist');
+		expect(await screen.findByText(/tree: '\/does-not-exist': No such directory/)).toBeInTheDocument();
+	});
+
+	it('supports cat options, directory check and error handling', async () => {
+		renderCmd();
+		submitCommand('cat -n package.json');
+		expect((await screen.findAllByText(/package\.json/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('cat src');
+		expect(await screen.findByText(/cat: src: Is a directory/)).toBeInTheDocument();
+	});
+
+	it('supports head and tail commands and error handling', async () => {
+		renderCmd();
+		submitCommand('head -n 2 package.json');
+		submitCommand('head -n5 package.json');
+		expect(await screen.findByText('head -n 2 package.json')).toBeInTheDocument();
+
+		submitCommand('tail -n 2 package.json');
+		expect(await screen.findByText('tail -n 2 package.json')).toBeInTheDocument();
+
+		submitCommand('head');
+		expect(await screen.findByText(/Usage: head/)).toBeInTheDocument();
+
+		submitCommand('head non-existing.ts');
+		expect(await screen.findByText(/head: non-existing\.ts: No such file/)).toBeInTheDocument();
+	});
+
+	it('supports grep command and error handling', async () => {
+		renderCmd();
+		submitCommand('grep -i "vscode" package.json');
+		expect((await screen.findAllByText(/vscode/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('grep');
+		expect(await screen.findByText(/Usage: grep/)).toBeInTheDocument();
+
+		submitCommand('grep "test" non-existing.ts');
+		expect(await screen.findByText(/grep: non-existing\.ts: No such file/)).toBeInTheDocument();
+	});
+
+	it('supports wc command with and without -l flag', async () => {
+		renderCmd();
+		submitCommand('wc -l package.json');
+		expect((await screen.findAllByText(/package\.json/)).length).toBeGreaterThanOrEqual(1);
+
+		submitCommand('wc package.json');
+		expect(await screen.findByText('wc package.json')).toBeInTheDocument();
+
+		submitCommand('wc');
+		expect(await screen.findByText(/Usage: wc/)).toBeInTheDocument();
+
+		submitCommand('wc non-existing.ts');
+		expect(await screen.findByText(/wc: non-existing\.ts: No such file/)).toBeInTheDocument();
+	});
+
+	it('supports touch, mkdir, and rm filesystem mutations', async () => {
+		renderCmd();
+		submitCommand('touch newfile.txt');
+		submitCommand('ls');
+		expect(await screen.findByText('newfile.txt')).toBeInTheDocument();
+
+		submitCommand('touch');
+		expect(await screen.findByText(/Usage: touch/)).toBeInTheDocument();
+
+		submitCommand('touch /invalid/path/file.txt');
+		expect(await screen.findByText(/cannot touch/)).toBeInTheDocument();
+
+		submitCommand('mkdir newdir');
+		submitCommand('ls');
+		expect(await screen.findByText('newdir/')).toBeInTheDocument();
+
+		submitCommand('mkdir');
+		expect(await screen.findByText(/Usage: mkdir/)).toBeInTheDocument();
+
+		submitCommand('mkdir /invalid/path/dir');
+		expect(await screen.findByText(/cannot create directory/)).toBeInTheDocument();
+
+		submitCommand('rm newfile.txt');
+		submitCommand('rm newdir');
+		expect(await screen.findByText(/rm: cannot remove 'newdir': Is a directory/)).toBeInTheDocument();
+
+		submitCommand('rm -r newdir');
+		submitCommand('rm');
+		expect(await screen.findByText(/Usage: rm/)).toBeInTheDocument();
+	});
+
+	it('focuses the input when clicking on the terminal container', () => {
+		renderCmd();
+		const terminal = document.getElementById('cmd-terminal');
+		expect(terminal).toBeInTheDocument();
+		fireEvent.click(terminal!);
 	});
 });
