@@ -1,7 +1,6 @@
-import * as React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
 import { useAppPalette } from '../theme/useAppPalette';
 import {
 	VscMarkdown,
@@ -14,15 +13,12 @@ import {
 import { convertFileName } from '../../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, InputBase } from '@mui/material';
-import { StorageService } from '../../services/storageService';
 import { Language, Page } from '../../domain/page';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
-import { normalizeFileName } from '../../utils/normalizeFileName';
 import { getBasePath, getLocalizedPath } from '../../config/seo';
-import { siteConfig } from '../../config/site';
 import { useEditorContext } from '../../contexts/EditorContext';
-
-import { stripFileExtension } from '../../utils/stripFileExtension';
+import { useFileCreation } from '../hooks/useFileCreation';
+import { useTreeContextMenu } from '../hooks/useTreeContextMenu';
 
 interface Props {
 	language: Language;
@@ -43,9 +39,6 @@ export default function AppTree({ language }: Props) {
 	const colors = useAppPalette();
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-	const [isCreatingFile, setIsCreatingFile] = useState(false);
-	const [newFileName, setNewFileName] = useState('');
-	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const page: Page | undefined = pages.find(
 		(item) => `/${item.route}` === getBasePath(pathname)
@@ -57,11 +50,41 @@ export default function AppTree({ language }: Props) {
 		}
 	}, [page, setSelectedIndex]);
 
-	useEffect(() => {
-		if (isCreatingFile && fileInputRef.current) {
-			fileInputRef.current.focus();
+	const openFile = useCallback((filePage: Page) => {
+		if (!visiblePageIndexes.includes(filePage.index)) {
+			setVisiblePageIndexes((prev) => [...prev, filePage.index]);
 		}
-	}, [isCreatingFile]);
+		setSelectedIndex(filePage.index);
+		navigate(getLocalizedPath(`/${filePage.route}`, language));
+	}, [language, navigate, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes]);
+
+	const {
+		isCreatingFile,
+		newFileName,
+		setNewFileName,
+		fileInputRef,
+		handleCreateFile,
+		handleConfirmCreateFile,
+		handleCancelCreateFile,
+		handleKeyDown,
+	} = useFileCreation({ pages, setPages, openFile });
+
+	const {
+		contextMenu,
+		handleContextMenu,
+		handleClose,
+		handleDelete,
+		handleOpenFile,
+		handleOpenFileOnGithub,
+	} = useTreeContextMenu({
+		pages,
+		setPages,
+		setVisiblePageIndexes,
+		setSelectedIndex,
+		navigate,
+		language,
+		openFile,
+	});
 
 	function renderTreeItemBgColor(index: number) {
 		return selectedIndex === index ? colors.bgElevated : colors.bgExplorer;
@@ -73,132 +96,6 @@ export default function AppTree({ language }: Props) {
 		}
 		return selectedIndex === index ? colors.accent : colors.textSecondary;
 	}
-
-	function handleCreateFile(e: React.MouseEvent) {
-		e.stopPropagation();
-		setIsCreatingFile(true);
-	}
-
-	function handleConfirmCreateFile(e?: React.MouseEvent) {
-		e?.stopPropagation();
-		createNewFile();
-	}
-
-	function handleCancelCreateFile(e?: React.MouseEvent) {
-		e?.stopPropagation();
-		resetFileCreationState();
-	}
-
-	function resetFileCreationState() {
-		setIsCreatingFile(false);
-		setNewFileName('');
-	}
-
-	function openFile(page: Page) {
-		if (!visiblePageIndexes.includes(page.index)) {
-			setVisiblePageIndexes((prev) => [...prev, page.index]);
-		}
-		setSelectedIndex(page.index);
-		navigate(getLocalizedPath(`/${page.route}`, language));
-	}
-
-	function createNewFile() {
-		const rawName = newFileName.trim();
-		if (rawName === '') {
-			resetFileCreationState();
-			return;
-		}
-
-		const baseName = stripFileExtension(rawName);
-		const normalizedName = normalizeFileName(baseName);
-		const fullFileName = `${normalizedName || 'novo-arquivo'}.md`;
-		const existingPage = pages.find(
-			(x) => x.name === fullFileName || x.route === fullFileName
-		);
-
-		if (existingPage) {
-			openFile(existingPage);
-			resetFileCreationState();
-			return;
-		}
-
-		const newFile = StorageService.createFile(fullFileName);
-		StorageService.saveOrUpdateData(newFile);
-		setPages([...pages, newFile]);
-		openFile(newFile);
-		resetFileCreationState();
-	}
-
-	function handleKeyDown(e: React.KeyboardEvent) {
-		e.stopPropagation();
-		const keyActions: Record<string, () => void> = {
-			Enter: createNewFile,
-			Escape: handleCancelCreateFile,
-		};
-
-		const action = keyActions[e.key];
-		if (action) {
-			e.preventDefault();
-			action();
-		}
-	}
-
-	const handleDeleteFile = (pageIndex: number) => {
-		setPages((prev) => prev.filter((x) => x.index !== pageIndex));
-		setVisiblePageIndexes((prev) => prev.filter((x) => x !== pageIndex));
-		StorageService.deleteFile(pageIndex);
-		setSelectedIndex(0);
-		navigate(getLocalizedPath('/about-me', language));
-	};
-
-	const [contextMenu, setContextMenu] = useState<{
-		mouseX: number;
-		mouseY: number;
-		pageIndex: number | null;
-	} | null>(null);
-
-	const handleContextMenu = (event: React.MouseEvent, index: number) => {
-		event.preventDefault();
-		setContextMenu(
-			contextMenu === null
-				? {
-					mouseX: event.clientX - 2,
-					mouseY: event.clientY - 4,
-					pageIndex: index,
-				}
-				: null
-		);
-	};
-
-	const handleClose = () => {
-		setContextMenu(null);
-	};
-
-	const handleDelete = () => {
-		handleDeleteFile(contextMenu!.pageIndex!);
-		handleClose();
-	};
-	const handleOpenFile = () => {
-		const existingPage = pages.find((x) => x.index === contextMenu!.pageIndex);
-
-		if (!existingPage) return;
-
-		openFile(existingPage);
-		handleClose();
-	};
-
-	const handleOpenFileOnGithub = () => {
-		const existingPage = pages.find((x) => x.index === contextMenu!.pageIndex);
-
-		if (!existingPage) return;
-
-		window.open(
-			`${siteConfig.repoUrl}/tree/main/src/pages/${language}/${existingPage.name}`,
-			'_blank',
-			'noopener,noreferrer'
-		);
-		handleClose();
-	};
 
 	return (
 		<>
@@ -289,7 +186,7 @@ export default function AppTree({ language }: Props) {
 												width: '10px',
 												height: '10px',
 											}}
-										></Box>
+										/>
 									)}
 								</Box>
 							}
