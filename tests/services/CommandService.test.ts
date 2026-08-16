@@ -33,7 +33,7 @@ describe('CommandService', () => {
         const mod = await import('../../src/services/api/command/CommandService');
         const result = await mod.CommandService.getResponse('nothing');
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns default error for non-axios errors', async () => {
@@ -42,7 +42,7 @@ describe('CommandService', () => {
         const mod = await import('../../src/services/api/command/CommandService');
         const result = await mod.CommandService.getResponse('test');
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('findAll returns data on success', async () => {

@@ -130,14 +130,18 @@ describe('AppButtons', () => {
         render(<AppButtons {...defaultProps} />);
         const closeButtons = screen.getAllByLabelText(/Close/);
         fireEvent.keyDown(closeButtons[1], { key: 'Enter' });
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
     });
 
     it('calls setVisiblePageIndexes when close button is pressed with Space', () => {
         render(<AppButtons {...defaultProps} />);
         const closeButtons = screen.getAllByLabelText(/Close/);
         fireEvent.keyDown(closeButtons[1], { key: ' ' });
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
     });
 
     it('handles close tab from context menu', () => {
@@ -146,7 +150,9 @@ describe('AppButtons', () => {
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeTabButton = screen.getByTestId('close-tab');
         fireEvent.click(closeTabButton);
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
     });
 
     it('handles close others from context menu', () => {
