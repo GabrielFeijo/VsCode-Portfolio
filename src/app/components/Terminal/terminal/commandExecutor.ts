@@ -2,6 +2,7 @@ import { Language } from '@/domain/page';
 import { getLocalizedPath } from '@/config/seo';
 import { ReviewService } from '@/services/api/review/ReviewService';
 import { StorageService } from '@/services/storageService';
+import { fetchFileContent } from '@/services/terminal/remoteFileService';
 import { PAGE_ROUTES, PROJECT_FS, PROJECT_ROOT } from './terminalConfig';
 import { ActiveEditorSession, TerminalColors, TerminalEntry, VirtualDirectory } from './types';
 import { calculate, formatResult } from './utils/calculator';
@@ -50,7 +51,12 @@ function parseFlagsAndArgs(rawArgs: string): { flags: Set<string>; args: string[
 	return { flags, args };
 }
 
-function getFileLines(fs: VirtualDirectory, parent: string, fileName: string): string[] | null {
+async function getFileLinesAsync(
+	fs: VirtualDirectory,
+	parent: string,
+	fileName: string,
+	language = 'pt',
+): Promise<string[] | null> {
 	const baseName = fileName.replace(/\.(html|md)$/, '');
 	const stored = StorageService.getData().find(
 		(p) =>
@@ -65,18 +71,27 @@ function getFileLines(fs: VirtualDirectory, parent: string, fileName: string): s
 	}
 
 	const exact = fs[parent]?.find((e) => e.name === fileName && e.type === 'file');
-	if (exact?.content) {
+	if (exact?.content && exact.content.length > 0 && exact.content.some((line) => line.length > 0)) {
 		return exact.content;
 	}
 
 	const altHtml = fs[parent]?.find((e) => e.name === `${baseName}.html` && e.type === 'file');
-	if (altHtml?.content) {
+	if (altHtml?.content && altHtml.content.length > 0 && altHtml.content.some((line) => line.length > 0)) {
 		return altHtml.content;
 	}
 
 	const altMd = fs[parent]?.find((e) => e.name === `${baseName}.md` && e.type === 'file');
-	if (altMd?.content) {
+	if (altMd?.content && altMd.content.length > 0 && altMd.content.some((line) => line.length > 0)) {
 		return altMd.content;
+	}
+
+	const remote = await fetchFileContent(fileName, language);
+	if (remote !== null) {
+		const lines = remote.split('\n');
+		if (exact) {
+			exact.content = lines;
+		}
+		return lines;
 	}
 
 	return null;
@@ -295,7 +310,7 @@ export async function executeLocalCommand(
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
 
-			const fileLines = getFileLines(fs, parent, fileName);
+			const fileLines = await getFileLinesAsync(fs, parent, fileName, language);
 			const fileContent = fileLines ? fileLines.join('\n') : '';
 
 			if (ctx.openEditor) {
@@ -358,7 +373,7 @@ export async function executeLocalCommand(
 
 				const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 				const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-				const lines = getFileLines(fs, parent, fileName);
+				const lines = await getFileLinesAsync(fs, parent, fileName, language);
 
 				if (!lines) {
 					addEntry(trimmed, [`\x1b[91mcat: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
@@ -401,7 +416,7 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const lines = getFileLines(fs, parent, fileName);
+			const lines = await getFileLinesAsync(fs, parent, fileName, language);
 
 			if (!lines) {
 				addEntry(trimmed, [`\x1b[91m${cmd}: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
@@ -425,7 +440,7 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const lines = getFileLines(fs, parent, fileName);
+			const lines = await getFileLinesAsync(fs, parent, fileName, language);
 
 			if (!lines) {
 				addEntry(trimmed, [`\x1b[91mgrep: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
@@ -461,7 +476,7 @@ export async function executeLocalCommand(
 			const filePath = normalizePath(cwd, fileArg);
 			const parent = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			const lines = getFileLines(fs, parent, fileName);
+			const lines = await getFileLinesAsync(fs, parent, fileName, language);
 
 			if (!lines) {
 				addEntry(trimmed, [`\x1b[91mwc: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
