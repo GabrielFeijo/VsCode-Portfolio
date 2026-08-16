@@ -137,6 +137,34 @@ describe('MDContainer', () => {
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
+	it('loads content from page.content when page is a default page', async () => {
+		jest.spyOn(StorageService, 'getData').mockReturnValue([]);
+		global.fetch = jest.fn();
+
+		const page = {
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: '<section><h1>Live content</h1></section>',
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/pages/pt/sobre-mim.html'
+					page={page}
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+			'Live content'
+		);
+		expect(screen.queryByLabelText('Markdown editor')).not.toBeInTheDocument();
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
 	it('reloads content on storage window event and aborts active controller', async () => {
 		let storageData: any[] = [];
 		jest.spyOn(StorageService, 'getData').mockImplementation(() => storageData);

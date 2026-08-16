@@ -18,8 +18,50 @@ interface Props {
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
 
+const DEFAULT_PAGE_NAMES = new Set([
+	'about-me',
+	'skills',
+	'projects',
+	'experience',
+	'accomplishments',
+	'certificates',
+	'sobre-mim',
+	'habilidades',
+	'projetos',
+	'experiencia',
+	'conquistas',
+	'certificados',
+]);
+
+function isDefaultPage(page?: Page): boolean {
+	const baseName = page?.name.replace(/\.(html|md)$/, '').toLowerCase() || '';
+	const baseRoute = page?.route.replace(/^\//, '').toLowerCase() || '';
+	return DEFAULT_PAGE_NAMES.has(baseName) || DEFAULT_PAGE_NAMES.has(baseRoute);
+}
+
 function hasEditableContent(page?: Page): page is Page & { content?: string } {
-	return Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+	return !isDefaultPage(page) && Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+}
+
+function getStoredPageContent(page?: Page): string | null {
+	if (!page) return null;
+	const baseName = page.name.replace(/\.(html|md)$/, '');
+	const stored = StorageService.getData().find(
+		(p) =>
+			p.name === page.name ||
+			p.name === `${baseName}.md` ||
+			p.name === `${baseName}.html` ||
+			p.name === baseName ||
+			p.index === page.index ||
+			p.route === page.route,
+	);
+	if (stored?.content !== undefined) {
+		return stored.content;
+	}
+	if (page.content !== undefined) {
+		return page.content;
+	}
+	return null;
 }
 
 export default function MDContainer({ path, page, setPages }: Props) {
@@ -35,18 +77,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		let activeController: AbortController | null = null;
 
 		const load = () => {
-			const baseName = page?.name.replace(/\.(html|md)$/, '');
-			const stored = StorageService.getData().find(
-				(p) =>
-					page &&
-					(p.name === page.name ||
-						p.name === `${baseName}.md` ||
-						p.name === baseName ||
-						p.index === page.index ||
-						p.route === page.route),
-			);
-			if (stored?.content !== undefined) {
-				setContent(stored.content);
+			const stored = getStoredPageContent(page);
+			if (stored !== null) {
+				setContent(stored);
 				return;
 			}
 
