@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import NanoEditor, { syncPageStorage } from '../../../src/app/components/Terminal/terminal/NanoEditor';
 import { StorageService } from '../../../src/services/storageService';
 import { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';

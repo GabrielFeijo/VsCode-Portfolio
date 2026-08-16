@@ -15,7 +15,6 @@ interface Props {
 
 interface PageTabProps {
 	page: Page;
-	language: Language;
 	isSelected: boolean;
 	onOpen: () => void;
 	onClose: (e: React.MouseEvent | React.KeyboardEvent) => void;
@@ -24,7 +23,6 @@ interface PageTabProps {
 
 function PageTab({
 	page,
-	language,
 	isSelected,
 	onOpen,
 	onClose,
@@ -206,7 +204,6 @@ export default function AppButtons({ language }: Props) {
 					<PageTab
 						key={page.index}
 						page={page}
-						language={language}
 						isSelected={selectedIndex === page.index}
 						onOpen={() => {
 							setSelectedIndex(page.index);

@@ -4,11 +4,11 @@ import { fonts } from '../../../theme/typography';
 import { getTerminalColors } from './terminalConfig';
 
 interface Props {
-	cwd: string;
-	isDark: boolean;
+	cwd?: string;
+	isDark?: boolean;
 }
 
-const TerminalPrompt = ({ cwd = '', isDark }: Props) => {
+const TerminalPrompt = ({ cwd = '' }: Props) => {
 	const { theme } = useTheme();
 	const colors = getTerminalColors(theme);
 	const displayPath = (cwd || '').replace(/^\/home\/gabriel/, '~');

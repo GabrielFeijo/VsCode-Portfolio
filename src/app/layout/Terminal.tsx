@@ -14,7 +14,6 @@ import Output from '../components/Terminal/Output';
 import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useAppPalette } from '../theme/useAppPalette';
 import { Language } from '../../domain/page';
 
@@ -32,24 +31,23 @@ const Terminal = ({
 	changeLanguage,
 }: Props) => {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
 	const colors = useAppPalette();
 	const [selectedTerminalIndex, setSelectedTerminalIndex] = useState(3);
 	const terminalTabs = useMemo(() => [
 		{
 			index: 0,
 			name: t('terminal.tabs.problems'),
-			element: <Problems language={language} />,
+			element: <Problems />,
 		},
 		{
 			index: 1,
 			name: t('terminal.tabs.output'),
-			element: <Output language={language} />,
+			element: <Output />,
 		},
 		{
 			index: 2,
 			name: t('terminal.tabs.debug'),
-			element: <Debug language={language} />,
+			element: <Debug />,
 		},
 		{
 			index: 3,

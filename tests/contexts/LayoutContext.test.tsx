@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useLayoutContext, LayoutProvider } from '../../src/contexts/LayoutContext';
 
 jest.mock('react-device-detect', () => ({

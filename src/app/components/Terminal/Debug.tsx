@@ -5,10 +5,10 @@ import { useAppPalette } from '../../theme/useAppPalette';
 import { fonts } from '../../theme/typography';
 
 interface Props {
-	language: string;
+	language?: string;
 }
 
-const Debug = ({ language }: Props) => {
+const Debug = (_props: Props = {}) => {
 	const { t } = useTranslation();
 	const colors = useAppPalette();
 

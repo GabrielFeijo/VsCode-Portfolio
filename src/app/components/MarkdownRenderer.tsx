@@ -18,7 +18,6 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { useTheme } from '../../contexts/ThemeContext';
 import { fonts } from '../theme/typography';
 import { getStyleContent } from '@/services/styleContentService';
 
@@ -218,11 +217,9 @@ function MarkdownTableCell({ children }: { children: ReactNode }) {
 function MarkdownCode({
 	children,
 	className,
-	isDarkTheme,
 }: {
 	children: ReactNode;
 	className?: string;
-	isDarkTheme: boolean;
 }) {
 	const language = className?.split('-')[1] || 'md';
 
@@ -278,17 +275,11 @@ export default function MarkdownRenderer({
 	allowRawHtml = false,
 	content,
 }: MarkdownRendererProps) {
-	const { theme } = useTheme();
-	const isDarkTheme = theme === 'dark';
-
 	return (
 		<ReactMarkdown
 			components={{
 				code: ({ children, className }) => (
-					<MarkdownCode
-						className={className}
-						isDarkTheme={isDarkTheme}
-					>
+					<MarkdownCode className={className}>
 						{children}
 					</MarkdownCode>
 				),

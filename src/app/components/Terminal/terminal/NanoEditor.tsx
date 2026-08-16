@@ -73,7 +73,6 @@ export default function NanoEditor({
 	filePath,
 	initialContent,
 	cwd,
-	fs,
 	setFs,
 	onClose,
 	onSave,

@@ -4,10 +4,10 @@ import { useAppPalette } from '../../theme/useAppPalette';
 import { fonts } from '../../theme/typography';
 
 interface Props {
-	language: string;
+	language?: string;
 }
 
-const Output = ({ language }: Props) => {
+const Output = (_props: Props = {}) => {
 	const { t } = useTranslation();
 	const colors = useAppPalette();
 	const today = new Date().toLocaleString();

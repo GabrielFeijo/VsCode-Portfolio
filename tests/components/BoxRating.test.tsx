@@ -445,7 +445,7 @@ describe('BoxRating component', () => {
     it('uses fallback aria-labels when translation returns falsy', () => {
         mockT.mockImplementation(() => '');
         const setRanking = jest.fn();
-        const { container } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const closeButton = screen.getByLabelText('Close rating modal');
         const submitButton = screen.getByLabelText('Submit rating');
