@@ -24,7 +24,14 @@ export type { Page } from '../domain/page';
 
 let _nextIndex = 1000;
 function getNextIndex(): number {
-	return _nextIndex++;
+	const stored = StorageService.getData();
+	const maxStoredIndex = stored.reduce(
+		(max, p) => (p.index > max ? p.index : max),
+		999
+	);
+	const next = Math.max(maxStoredIndex + 1, _nextIndex);
+	_nextIndex = next + 1;
+	return next;
 }
 
 export const StorageService = {

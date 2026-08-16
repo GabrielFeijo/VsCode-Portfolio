@@ -67,10 +67,19 @@ describe('StorageService', () => {
         expect(Array.isArray(folder.children)).toBe(true);
     });
 
-	it('creates a file with empty content by default', () => {
-		const file = StorageService.createFile('empty.md');
+	it('creates a file with empty content by default and auto-increments index above stored pages', () => {
+		const storedPages = [
+			{ index: 1500, name: 'stored.md', route: 'stored.md' },
+			{ index: 1200, name: 'stored2.md', route: 'stored2.md' },
+		];
+		localStorage.setItem('markdown-editor-data', JSON.stringify(storedPages));
 
-		expect(file.content).toBe('');
+		const file1 = StorageService.createFile('empty.md');
+		expect(file1.content).toBe('');
+		expect(file1.index).toBeGreaterThan(1500);
+
+		const file2 = StorageService.createFile('empty2.md');
+		expect(file2.index).toBeGreaterThan(file1.index);
 	});
 
     it('deleteFile removes by index and by name', () => {

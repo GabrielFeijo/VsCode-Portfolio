@@ -213,6 +213,34 @@ describe('EditorContext pure functions', () => {
     });
   });
 
+  test('loadPages reassigns duplicate or conflicting custom page indexes', () => {
+    (StorageService.getData as jest.Mock).mockReturnValue([
+      {
+        index: 0,
+        name: 'custom1.md',
+        route: 'custom1',
+        content: 'content 1',
+      },
+      {
+        index: 1000,
+        name: 'custom2.md',
+        route: 'custom2',
+        content: 'content 2',
+      },
+      {
+        index: 1000,
+        name: 'custom3.md',
+        route: 'custom3',
+        content: 'content 3',
+      },
+    ]);
+
+    const pages = loadPages('pt');
+    expect(pages).toHaveLength(3);
+    const indexes = pages.map((p) => p.index);
+    expect(new Set(indexes).size).toBe(3);
+  });
+
   test('initVisiblePageIndexes(pages) returns all indexes', () => {
     const samplePages: Page[] = [
       { index: 0, name: 'a.html', route: 'a' },

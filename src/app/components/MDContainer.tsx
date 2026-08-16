@@ -200,10 +200,20 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					sx={{
 						height: '100%',
 						overflowY: 'auto',
-						margin: 2,
+						p: { xs: 2, sm: 3, md: 4 },
+						boxSizing: 'border-box',
 					}}
 				>
-					<MarkdownRenderer content={content} allowRawHtml={true} />
+					<Box
+						sx={{
+							maxWidth: editMode ? '100%' : '960px',
+							width: '100%',
+							mx: 'auto',
+							pb: 6,
+						}}
+					>
+						<MarkdownRenderer content={content} allowRawHtml={true} />
+					</Box>
 				</Grid>
 			</Grid>
 		</Container>

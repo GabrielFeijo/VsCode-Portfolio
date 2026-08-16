@@ -45,7 +45,18 @@ export function loadPages(language: Language): Page[] {
       ),
   );
 
-  return [...mergedDefaults, ...customStored];
+  const seenIndexes = new Set(mergedDefaults.map((p) => p.index));
+  let fallbackIndex = 1000;
+  const uniqueCustom = customStored.map((p) => {
+    let idx = p.index;
+    while (seenIndexes.has(idx)) {
+      idx = fallbackIndex++;
+    }
+    seenIndexes.add(idx);
+    return { ...p, index: idx };
+  });
+
+  return [...mergedDefaults, ...uniqueCustom];
 }
 
 export function initVisiblePageIndexes(pages: Page[]): number[] {
