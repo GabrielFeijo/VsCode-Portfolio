@@ -1,7 +1,7 @@
 import styles from './Kbd.module.css';
 
 interface Props {
-	keys: string[];
+	keys: readonly string[];
 }
 
 export default function Kbd({ keys }: Props) {

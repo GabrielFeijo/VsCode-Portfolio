@@ -83,7 +83,7 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 											className={styles.iconContainer}
 											data-accent={shortcut.accent}
 										>
-											{shortcut.icon}
+											<shortcut.Icon className={styles.icon} />
 										</div>
 										<span className={styles.shortcutLabel}>
 											{t(shortcut.labelKey)}
