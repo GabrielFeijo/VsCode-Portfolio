@@ -1,3 +1,4 @@
+import { PAGE_ROUTES } from '../terminalConfig';
 import { CompletionState, VirtualDirectory } from '../types';
 import { PATH_COMMANDS, completePathArgument } from './pathUtils';
 
@@ -15,12 +16,25 @@ export function getCompletionState(
 	const arg = spaceIdx > 0 ? trimmed.slice(spaceIdx + 1) : '';
 	const isPath = PATH_COMMANDS.includes(cmd);
 
-	const raw = isPath
-		? completePathArgument(arg, cwd, fs)
-		: allCommands.filter((c) => c.startsWith(trimmed.toLowerCase()));
+	let raw: string[] = [];
+
+	if (isPath) {
+		raw = completePathArgument(arg, cwd, fs);
+	} else if (cmd === 'route' || cmd === 'rota') {
+		raw = PAGE_ROUTES.filter((r) => r.startsWith(arg.toLowerCase()));
+	} else if (cmd === 'theme' || cmd === 'tema') {
+		raw = ['dark', 'light'].filter((t) => t.startsWith(arg.toLowerCase()));
+	} else if (cmd === 'lang' || cmd === 'idioma') {
+		raw = ['pt', 'en'].filter((l) => l.startsWith(arg.toLowerCase()));
+	} else if (cmd === 'man') {
+		raw = allCommands.filter((c) => c.startsWith(arg.toLowerCase()));
+	} else if (spaceIdx === -1) {
+		raw = allCommands.filter((c) => c.startsWith(trimmed.toLowerCase()));
+	}
 
 	if (raw.length === 0) return { value: null, candidates: [], list: [], isPath };
-	const candidates = isPath ? raw.map((c) => `${cmd} ${c}`) : raw;
+	const isSubcommand = isPath || cmd !== '';
+	const candidates = isSubcommand ? raw.map((c) => `${cmd} ${c}`) : raw;
 
 	if (raw.length === 1) {
 		const full = candidates[0];

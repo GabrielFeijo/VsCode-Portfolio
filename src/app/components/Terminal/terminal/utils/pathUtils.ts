@@ -2,16 +2,21 @@ import { VirtualDirectory, VirtualFileEntry } from '../types';
 
 export const PATH_COMMANDS = [
 	'cd',
-	'cat',
 	'ls',
-	'echo',
+	'code',
+	'nano',
+	'vim',
+	'vi',
+	'cat',
 	'head',
 	'tail',
 	'grep',
-	'tree',
-	'rm',
+	'wc',
 	'touch',
 	'mkdir',
+	'rm',
+	'tree',
+	'echo',
 ];
 
 export function normalizePath(base: string, target: string): string {
