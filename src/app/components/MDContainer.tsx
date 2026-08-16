@@ -200,6 +200,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					sx={{
 						height: '100%',
 						overflowY: 'auto',
+						margin: 2,
 					}}
 				>
 					<MarkdownRenderer content={content} allowRawHtml={true} />
