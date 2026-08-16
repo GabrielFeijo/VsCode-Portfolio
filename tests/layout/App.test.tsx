@@ -40,7 +40,8 @@ jest.mock('@mui/material', () => {
 
 let mockCalled = false;
 let appTreeMode = 'default';
-jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedIndex, setPages }: any) => {
+jest.mock('src/app/layout/AppTree', () => () => {
+    const { setVisiblePageIndexes, setSelectedIndex, setPages } = require('src/contexts/EditorContext').useEditorContext();
     React.useEffect(() => {
         if (!mockCalled) {
             mockCalled = true;
@@ -63,16 +64,22 @@ jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedI
                     setVisiblePageIndexes([1]);
             }
         }
-    }, []);
+    }, [setPages, setSelectedIndex, setVisiblePageIndexes]);
     return <div data-testid="app-tree" />;
 });
 jest.mock('src/app/layout/Footer', () => () => <div data-testid="footer" />);
-jest.mock('src/app/layout/Sidebar', () => ({ setExpanded, expanded, terminal, setTerminal, language, changeLanguage }: any) => (
-    <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded} data-language={language}>
-        <button data-testid="toggle-terminal" onClick={() => setTerminal(!terminal)}>Toggle Terminal</button>
-        <button data-testid="change-language" onClick={changeLanguage}>Change Language</button>
-    </div>
-));
+jest.mock('src/app/layout/Sidebar', () => {
+    const { useLayoutContext } = require('src/contexts/LayoutContext');
+    return ({ language, changeLanguage }: any) => {
+        const { expanded, setExpanded, terminal, setTerminal } = useLayoutContext();
+        return (
+            <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded} data-language={language}>
+                <button data-testid="toggle-terminal" onClick={() => setTerminal(!terminal)}>Toggle Terminal</button>
+                <button data-testid="change-language" onClick={changeLanguage}>Change Language</button>
+            </div>
+        );
+    };
+});
 let mockPathname = '/';
 jest.mock('react-router-dom', () => ({
     Routes: ({ children }: any) => (
@@ -87,9 +94,10 @@ jest.mock('react-router-dom', () => ({
     useLocation: () => ({ pathname: mockPathname }),
     Navigate: () => <div data-testid="navigate" />,
 }));
-jest.mock('src/app/layout/AppButtons', () => ({ pages }: any) => (
-    <div data-testid="app-buttons" data-pages={pages ? pages.length : 0} />
-));
+jest.mock('src/app/layout/AppButtons', () => () => {
+    const { visiblePages } = require('src/contexts/EditorContext').useEditorContext();
+    return <div data-testid="app-buttons" data-pages={visiblePages ? visiblePages.length : 0} />;
+});
 jest.mock('src/app/components/MDContainer', () => ({ path }: any) => (
     <div
         data-testid="md-container"

@@ -17,6 +17,10 @@ jest.mock('../../src/contexts/ThemeContext', () => ({
     useTheme: jest.fn(),
 }));
 
+jest.mock('../../src/contexts/LayoutContext', () => ({
+    useLayoutContext: jest.fn(),
+}));
+
 jest.mock('react-i18next', () => ({
     useTranslation: jest.fn(),
 }));
@@ -26,16 +30,24 @@ jest.mock('react-device-detect', () => ({
 }));
 
 const mockUseTheme = require('../../src/contexts/ThemeContext').useTheme;
+const mockUseLayoutContext = require('../../src/contexts/LayoutContext').useLayoutContext;
 const mockUseTranslation = require('react-i18next').useTranslation;
 
 describe('Sidebar', () => {
     const defaultProps = {
+        language: 'en',
+        changeLanguage: jest.fn(),
+    };
+
+    const mockLayoutContext = {
         expanded: true,
         setExpanded: jest.fn(),
         terminal: true,
         setTerminal: jest.fn(),
-        language: 'en',
-        changeLanguage: jest.fn(),
+        toggleExplorer: jest.fn(),
+        toggleTerminal: jest.fn(),
+        ranking: false,
+        setRanking: jest.fn(),
     };
 
     beforeEach(() => {
@@ -47,8 +59,9 @@ describe('Sidebar', () => {
             t: (key: string) => key,
             i18n: { language: 'en' },
         });
-        defaultProps.setExpanded.mockClear();
-        defaultProps.setTerminal.mockClear();
+        mockLayoutContext.setExpanded.mockClear();
+        mockLayoutContext.setTerminal.mockClear();
+        mockUseLayoutContext.mockReturnValue(mockLayoutContext);
         defaultProps.changeLanguage.mockClear();
     });
 
@@ -70,7 +83,7 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
         fireEvent.click(filesButton);
-        expect(defaultProps.setExpanded).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setExpanded).toHaveBeenCalledWith(false);
     });
 
     it('calls toggleTheme when theme button is clicked', () => {
@@ -89,7 +102,7 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
         fireEvent.click(terminalButton);
-        expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setTerminal).toHaveBeenCalledWith(false);
     });
 
     it('calls changeLanguage when language button is clicked', () => {
@@ -104,7 +117,7 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
         fireEvent.keyDown(filesButton, { key: 'Enter', preventDefault });
-        expect(defaultProps.setExpanded).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setExpanded).toHaveBeenCalledWith(false);
     });
 
     it('calls setExpanded and preventDefault when files button is pressed with Space', () => {
@@ -112,14 +125,14 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
         fireEvent.keyDown(filesButton, { key: ' ', preventDefault });
-        expect(defaultProps.setExpanded).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setExpanded).toHaveBeenCalledWith(false);
     });
 
     it('does not call setExpanded when files button is pressed with other key', () => {
         render(<Sidebar {...defaultProps} />);
         const filesButton = screen.getByRole('button', { name: /sidebar\.closeExplorer/i });
         fireEvent.keyDown(filesButton, { key: 'A' });
-        expect(defaultProps.setExpanded).not.toHaveBeenCalled();
+        expect(mockLayoutContext.setExpanded).not.toHaveBeenCalled();
     });
 
     it('calls setTerminal and preventDefault when terminal button is pressed with Enter', () => {
@@ -127,7 +140,7 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
         fireEvent.keyDown(terminalButton, { key: 'Enter', preventDefault });
-        expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setTerminal).toHaveBeenCalledWith(false);
     });
 
     it('calls setTerminal and preventDefault when terminal button is pressed with Space', () => {
@@ -135,14 +148,14 @@ describe('Sidebar', () => {
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
         fireEvent.keyDown(terminalButton, { key: ' ', preventDefault });
-        expect(defaultProps.setTerminal).toHaveBeenCalledWith(false);
+        expect(mockLayoutContext.setTerminal).toHaveBeenCalledWith(false);
     });
 
     it('does not call setTerminal when terminal button is pressed with other key', () => {
         render(<Sidebar {...defaultProps} />);
         const terminalButton = screen.getByRole('button', { name: /sidebar\.terminal\.close/i });
         fireEvent.keyDown(terminalButton, { key: 'A' });
-        expect(defaultProps.setTerminal).not.toHaveBeenCalled();
+        expect(mockLayoutContext.setTerminal).not.toHaveBeenCalled();
     });
 
     it('calls changeLanguage and preventDefault when language button is pressed with Enter', () => {
@@ -244,12 +257,20 @@ describe('Sidebar', () => {
             theme: 'dark',
             toggleTheme: jest.fn(),
         });
-        render(<Sidebar {...defaultProps} expanded={false} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            expanded: false,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
     });
 
     it('renders with terminal false', () => {
-        render(<Sidebar {...defaultProps} terminal={false} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            terminal: false,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.terminal\.open/i })).toBeInTheDocument();
     });
 
@@ -258,7 +279,11 @@ describe('Sidebar', () => {
             theme: 'dark',
             toggleTheme: jest.fn(),
         });
-        render(<Sidebar {...defaultProps} terminal={true} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            terminal: true,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.terminal\.close/i })).toBeInTheDocument();
     });
 
@@ -267,7 +292,11 @@ describe('Sidebar', () => {
             theme: 'light',
             toggleTheme: jest.fn(),
         });
-        render(<Sidebar {...defaultProps} expanded={false} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            expanded: false,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
     });
 
@@ -298,7 +327,11 @@ describe('Sidebar', () => {
             theme: 'dark',
             toggleTheme: jest.fn(),
         });
-        render(<Sidebar {...defaultProps} terminal={false} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            terminal: false,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.terminal\.open/i })).toBeInTheDocument();
     });
 
@@ -307,7 +340,11 @@ describe('Sidebar', () => {
             theme: 'dark',
             toggleTheme: jest.fn(),
         });
-        render(<Sidebar {...defaultProps} expanded={false} />);
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            expanded: false,
+        });
+        render(<Sidebar {...defaultProps} />);
         expect(screen.getByRole('button', { name: /sidebar\.openExplorer/i })).toBeInTheDocument();
     });
 
@@ -335,8 +372,13 @@ describe('Sidebar', () => {
             t: () => undefined,
             i18n: { language: 'en' },
         });
+        mockUseLayoutContext.mockReturnValue({
+            ...mockLayoutContext,
+            expanded: false,
+            terminal: false,
+        });
 
-        render(<Sidebar {...defaultProps} expanded={false} terminal={false} />);
+        render(<Sidebar {...defaultProps} />);
 
         expect(screen.getByRole('button', { name: 'Open explorer' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Open terminal' })).toBeInTheDocument();

@@ -84,6 +84,12 @@ jest.mock('src/app/components/ContextMenu/ContextMenu', () => ({
 		) : null,
 }));
 
+let mockEditorContext: any = {};
+
+jest.mock('src/contexts/EditorContext', () => ({
+	useEditorContext: () => mockEditorContext,
+}));
+
 const defaultPages: Page[] = [
 	{ index: 0, name: 'about-me.html', route: 'about-me' },
 	{ index: 1, name: 'projects.html', route: 'projects', isSaved: false },
@@ -98,7 +104,7 @@ function renderTree(options?: {
 }) {
 	const pages = options?.pages || defaultPages;
 	const visiblePageIndexes = options?.visiblePageIndexes || [0];
-	const props = {
+	mockEditorContext = {
 		pages,
 		setPages: jest.fn((update: SetStateAction<Page[]>) =>
 			typeof update === 'function' ? update(pages) : undefined
@@ -117,15 +123,16 @@ function renderTree(options?: {
 	const theme = createTheme({ palette: { mode: options?.theme || 'dark' } });
 	const view = render(
 		<ThemeProvider theme={theme}>
-			<AppTree {...props} />
+			<AppTree language={mockEditorContext.language} />
 		</ThemeProvider>
 	);
 	return {
-		...props,
+		...mockEditorContext,
 		rerenderPages(nextPages: Page[]) {
+			mockEditorContext.pages = nextPages;
 			view.rerender(
 				<ThemeProvider theme={theme}>
-					<AppTree {...props} pages={nextPages} />
+					<AppTree language={mockEditorContext.language} />
 				</ThemeProvider>
 			);
 		},
