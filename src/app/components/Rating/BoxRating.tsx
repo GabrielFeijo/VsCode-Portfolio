@@ -60,35 +60,19 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	};
 
 	const getErrorMessage = (error: ApiError): string => {
-		const statusCode = error.statusCode;
+		const { statusCode, validationErrors } = error;
 
-		if (statusCode === 400 && error.validationErrors) {
-			const validationError = error.validationErrors[0];
-
-			if (validationError.includes('Username must be at least')) {
-				return t('rating.errors.usernameMin');
-			}
-			if (validationError.includes('Comment must be at least')) {
-				return t('rating.errors.commentMin');
-			}
-			if (validationError.includes('Stars must not exceed')) {
-				return t('rating.errors.starsMax');
-			}
-
+		if (statusCode === 400 && validationErrors && validationErrors.length > 0) {
+			const validationError = validationErrors[0];
+			if (validationError.includes('Username must be at least')) return t('rating.errors.usernameMin');
+			if (validationError.includes('Comment must be at least')) return t('rating.errors.commentMin');
+			if (validationError.includes('Stars must not exceed')) return t('rating.errors.starsMax');
 			return validationError;
 		}
 
-		if (statusCode === 429) {
-			return t('rating.errors.tooManyRequests');
-		}
-
-		if (statusCode && statusCode >= 500) {
-			return t('rating.errors.serverError');
-		}
-
-		if (error.message.toLowerCase().includes('network')) {
-			return t('rating.errors.networkError');
-		}
+		if (statusCode === 429) return t('rating.errors.tooManyRequests');
+		if (statusCode && statusCode >= 500) return t('rating.errors.serverError');
+		if (error.message.toLowerCase().includes('network')) return t('rating.errors.networkError');
 
 		return t('rating.errors.unknownError');
 	};

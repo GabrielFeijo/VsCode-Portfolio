@@ -75,12 +75,11 @@ export const StorageService = {
 
 	deleteFile: (identifier: number | string) => {
 		const data = StorageService.getData();
-		const updatedData = data.filter((page) => {
-			if (typeof identifier === 'number') {
-				return page.index !== identifier;
-			}
-			return page.name !== identifier;
-		});
+		const updatedData = data.filter((page) =>
+			typeof identifier === 'number'
+				? page.index !== identifier
+				: page.name !== identifier
+		);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
 	},
 

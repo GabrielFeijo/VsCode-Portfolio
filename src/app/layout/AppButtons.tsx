@@ -151,32 +151,28 @@ export default function AppButtons({ language }: Props) {
 	const handleCloseContextMenu = useCallback(() => setContextMenu(null), []);
 
 	const handleCloseTab = useCallback(() => {
-		if (contextMenu) {
-			setVisiblePageIndexes((prev) => prev.filter((x) => x !== contextMenu.tabIndex));
-		}
+		if (!contextMenu) return;
+		setVisiblePageIndexes((prev) => prev.filter((x) => x !== contextMenu.tabIndex));
 	}, [contextMenu, setVisiblePageIndexes]);
 
 	const handleCloseOthers = useCallback(() => {
-		if (contextMenu) {
-			setVisiblePageIndexes([contextMenu.tabIndex]);
-			setSelectedIndex(contextMenu.tabIndex);
-			const page = pages.find((x) => x.index === contextMenu.tabIndex);
-			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
-		}
+		if (!contextMenu) return;
+		setVisiblePageIndexes([contextMenu.tabIndex]);
+		setSelectedIndex(contextMenu.tabIndex);
+		const page = pages.find((x) => x.index === contextMenu.tabIndex);
+		if (page) navigate(getLocalizedPath(`/${page.route}`, language));
 	}, [contextMenu, language, navigate, pages, setSelectedIndex, setVisiblePageIndexes]);
 
 	const handleCloseToRight = useCallback(() => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			setVisiblePageIndexes(visiblePageIndexes.slice(0, currentPosition + 1));
-		}
+		if (!contextMenu) return;
+		const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+		setVisiblePageIndexes(visiblePageIndexes.slice(0, currentPosition + 1));
 	}, [contextMenu, setVisiblePageIndexes, visiblePageIndexes]);
 
 	const handleCloseToLeft = useCallback(() => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			setVisiblePageIndexes(visiblePageIndexes.slice(currentPosition));
-		}
+		if (!contextMenu) return;
+		const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+		setVisiblePageIndexes(visiblePageIndexes.slice(currentPosition));
 	}, [contextMenu, setVisiblePageIndexes, visiblePageIndexes]);
 
 	const handleCloseAll = useCallback(() => {

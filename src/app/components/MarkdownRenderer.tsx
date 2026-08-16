@@ -131,10 +131,10 @@ export function getAllowedEmbedSource(source?: string): string | null {
 
 function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
 	if (props.rel !== 'stylesheet' || !props.href) return null;
-	const isRemoteStylesheet = allowedStylesheets.has(props.href);
-	if (!isRemoteStylesheet && !localStylesheetPattern.test(props.href)) return null;
 
-	if (!isRemoteStylesheet && localStylesheetPattern.test(props.href)) {
+	const isRemoteStylesheet = allowedStylesheets.has(props.href);
+	if (!isRemoteStylesheet) {
+		if (!localStylesheetPattern.test(props.href)) return null;
 		const localContent = getStyleContent(props.href);
 		if (localContent) {
 			return <style data-stylesheet={props.href}>{localContent}</style>;

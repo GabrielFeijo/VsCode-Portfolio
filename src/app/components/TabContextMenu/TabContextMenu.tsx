@@ -37,6 +37,8 @@ export default function TabContextMenu({
     const { t } = useTranslation();
 
     useEffect(() => {
+        if (contextMenu === null) return;
+
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 handleClose();
@@ -49,10 +51,8 @@ export default function TabContextMenu({
             }
         };
 
-        if (contextMenu !== null) {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('keydown', handleEscape);
-        }
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
