@@ -30,10 +30,34 @@ const markdownPlugins = [remarkGfm, remarkBreaks];
 const rawHtmlSchema = {
 	...defaultSchema,
 	strip: [...defaultSchema.strip!, 'title'],
-	tagNames: [...defaultSchema.tagNames!, 'iframe', 'link', 'main'],
+	tagNames: [
+		...defaultSchema.tagNames!,
+		'iframe',
+		'link',
+		'main',
+		'section',
+		'header',
+		'article',
+		'nav',
+		'aside',
+		'figure',
+		'figcaption',
+		'span',
+		'div',
+		'img',
+	],
 	attributes: {
 		...defaultSchema.attributes,
-		'*': [...defaultSchema.attributes!['*']!, 'className'],
+		'*': [
+			...defaultSchema.attributes!['*']!,
+			'className',
+			'class',
+			'id',
+			'style',
+			'ariaLabel',
+			'ariaDescribedBy',
+			'ariaLabelledBy',
+		],
 		iframe: [
 			'src',
 			'title',
@@ -43,17 +67,32 @@ const rawHtmlSchema = {
 			'allow',
 			'allowFullScreen',
 		],
-		link: ['href', ['rel', 'stylesheet']],
+		link: ['href', 'rel', 'integrity', 'crossOrigin', 'referrerPolicy'],
+		img: [
+			'src',
+			'alt',
+			'width',
+			'height',
+			'loading',
+			'decoding',
+			'className',
+			'class',
+		],
 		section: [
 			'dataFootnotes',
-			['className', 'footnotes', 'desc', 'exp', 'flex', 'header'],
+			'className',
+			'class',
+			'id',
 		],
 		ul: [
 			'ariaDescribedBy',
 			'ariaLabel',
 			'ariaLabelledBy',
-			['className', 'contains-task-list', 'flex'],
+			'className',
+			'class',
 		],
+		span: ['className', 'class', 'id'],
+		div: ['className', 'class', 'id'],
 	},
 };
 const rawHtmlPlugins: NonNullable<ReactMarkdownOptions['rehypePlugins']> = [
@@ -74,7 +113,7 @@ const allowedStylesheets = new Set([
 	deviconStylesheet,
 	'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0',
 ]);
-const localStylesheetPattern = /^\.\.\/\.\.\/styles\/[a-z0-9-]+\.css$/;
+const localStylesheetPattern = /^((\.\.\/)+|\/)styles\/[a-z0-9-]+\.css$/;
 
 export function getAllowedEmbedSource(source?: string): string | null {
 	if (!source) return null;
@@ -120,10 +159,12 @@ function MarkdownLink(props: ComponentPropsWithoutRef<'a'>) {
 
 function MarkdownImage(props: ComponentPropsWithoutRef<'img'>) {
 	const isProfileImage = props.className?.split(' ').includes('profile');
+	const src = props.src ? props.src.replace(/^(\.\.\/)+/, '/') : props.src;
 
 	return (
 		<img
 			{...props}
+			src={src}
 			loading={isProfileImage ? 'eager' : 'lazy'}
 			decoding='async'
 		/>

@@ -162,7 +162,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 						overflowY: 'auto',
 					}}
 				>
-					<MarkdownRenderer content={content} allowRawHtml={!editMode} />
+					<MarkdownRenderer content={content} allowRawHtml={true} />
 				</Grid>
 			</Grid>
 		</Container>
