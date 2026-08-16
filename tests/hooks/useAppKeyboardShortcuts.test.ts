@@ -54,6 +54,26 @@ describe('useAppKeyboardShortcuts', () => {
 		expect(actions.toggleTerminal).not.toHaveBeenCalled();
 	});
 
+	it('ignores shortcuts when target is an input or textarea element', () => {
+		const actions = createActions();
+		renderHook(() => useAppKeyboardShortcuts(actions));
+
+		const input = document.createElement('input');
+		document.body.appendChild(input);
+
+		const event = new KeyboardEvent('keydown', {
+			key: 'l',
+			ctrlKey: true,
+			cancelable: true,
+			bubbles: true,
+		});
+		input.dispatchEvent(event);
+
+		expect(actions.changeLanguage).not.toHaveBeenCalled();
+		expect(event.defaultPrevented).toBe(false);
+		document.body.removeChild(input);
+	});
+
 	it('removes its keyboard listener on unmount', () => {
 		const actions = createActions();
 		const { unmount } = renderHook(() => useAppKeyboardShortcuts(actions));

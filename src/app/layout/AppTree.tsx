@@ -83,7 +83,13 @@ export default function AppTree({
 		setIsCreatingFile(true);
 	}
 
-	function handleCancelCreateFile() {
+	function handleConfirmCreateFile(e?: React.MouseEvent) {
+		e?.stopPropagation();
+		createNewFile();
+	}
+
+	function handleCancelCreateFile(e?: React.MouseEvent) {
+		e?.stopPropagation();
 		resetFileCreationState();
 	}
 
@@ -101,14 +107,18 @@ export default function AppTree({
 	}
 
 	function createNewFile() {
-		if (newFileName.trim() === '') {
-			setIsCreatingFile(false);
+		const rawName = newFileName.trim();
+		if (rawName === '') {
+			resetFileCreationState();
 			return;
 		}
 
-		const normalizedName = normalizeFileName(newFileName);
-		const fullFileName = `${normalizedName}.md`;
-		const existingPage = pages.find((x) => x.route === fullFileName);
+		const baseName = rawName.replace(/\.(md|html)$/i, '');
+		const normalizedName = normalizeFileName(baseName);
+		const fullFileName = `${normalizedName || 'novo-arquivo'}.md`;
+		const existingPage = pages.find(
+			(x) => x.name === fullFileName || x.route === fullFileName
+		);
 
 		if (existingPage) {
 			openFile(existingPage);
@@ -124,6 +134,7 @@ export default function AppTree({
 	}
 
 	function handleKeyDown(e: React.KeyboardEvent) {
+		e.stopPropagation();
 		const keyActions: Record<string, () => void> = {
 			Enter: createNewFile,
 			Escape: handleCancelCreateFile,
@@ -315,11 +326,10 @@ export default function AppTree({
 									sx={{
 										maxWidth: '100%',
 									}}
-									onClick={(e: React.MouseEvent) => e.stopPropagation()}
 								>
 									<InputBase
 										inputRef={fileInputRef}
-										value={`${normalizeFileName(newFileName)}`}
+										value={newFileName}
 										onChange={(e) => setNewFileName(e.target.value)}
 										onKeyDown={handleKeyDown}
 										placeholder={t('prompts.enter_filename')}
@@ -336,7 +346,7 @@ export default function AppTree({
 												<IconButton
 													size='small'
 													aria-label={t('sidebar.confirm') || 'Confirm'}
-													onClick={createNewFile}
+													onClick={handleConfirmCreateFile}
 												>
 													<VscCheck size={12} />
 												</IconButton>

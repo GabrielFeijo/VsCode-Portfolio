@@ -133,6 +133,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 		getCompletionsUtil(input, cwd, allCommands, fs);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		e.stopPropagation();
 		if (e.key === 'l' && e.ctrlKey) {
 			e.preventDefault();
 			clearEntries();

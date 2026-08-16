@@ -19,6 +19,16 @@ export function useAppKeyboardShortcuts({
 }: ShortcutActions) {
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
+			const target = event.target as HTMLElement | null;
+			if (
+				target &&
+				(target.tagName === 'INPUT' ||
+					target.tagName === 'TEXTAREA' ||
+					target.isContentEditable)
+			) {
+				return;
+			}
+
 			if (!event.ctrlKey) return;
 
 			const actions: Partial<Record<string, () => void>> = {

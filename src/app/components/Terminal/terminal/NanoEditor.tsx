@@ -100,6 +100,7 @@ export default function NanoEditor({
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		e.stopPropagation();
 		if (promptSave) {
 			if (e.key === 'y' || e.key === 'Y' || e.key === 's' || e.key === 'S') {
 				e.preventDefault();

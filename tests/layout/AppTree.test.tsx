@@ -184,7 +184,7 @@ describe('AppTree', () => {
 
 		const input = screen.getByPlaceholderText('prompts.enter_filename');
 		fireEvent.change(input, { target: { value: 'New File.md' } });
-		expect(input).toHaveValue('new-file');
+		expect(input).toHaveValue('New File.md');
 		fireEvent.keyDown(input, { key: 'Enter' });
 
 		expect(createFile).toHaveBeenCalledWith('new-file.md');
@@ -196,6 +196,28 @@ describe('AppTree', () => {
 			expect.objectContaining({ index: 10 }),
 		]);
 		expect(navigate).toHaveBeenCalledWith('/new-file.md');
+	});
+
+	it('creates file using confirm button', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'notes' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.confirm' }));
+
+		expect(createFile).toHaveBeenCalledWith('notes.md');
+	});
+
+	it('cancels file creation using cancel button', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'notes' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.cancel' }));
+
+		expect(screen.queryByPlaceholderText('prompts.enter_filename')).not.toBeInTheDocument();
 	});
 
 	it('opens an existing custom file instead of duplicating it', () => {
