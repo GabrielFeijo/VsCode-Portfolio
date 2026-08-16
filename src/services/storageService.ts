@@ -22,6 +22,11 @@ function parseStoredPages(raw: string | null): Page[] {
 
 export type { Page } from '../domain/page';
 
+let _nextIndex = 1000;
+function getNextIndex(): number {
+	return _nextIndex++;
+}
+
 export const StorageService = {
 	getData: (): Page[] => {
 		return parseStoredPages(localStorage.getItem(STORAGE_KEY));
@@ -43,7 +48,7 @@ export const StorageService = {
 
 	createFile: (name: string, content = ''): Page => {
 		return {
-			index: Date.now(),
+			index: getNextIndex(),
 			name,
 			route: name,
 			content,
@@ -53,7 +58,7 @@ export const StorageService = {
 
 	createFolder: (name: string): Page => {
 		return {
-			index: Date.now(),
+			index: getNextIndex(),
 			name,
 			route: name,
 			isFolder: true,
