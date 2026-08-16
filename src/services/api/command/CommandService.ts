@@ -2,11 +2,15 @@ import apiFetch from '../axios-config';
 import { ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
 
 export interface ICommand {
-	_id: string;
+	_id?: string;
 	command: string;
+	aliases?: string[];
+	category?: string;
+	description?: string;
+	language?: string;
 	response: string[];
-	created_at: string;
-	updatedAt: string;
+	created_at?: string;
+	updatedAt?: string;
 }
 
 const getResponse = async (command: string): Promise<ICommand | ApiError> => {
