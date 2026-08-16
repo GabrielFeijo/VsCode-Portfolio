@@ -48,6 +48,7 @@ import {
 } from '../../config/seo';
 import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
+import { LAYOUT } from '../../constants/layout';
 
 // Re-export for backward compatibility with existing tests
 export { loadPages, initVisiblePageIndexes } from '../../contexts/EditorContext';
@@ -70,13 +71,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	const {
 		pages,
 		setPages,
-		selectedIndex,
 		setSelectedIndex,
-		currentComponent,
-		setCurrentComponent,
-		visiblePageIndexes,
-		setVisiblePageIndexes,
-		visiblePages,
 		openTabByTarget,
 	} = useEditorContext();
 
@@ -152,12 +147,12 @@ function AppContent({ changeLanguage }: AppContentProps) {
 					>
 						<Grid
 							container
-							sx={{ height: 'calc(100% - 20px)', overflow: 'hidden' }}
+							sx={{ height: `calc(100% - ${LAYOUT.FOOTER_HEIGHT}px)`, overflow: 'hidden' }}
 						>
 							<Grid
 								item
 								sx={{
-									width: 50,
+									width: LAYOUT.SIDEBAR_WIDTH,
 									height: '100%',
 									zIndex: isMobile ? 1000 : 2,
 								}}
@@ -170,10 +165,6 @@ function AppContent({ changeLanguage }: AppContentProps) {
 									style={{ height: '100%' }}
 								>
 									<Sidebar
-										setExpanded={setExpanded}
-										expanded={expanded}
-										terminal={terminal}
-										setTerminal={setTerminal}
 										language={language}
 										changeLanguage={changeLanguage}
 									/>
@@ -189,10 +180,10 @@ function AppContent({ changeLanguage }: AppContentProps) {
 										layout='position'
 										style={{
 											position: isMobile ? 'fixed' : 'relative',
-											left: isMobile ? 50 : 0,
+											left: isMobile ? LAYOUT.SIDEBAR_WIDTH : 0,
 											top: 0,
 											height: isMobile
-												? 'calc(var(--app-viewport-height) - 20px)'
+												? `calc(var(--app-viewport-height) - ${LAYOUT.FOOTER_HEIGHT}px)`
 												: '100%',
 											zIndex: isMobile ? 999 : 'auto',
 											boxShadow: isMobile
@@ -219,17 +210,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 													</Typography>
 												</motion.div>
 												<motion.div variants={sidebarItemAnimations}>
-													<AppTree
-														pages={pages}
-														setPages={setPages}
-														selectedIndex={selectedIndex}
-														setSelectedIndex={setSelectedIndex}
-														currentComponent={currentComponent}
-														setCurrentComponent={setCurrentComponent}
-														visiblePageIndexes={visiblePageIndexes}
-														setVisiblePageIndexes={setVisiblePageIndexes}
-														language={language}
-													/>
+													<AppTree language={language} />
 												</motion.div>
 											</Stack>
 										</Grid>
@@ -263,25 +244,15 @@ function AppContent({ changeLanguage }: AppContentProps) {
 									overflow: 'hidden',
 								}}
 							>
-								<Grid sx={{ height: '33px' }}>
-									<AppButtons
-										language={language}
-										pages={visiblePages}
-										selectedIndex={selectedIndex}
-										setSelectedIndex={setSelectedIndex}
-										currentComponent={currentComponent}
-										setCurrentComponent={setCurrentComponent}
-										visiblePageIndexes={visiblePageIndexes}
-										setVisiblePageIndexes={setVisiblePageIndexes}
-									/>
+								<Grid sx={{ height: `${LAYOUT.TABS_HEIGHT}px` }}>
+									<AppButtons language={language} />
 								</Grid>
 
 								<motion.div
 									initial={false}
 									animate={{
-										height: `calc(100% - 33px - ${
-											terminal && !isMobile ? '300px' : '0px'
-										})`,
+										height: `calc(100% - ${LAYOUT.TABS_HEIGHT}px - ${terminal && !isMobile ? `${LAYOUT.TERMINAL_MIN_HEIGHT}px` : '0px'
+											})`,
 									}}
 									transition={{
 										type: 'spring',
@@ -349,18 +320,18 @@ function AppContent({ changeLanguage }: AppContentProps) {
 					<Grid
 						sx={{
 							scrollBehavior: 'smooth',
-							minHeight: '300px',
+							minHeight: `${LAYOUT.TERMINAL_MIN_HEIGHT}px`,
 							overflow: 'hidden',
 							position: 'absolute',
-							width: `calc(100% - 50px - ${expanded ? '220px' : '0px'})`,
-							bottom: 20,
+							width: `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`,
+							bottom: LAYOUT.FOOTER_HEIGHT,
 							right: 0,
 						}}
 					>
 						<motion.div
 							initial={false}
 							animate={{
-								width: `calc(100% - 50px - ${expanded ? '220px' : '0px'})`,
+								width: `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`,
 							}}
 							transition={{
 								type: 'spring',

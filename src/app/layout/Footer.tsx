@@ -10,6 +10,7 @@ import {
 import { IoIosGitBranch } from 'react-icons/io';
 import { useAppPalette } from '../theme/useAppPalette';
 import { siteConfig } from '../../config/site';
+import { LAYOUT } from '../../constants/layout';
 
 export default function Footer() {
 	const colors = useAppPalette();
@@ -19,7 +20,7 @@ export default function Footer() {
 			component={Paper}
 			square
 			elevation={0}
-			sx={{ height: '20px', color: colors.textPrimary, bgcolor: colors.bgFooter }}
+			sx={{ height: `${LAYOUT.FOOTER_HEIGHT}px`, color: colors.textPrimary, bgcolor: colors.bgFooter }}
 			display='flex'
 		>
 			<Grid container>
@@ -30,7 +31,7 @@ export default function Footer() {
 					aria-label="Remote connection status"
 					tabIndex={0}
 					sx={{
-						width: '35px',
+						width: `${LAYOUT.REMOTE_BUTTON_WIDTH}px`,
 						backgroundColor: colors.footerAccent,
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -48,7 +49,7 @@ export default function Footer() {
 				</Grid>
 				<Grid
 					item
-					sx={{ backgroundColor: colors.bgFooter, width: '200px' }}
+					sx={{ backgroundColor: colors.bgFooter, width: `${LAYOUT.GIT_INFO_WIDTH}px` }}
 					display='flex'
 				>
 					<Stack direction='row' spacing={0.5} sx={{ pl: 1 }}>
@@ -100,7 +101,7 @@ export default function Footer() {
 				</Grid>
 				<Grid
 					item
-					sx={{ backgroundColor: colors.bgFooter, minWidth: `calc(100% - 235px)` }}
+					sx={{ backgroundColor: colors.bgFooter, minWidth: `calc(100% - ${LAYOUT.REMOTE_BUTTON_WIDTH + LAYOUT.GIT_INFO_WIDTH}px)` }}
 					display='flex'
 					justifyContent='flex-end'
 				>
