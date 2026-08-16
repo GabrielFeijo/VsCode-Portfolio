@@ -12,7 +12,9 @@ export const PROJECT_FILES: Record<string, string> = {
 	'src/app/pages/Home.tsx': '// Home page',
 	'src/app/components/Terminal/Cmd.tsx': '// You are here! 👋\nexport default function Cmd() { ... }',
 	'src/services/api/command/CommandService.ts': '// Command API service',
-	'public/pages/index.html': '<h1>Portfolio</h1>',
-	'public/locales/pt.json': '{}',
-	'public/locales/en.json': '{}',
+	'src/pages/pt/sobre-mim.html': '<h1>Sobre Mim</h1>',
+	'src/styles/about.css': '.header { display: flex; }',
+	'src/locales/pt/translation.json': '{}',
+	'src/locales/en/translation.json': '{}',
+	'public/robots.txt': 'User-agent: *',
 };

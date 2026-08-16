@@ -1,7 +1,6 @@
 export const PROJECT_FILES: Record<string, string> = import.meta.glob(
 	[
-		'../../../public/**/*.{html,css,txt,xml,json,webmanifest,svg,webp,png,ico}',
-		'../../../src/**/*.{ts,tsx,css,json,svg}',
+		'../../../src/**/*.{ts,tsx,css,json,svg,html,md}',
 		'../../../tests/**/*.{ts,tsx}',
 		'../../../scripts/**/*.{js,mjs}',
 		'../../../*.{json,js,cjs,ts,html,md}',
@@ -18,3 +17,4 @@ export const PROJECT_FILES: Record<string, string> = import.meta.glob(
 	],
 	{ query: '?raw', eager: true, import: 'default' },
 );
+

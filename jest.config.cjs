@@ -37,7 +37,9 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
     roots: ['<rootDir>/tests', '<rootDir>/src'],
     moduleNameMapper: {
-        '^./projectFilesGlob$': '<rootDir>/tests/mocks/projectFilesGlob.ts',
+        '.*projectFilesGlob.*': '<rootDir>/tests/mocks/projectFilesGlob.ts',
+        '.*pageContentGlob.*': '<rootDir>/tests/mocks/pageContentGlob.ts',
+        '.*styleContentGlob.*': '<rootDir>/tests/mocks/styleContentGlob.ts',
         '^@/(.*)$': '<rootDir>/src/$1',
         '^@app/(.*)$': '<rootDir>/src/app/$1',
         '^@components/(.*)$': '<rootDir>/src/app/components/$1',
@@ -61,6 +63,8 @@ module.exports = {
         '!src/**/*.d.ts',
         '!src/services/api/axios-config/index.ts',
         '!src/services/terminal/projectFilesGlob.ts',
+        '!src/services/pageContentGlob.ts',
+        '!src/services/styleContentGlob.ts',
     ],
     coverageDirectory: 'coverage',
     coverageThreshold: {
