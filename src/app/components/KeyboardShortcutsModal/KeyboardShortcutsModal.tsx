@@ -55,8 +55,6 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 						}}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
-						<div className={styles.modalAccent} aria-hidden="true" />
-
 						<div className={styles.modalHeader}>
 							<div className={styles.titleGroup}>
 								<VscRecordKeys className={styles.titleIcon} />

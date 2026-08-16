@@ -18,22 +18,6 @@
 	font-family: var(--font-mono);
 }
 
-.modalAccent {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 3px;
-	background: linear-gradient(
-		90deg,
-		var(--accent-green),
-		var(--accent-cyan),
-		var(--accent),
-		var(--accent-muted),
-		var(--accent-pink)
-	);
-}
-
 .modalHeader {
 	display: flex;
 	align-items: center;
@@ -165,6 +149,7 @@
 		opacity: 0;
 		transform: translateY(20px);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0);
