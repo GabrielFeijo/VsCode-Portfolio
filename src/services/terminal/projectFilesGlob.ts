@@ -1,5 +1,6 @@
 export const PROJECT_FILES: Record<string, string> = import.meta.glob(
 	[
+		'../../../public/**/*.{html,css,txt,xml,json,webmanifest,svg,webp,png,ico}',
 		'../../../src/**/*.{ts,tsx,css,json,svg}',
 		'../../../tests/**/*.{ts,tsx}',
 		'../../../scripts/**/*.{js,mjs}',
