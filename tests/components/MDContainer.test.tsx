@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import MDContainer from '../../src/app/components/MDContainer';
 import { StorageService } from '../../src/services/storageService';
@@ -117,6 +117,33 @@ describe('MDContainer', () => {
 
 		const page = {
 			index: 10,
+			name: 'about.html',
+			route: 'about-me',
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/about.html'
+					page={page}
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
+			'# From storage'
+		);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it('reloads content on storage window event and aborts active controller', async () => {
+		let storageData: any[] = [];
+		jest.spyOn(StorageService, 'getData').mockImplementation(() => storageData);
+		global.fetch = jest.fn().mockImplementation(() => new Promise(() => undefined));
+
+		const page = {
+			index: 10,
 			name: 'about.md',
 			route: 'about-me',
 		};
@@ -131,10 +158,11 @@ describe('MDContainer', () => {
 			</MemoryRouter>
 		);
 
-		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-			'# From storage'
-		);
-		expect(global.fetch).not.toHaveBeenCalled();
+		act(() => {
+			window.dispatchEvent(new Event('storage'));
+		});
+
+		expect(global.fetch).toHaveBeenCalled();
 	});
 
 	it('ignores abort errors while loading static content', async () => {
@@ -174,7 +202,7 @@ describe('MDContainer', () => {
 		expect(abort).toHaveBeenCalledTimes(1);
 	});
 
-	it('opens editable pages with empty content', async () => {
+	it('opens editable pages with empty content when content is undefined', async () => {
 		global.fetch = jest.fn();
 		const page = {
 			index: 15,
@@ -195,6 +223,23 @@ describe('MDContainer', () => {
 
 		expect(await screen.findByLabelText('Markdown editor')).toHaveValue('');
 		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it('opens editable pages with preset content and handles global save shortcut when page is undefined', async () => {
+		global.fetch = jest.fn().mockResolvedValue({
+			ok: true,
+			text: jest.fn().mockResolvedValue('# Content'),
+		});
+		render(
+			<MemoryRouter>
+				<MDContainer
+					path='/static.html'
+					setPages={jest.fn()}
+				/>
+			</MemoryRouter>
+		);
+
+		fireEvent.keyDown(window, { key: 's', ctrlKey: true });
 	});
 
 	it('edits and persists a custom page without fetching static content', async () => {

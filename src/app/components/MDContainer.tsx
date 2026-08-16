@@ -28,36 +28,55 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 	useEffect(() => {
 		if (editMode) {
-			setContent(page.content || '');
+			setContent(page?.content || '');
 			return;
 		}
 
-		const stored = StorageService.getData().find(
-			(p) => page && (p.name === page.name || p.index === page.index || p.route === page.route),
-		);
-		if (stored?.content !== undefined) {
-			setContent(stored.content);
-			return;
-		}
+		let activeController: AbortController | null = null;
 
-		const controller = new AbortController();
-		void fetch(path, {
-			cache: 'force-cache',
-			signal: controller.signal,
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(`Failed to load content (${response.status})`);
-				}
-				return response.text();
+		const load = () => {
+			const baseName = page?.name.replace(/\.(html|md)$/, '');
+			const stored = StorageService.getData().find(
+				(p) =>
+					page &&
+					(p.name === page.name ||
+						p.name === `${baseName}.md` ||
+						p.name === baseName ||
+						p.index === page.index ||
+						p.route === page.route),
+			);
+			if (stored?.content !== undefined) {
+				setContent(stored.content);
+				return;
+			}
+
+			activeController?.abort();
+			const controller = new AbortController();
+			activeController = controller;
+
+			void fetch(path, {
+				cache: 'force-cache',
+				signal: controller.signal,
 			})
-			.then(setContent)
-			.catch((error: unknown) => {
-				if (error instanceof DOMException && error.name === 'AbortError') return;
-				setContent('# Error\n\nFailed to load content.');
-			});
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error(`Failed to load content (${response.status})`);
+					}
+					return response.text();
+				})
+				.then(setContent)
+				.catch((error: unknown) => {
+					if (error instanceof DOMException && error.name === 'AbortError') return;
+					setContent('# Error\n\nFailed to load content.');
+				});
+		};
 
-		return () => controller.abort();
+		load();
+		window.addEventListener('storage', load);
+		return () => {
+			activeController?.abort();
+			window.removeEventListener('storage', load);
+		};
 	}, [editMode, page, path]);
 
 	const handleChange = useCallback(
