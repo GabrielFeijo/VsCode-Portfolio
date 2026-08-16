@@ -2,7 +2,7 @@ import { getAppPalette } from '../../../theme/palette';
 import { Theme } from '../../../../contexts/ThemeContext';
 import { PROJECT_ROOT } from '../../../../services/terminal/projectFileSystem';
 
-export { PROJECT_FS } from '../../../../services/terminal/projectFileSystem';
+export { PROJECT_FS, PROJECT_ROOT } from '../../../../services/terminal/projectFileSystem';
 
 export const TERMINAL_USER = 'gabriel';
 export const TERMINAL_HOST = 'portfolio';
@@ -50,7 +50,8 @@ export interface VirtualDirectory {
 
 export const LOCAL_COMMANDS = [
 	'help', 'ajuda', 'ls', 'cd', 'pwd', 'whoami', 'date', 'uptime', 'history',
-	'echo', 'cat', 'clear', 'limpar', 'neofetch', 'reviews', 'avaliacoes',
+	'echo', 'cat', 'head', 'tail', 'tree', 'grep', 'wc', 'touch', 'mkdir', 'rm',
+	'clear', 'limpar', 'neofetch', 'reviews', 'avaliacoes',
 	'evaluate', 'avaliar', 'changetheme', 'mudartema', 'changelanguage', 'mudaridioma',
 	'route', 'rota', 'theme', 'tema', 'lang', 'idioma', 'matrix', 'cowsay',
 	'banner', 'ping', 'curl', 'man', 'exit', 'calc', 'calcular',

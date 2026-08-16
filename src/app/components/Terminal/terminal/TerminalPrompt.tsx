@@ -8,10 +8,10 @@ interface Props {
 	isDark: boolean;
 }
 
-const TerminalPrompt = ({ cwd, isDark }: Props) => {
+const TerminalPrompt = ({ cwd = '', isDark }: Props) => {
 	const { theme } = useTheme();
 	const colors = getTerminalColors(theme);
-	const displayPath = cwd.replace(/^\/home\/gabriel/, '~');
+	const displayPath = (cwd || '').replace(/^\/home\/gabriel/, '~');
 
 	return (
 		<Box
