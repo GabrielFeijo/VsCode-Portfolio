@@ -271,6 +271,23 @@ describe('AppTree', () => {
 		expect(screen.queryByPlaceholderText('prompts.enter_filename')).not.toBeInTheDocument();
 	});
 
+	it('allows blurring and refocusing the file creation input without losing interactive input control', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'initial' } });
+		fireEvent.blur(input);
+
+		const wrapper = input.parentElement?.parentElement!;
+		fireEvent.mouseDown(wrapper);
+		fireEvent.click(wrapper);
+		fireEvent.change(input, { target: { value: 'initial-updated' } });
+		fireEvent.keyDown(input, { key: 'Enter' });
+
+		expect(createFile).toHaveBeenCalledWith('initial-updated.md');
+	});
+
 	it('supports context menu open, delete and GitHub actions', () => {
 		const props = renderTree();
 		const page = screen.getByTestId('tree-item-1');

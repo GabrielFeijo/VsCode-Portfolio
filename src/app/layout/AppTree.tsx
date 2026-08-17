@@ -216,6 +216,8 @@ export default function AppTree({ language }: Props) {
 							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							label={
 								<Box
+									onClick={(e) => e.stopPropagation()}
+									onMouseDown={(e) => e.stopPropagation()}
 									sx={{
 										maxWidth: '100%',
 									}}
