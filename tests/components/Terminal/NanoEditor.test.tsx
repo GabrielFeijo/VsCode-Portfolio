@@ -258,6 +258,16 @@ describe('NanoEditor', () => {
 		});
 
 		(StorageService.getData as jest.Mock).mockReturnValue([]);
+		syncPageStorage('about-me.html', '<p>English html</p>');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 0,
+			name: 'about-me.html',
+			route: 'about-me',
+			content: '<p>English html</p>',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([]);
 		syncPageStorage('novo.md', 'new markdown');
 		expect(StorageService.createFile).toHaveBeenCalledWith('novo.md', 'new markdown');
 	});

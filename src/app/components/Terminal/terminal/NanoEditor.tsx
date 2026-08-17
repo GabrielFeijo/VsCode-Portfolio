@@ -21,13 +21,15 @@ interface NanoEditorProps {
 
 import { stripFileExtension } from '@/utils/stripFileExtension';
 
-function buildPageMap(): Record<string, { index: number; route: string }> {
-	const map: Record<string, { index: number; route: string }> = {};
+function buildPageMap(): Record<string, { index: number; route: string; name: string }> {
+	const map: Record<string, { index: number; route: string; name: string }> = {};
 	for (const pages of Object.values(pageRoutes)) {
 		for (const page of pages) {
 			const base = stripFileExtension(page.name);
-			const entry = { index: page.index, route: page.route };
+			const entry = { index: page.index, route: page.route, name: page.name };
 			map[page.name] = entry;
+			map[`${base}.html`] = entry;
+			map[`${base}.md`] = entry;
 			map[base] = entry;
 		}
 	}
@@ -42,22 +44,19 @@ function resolvePageData(fileName: string, content: string): Page {
 	const targetPage = storedPages.find(
 		(p) =>
 			p.name === fileName ||
-			p.name === baseName ||
 			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html` ||
-			p.route === baseName ||
-			p.route === `/${baseName}`,
+			p.name === `${baseName}.html`
 	);
 
 	if (targetPage) {
 		return { ...targetPage, content, isSaved: true };
 	}
 
-	const meta = PAGE_MAP[fileName] || PAGE_MAP[baseName];
+	const meta = PAGE_MAP[fileName] || PAGE_MAP[`${baseName}.html`] || PAGE_MAP[`${baseName}.md`] || PAGE_MAP[baseName];
 	if (meta) {
 		return {
 			index: meta.index,
-			name: fileName,
+			name: fileName.includes('.') ? fileName : meta.name,
 			route: meta.route,
 			content,
 			isSaved: true,

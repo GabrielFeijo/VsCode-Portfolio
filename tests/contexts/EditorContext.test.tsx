@@ -212,6 +212,25 @@ describe('EditorContext pure functions', () => {
     });
   });
 
+  test('loadPages keeps Portuguese and English default page editions isolated without cross-language pollution', () => {
+    (StorageService.getData as jest.Mock).mockReturnValue([
+      {
+        index: 0,
+        name: 'sobre-mim.html',
+        route: 'about-me',
+        content: 'Conteúdo em Português modificado',
+      },
+    ]);
+
+    const ptPages = loadPages('pt');
+    expect(ptPages[0].content).toBe('Conteúdo em Português modificado');
+
+    const enPages = loadPages('en');
+    expect(enPages[0].content).toBe('');
+    expect(enPages).toHaveLength(1);
+    expect(enPages[0].name).toBe('about-me.html');
+  });
+
   test('loadPages reassigns duplicate or conflicting custom page indexes', () => {
     (StorageService.getData as jest.Mock).mockReturnValue([
       {
@@ -235,9 +254,9 @@ describe('EditorContext pure functions', () => {
     ]);
 
     const pages = loadPages('pt');
-    expect(pages).toHaveLength(3);
+    expect(pages).toHaveLength(4);
     const indexes = pages.map((p) => p.index);
-    expect(new Set(indexes).size).toBe(3);
+    expect(new Set(indexes).size).toBe(4);
   });
 
   test('initVisiblePageIndexes(pages) returns all indexes', () => {

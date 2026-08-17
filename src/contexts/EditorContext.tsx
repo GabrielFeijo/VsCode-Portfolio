@@ -23,28 +23,24 @@ export function loadPages(language: Language): Page[] {
     const baseName = stripFileExtension(defPage.name);
     const stored = storedPages.find(
       (s) =>
-        s.index === defPage.index ||
         s.name === defPage.name ||
         s.name === `${baseName}.md` ||
-        s.name === `${baseName}.html` ||
-        s.name === baseName ||
-        s.route === defPage.route,
+        s.name === `${baseName}.html`
     );
     return stored
       ? { ...defPage, ...stored, index: defPage.index, route: defPage.route }
       : defPage;
   });
 
-  const customStored = storedPages.filter(
-    (s) =>
-      !defaultPages.some(
-        (d) =>
-          d.index === s.index ||
-          d.route === s.route ||
-          d.name === s.name ||
-          stripFileExtension(d.name) === stripFileExtension(s.name),
-      ),
+  const allDefaultNames = new Set(
+    Object.values(pageRoutes).flatMap((langPages) => [
+      ...langPages.map((lp) => lp.name),
+      ...langPages.map((lp) => `${stripFileExtension(lp.name)}.md`),
+      ...langPages.map((lp) => stripFileExtension(lp.name)),
+    ]),
   );
+
+  const customStored = storedPages.filter((s) => !allDefaultNames.has(s.name));
 
   const seenIndexes = new Set(mergedDefaults.map((p) => p.index));
   let fallbackIndex = 1000;
@@ -230,10 +226,8 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
         const idx = prev.findIndex(
           (p) =>
             p.name === fileName ||
-            p.name === baseName ||
             p.name === `${baseName}.md` ||
-            p.name === `${baseName}.html` ||
-            p.route === baseName,
+            p.name === `${baseName}.html`
         );
         if (idx < 0) return prev;
         const updated = [...prev];

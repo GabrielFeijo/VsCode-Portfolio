@@ -56,6 +56,15 @@ describe('fileLookup', () => {
 		expect(fileEntry.content).toEqual(['remote line 1', 'remote line 2']);
 	});
 
+	it('does not cross-match different language files sharing the same route', async () => {
+		(StorageService.getData as jest.Mock).mockReturnValue([
+			{ name: 'sobre-mim.html', content: 'Portuguese content', index: 0, route: 'about-me' },
+		]);
+
+		const enLines = await getFileLinesAsync({}, '/home/gabriel', 'about-me.html', 'en');
+		expect(enLines).toBeNull();
+	});
+
 	it('returns null when file is not found anywhere', async () => {
 		const lines = await getFileLinesAsync({}, '/home/gabriel', 'nonexistent.txt', 'pt');
 		expect(lines).toBeNull();

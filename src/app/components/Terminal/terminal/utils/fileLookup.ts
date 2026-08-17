@@ -18,9 +18,7 @@ export async function getFileLinesAsync(
 		(p) =>
 			p.name === fileName ||
 			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html` ||
-			p.name === baseName ||
-			p.route === baseName,
+			p.name === `${baseName}.html`
 	);
 	if (stored?.content !== undefined) {
 		return stored.content.split('\n');

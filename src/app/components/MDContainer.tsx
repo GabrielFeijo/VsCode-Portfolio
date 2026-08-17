@@ -54,9 +54,7 @@ function getStoredPageContent(page?: Page): string | null {
 			p.name === page.name ||
 			p.name === `${baseName}.md` ||
 			p.name === `${baseName}.html` ||
-			p.name === baseName ||
-			p.index === page.index ||
-			p.route === page.route,
+			p.name === baseName
 	);
 	if (stored?.content !== undefined) {
 		return stored.content;
