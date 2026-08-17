@@ -1,4 +1,4 @@
-import { buildFileSystem, PROJECT_ROOT } from '../../../src/services/terminal/projectFileSystem';
+import { buildFileSystem, PROJECT_FS, PROJECT_ROOT } from '../../../src/services/terminal/projectFileSystem';
 
 describe('buildFileSystem', () => {
 	it('creates the home directory containing the project root', () => {
@@ -7,6 +7,11 @@ describe('buildFileSystem', () => {
 		expect(fs['/home']).toEqual([{ name: 'gabriel', type: 'dir' }]);
 		expect(fs['/home/gabriel']).toEqual([{ name: 'vscode-portfolio', type: 'dir' }]);
 		expect(fs[PROJECT_ROOT]).toEqual([]);
+	});
+
+	it('exports PROJECT_FS with default project structure', () => {
+		expect(PROJECT_FS).toBeDefined();
+		expect(PROJECT_FS['/']).toBeDefined();
 	});
 
 	it('does not create extra ancestors when the root has no parent', () => {

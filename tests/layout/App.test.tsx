@@ -2,7 +2,7 @@ import { render as rtlRender, screen, fireEvent, waitFor, act } from '@testing-l
 import '@testing-library/jest-dom';
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import App, { initVisiblePageIndexes } from '../../src/app/layout/App';
+import App, { initVisiblePageIndexes, loadPages } from '../../src/app/layout/App';
 
 const createWrapper = () => {
     const queryClient = new QueryClient({
@@ -428,5 +428,12 @@ describe('App', () => {
             window.dispatchEvent(new Event('storage'));
         });
         expect(screen.getByTestId('app-tree')).toBeInTheDocument();
+    });
+
+    it('re-exports loadPages and initVisiblePageIndexes correctly', () => {
+        const pages = loadPages('pt');
+        expect(pages.length).toBeGreaterThan(0);
+        const visible = initVisiblePageIndexes(pages);
+        expect(visible.length).toBe(pages.length);
     });
 });

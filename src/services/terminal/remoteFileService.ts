@@ -24,7 +24,7 @@ export async function fetchFileContent(
 ): Promise<string | null> {
 	const normalized = filePathOrName.replace(/^\.?\//, '');
 	if (contentCache.has(normalized)) {
-		return contentCache.get(normalized) ?? null;
+		return contentCache.get(normalized) as string;
 	}
 
 	const candidates = getCandidateUrls(normalized, language);

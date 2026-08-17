@@ -1,9 +1,19 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
+import React from 'react';
 import { useLayoutContext, LayoutProvider } from '../../src/contexts/LayoutContext';
 
-jest.mock('react-device-detect', () => ({
+const mockDeviceDetect = {
     isMobile: false,
     isBrowser: true,
+};
+
+jest.mock('react-device-detect', () => ({
+    get isMobile() {
+        return mockDeviceDetect.isMobile;
+    },
+    get isBrowser() {
+        return mockDeviceDetect.isBrowser;
+    },
 }));
 
 function TestConsumer() {
@@ -23,6 +33,11 @@ function TestConsumer() {
 }
 
 describe('LayoutContext', () => {
+    beforeEach(() => {
+        mockDeviceDetect.isMobile = false;
+        mockDeviceDetect.isBrowser = true;
+    });
+
     it('throws when used outside LayoutProvider', () => {
         const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
         expect(() => render(<TestConsumer />)).toThrow();
@@ -53,7 +68,7 @@ describe('LayoutContext', () => {
         expect(screen.getByTestId('expanded').textContent).toBe('true');
     });
 
-    it('toggleTerminal flips terminal state', () => {
+    it('toggleTerminal flips terminal state when not on mobile', () => {
         render(
             <LayoutProvider>
                 <TestConsumer />
@@ -64,6 +79,24 @@ describe('LayoutContext', () => {
         expect(screen.getByTestId('terminal').textContent).toBe('false');
         fireEvent.click(screen.getByTestId('toggle-terminal'));
         expect(screen.getByTestId('terminal').textContent).toBe('true');
+    });
+
+    it('toggleTerminal does nothing when isMobile is true', () => {
+        mockDeviceDetect.isMobile = true;
+        mockDeviceDetect.isBrowser = false;
+
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <LayoutProvider>{children}</LayoutProvider>
+        );
+        const { result } = renderHook(() => useLayoutContext(), { wrapper });
+
+        expect(result.current.terminal).toBe(false);
+
+        act(() => {
+            result.current.toggleTerminal();
+        });
+
+        expect(result.current.terminal).toBe(false);
     });
 
     it('setRanking updates ranking state', () => {

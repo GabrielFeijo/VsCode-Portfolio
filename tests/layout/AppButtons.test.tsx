@@ -33,7 +33,6 @@ jest.mock('@mui/material', () => {
     };
 });
 
-
 jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(),
 }));
@@ -57,8 +56,11 @@ jest.mock('src/contexts/EditorContext', () => ({
     useEditorContext: () => mockEditorContext,
 }));
 
+let latestTabContextMenuProps: any = null;
+
 jest.mock('src/app/components/TabContextMenu/TabContextMenu', () => {
     return function MockTabContextMenu(props: any) {
+        latestTabContextMenuProps = props;
         return (
             <div data-testid="tab-context-menu">
                 <button data-testid="close-tab" onClick={props.handleCloseTab} />
@@ -109,6 +111,7 @@ describe('AppButtons', () => {
         mockEditorContext = {
             ...defaultProps,
         };
+        latestTabContextMenuProps = null;
     });
 
     it('renders buttons with dark theme', () => {
@@ -167,6 +170,18 @@ describe('AppButtons', () => {
         expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
         const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
         expect(updater([0, 1, 2])).toEqual([0, 2]);
+    });
+
+    it('does nothing on context menu handlers when contextMenu state is null', () => {
+        render(<AppButtons language={defaultProps.language} />);
+        expect(latestTabContextMenuProps).toBeDefined();
+
+        latestTabContextMenuProps.handleCloseTab();
+        latestTabContextMenuProps.handleCloseOthers();
+        latestTabContextMenuProps.handleCloseToRight();
+        latestTabContextMenuProps.handleCloseToLeft();
+
+        expect(defaultProps.setVisiblePageIndexes).not.toHaveBeenCalled();
     });
 
     it('handles close others from context menu', () => {
