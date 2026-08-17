@@ -13,6 +13,9 @@ jest.mock('../../../src/services/storageService', () => ({
 
 describe('NanoEditor', () => {
 	const defaultFs: VirtualDirectory = {
+		'/': [
+			{ name: 'root.md', type: 'file', content: ['root line 1'] },
+		],
 		'/home/gabriel': [
 			{ name: 'test.md', type: 'file', content: ['initial line 1', 'initial line 2'] },
 		],
@@ -81,16 +84,16 @@ describe('NanoEditor', () => {
 		expect(screen.getByText(/Wrote 2 lines to test\.md/)).toBeInTheDocument();
 	});
 
-	it('saves content with Ctrl+O or Ctrl+S', () => {
+	it('saves file in root directory with Ctrl+S', () => {
 		const onClose = jest.fn();
 		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
-				initialContent="hello"
-				cwd="/home/gabriel"
+				fileName="root.md"
+				filePath="/root.md"
+				initialContent="hello root"
+				cwd="/"
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -183,7 +186,7 @@ describe('NanoEditor', () => {
 		expect(onClose2).toHaveBeenCalledTimes(1);
 	});
 
-	it('cuts and pastes text with Ctrl+K and Ctrl+U', () => {
+	it('cuts and pastes text with Ctrl+K and Ctrl+U, and ignores Ctrl+U when clipboard empty', () => {
 		const onClose = jest.fn();
 		const setFs = jest.fn();
 
@@ -201,6 +204,9 @@ describe('NanoEditor', () => {
 		);
 
 		const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+		fireEvent.keyDown(textarea, { key: 'u', ctrlKey: true });
+
 		textarea.selectionStart = 0;
 		textarea.selectionEnd = 0;
 
@@ -209,6 +215,33 @@ describe('NanoEditor', () => {
 
 		fireEvent.keyDown(textarea, { key: 'u', ctrlKey: true });
 		expect(screen.getByText('[ Pasted line ]')).toBeInTheDocument();
+
+		textarea.selectionStart = textarea.value.length;
+		textarea.selectionEnd = textarea.value.length;
+		fireEvent.keyDown(textarea, { key: 'k', ctrlKey: true });
+		expect(screen.getByText('[ Cut line ]')).toBeInTheDocument();
+	});
+
+	it('saves file when parent directory is not yet created in virtual fs', () => {
+		const onClose = jest.fn();
+		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater({}) : updater));
+
+		render(
+			<NanoEditor
+				fileName="new.txt"
+				filePath="/uninitialized/new.txt"
+				initialContent="content in new parent"
+				cwd="/"
+				fs={{}}
+				setFs={setFs}
+				onClose={onClose}
+				isDark={true}
+			/>,
+		);
+
+		const textarea = screen.getByRole('textbox');
+		fireEvent.keyDown(textarea, { key: 's', ctrlKey: true });
+		expect(setFs).toHaveBeenCalled();
 	});
 
 	it('displays line count with Ctrl+C', () => {
@@ -264,6 +297,50 @@ describe('NanoEditor', () => {
 			name: 'about-me.html',
 			route: 'about-me',
 			content: '<p>English html</p>',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([]);
+		syncPageStorage('sobre-mim', '<p>Base name html</p>');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: '<p>Base name html</p>',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([]);
+		syncPageStorage('habilidades.md', '<p>Skills md</p>');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 1,
+			name: 'habilidades.md',
+			route: 'skills',
+			content: '<p>Skills md</p>',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([
+			{ index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'html' },
+		]);
+		syncPageStorage('sobre-mim.md', 'updated content for html');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: 'updated content for html',
+			isSaved: true,
+		});
+
+		(StorageService.getData as jest.Mock).mockReturnValue([
+			{ index: 1, name: 'skills.md', route: 'skills', content: 'md' },
+		]);
+		syncPageStorage('skills.html', 'updated content for md');
+		expect(StorageService.saveOrUpdateData).toHaveBeenCalledWith({
+			index: 1,
+			name: 'skills.md',
+			route: 'skills',
+			content: 'updated content for md',
 			isSaved: true,
 		});
 

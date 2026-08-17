@@ -7,7 +7,7 @@ interface Props {
 	language?: string;
 }
 
-const Output = (_props: Props = {}) => {
+const Output = (_props?: Props) => {
 	const { t } = useTranslation();
 	const colors = useAppPalette();
 	const today = new Date().toLocaleString();

@@ -7,7 +7,7 @@ interface Props {
 	language?: string;
 }
 
-const Problems = (_props: Props = {}) => {
+const Problems = (_props?: Props) => {
 	const { t } = useTranslation();
 	const colors = useAppPalette();
 	return (

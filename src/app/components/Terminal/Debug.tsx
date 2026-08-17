@@ -8,7 +8,7 @@ interface Props {
 	language?: string;
 }
 
-const Debug = (_props: Props = {}) => {
+const Debug = (_props?: Props) => {
 	const { t } = useTranslation();
 	const colors = useAppPalette();
 

@@ -175,8 +175,7 @@ export default function NanoEditor({
 
 		if (e.key === 'k' && e.ctrlKey) {
 			e.preventDefault();
-			const textarea = textareaRef.current;
-			if (!textarea) return;
+			const textarea = e.currentTarget;
 
 			const val = textarea.value;
 			const selStart = textarea.selectionStart;
@@ -199,8 +198,7 @@ export default function NanoEditor({
 		if (e.key === 'u' && e.ctrlKey) {
 			e.preventDefault();
 			if (!clipboard) return;
-			const textarea = textareaRef.current;
-			if (!textarea) return;
+			const textarea = e.currentTarget;
 
 			const selStart = textarea.selectionStart;
 			const nextContent = content.substring(0, selStart) + clipboard + content.substring(selStart);
