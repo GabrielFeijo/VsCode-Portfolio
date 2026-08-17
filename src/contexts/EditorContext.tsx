@@ -13,7 +13,10 @@ import { pageRoutes } from '../app/pages/pages';
 import { StorageService } from '../services/storageService';
 import { getLocalizedPath } from '../config/seo';
 
+import { customAlphabet } from 'nanoid';
 import { stripFileExtension } from '../utils/stripFileExtension';
+
+const generatePageIndex = customAlphabet('123456789', 8);
 
 export function loadPages(language: Language): Page[] {
   const defaultPages = pageRoutes[language];
@@ -43,11 +46,10 @@ export function loadPages(language: Language): Page[] {
   const customStored = storedPages.filter((s) => !allDefaultNames.has(s.name));
 
   const seenIndexes = new Set(mergedDefaults.map((p) => p.index));
-  let fallbackIndex = 1000;
   const uniqueCustom = customStored.map((p) => {
     let idx = p.index;
     while (seenIndexes.has(idx)) {
-      idx = fallbackIndex++;
+      idx = Number(generatePageIndex());
     }
     seenIndexes.add(idx);
     return { ...p, index: idx };
