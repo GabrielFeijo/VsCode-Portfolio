@@ -52,6 +52,7 @@ module.exports = {
         '^@domain/(.*)$': '<rootDir>/src/domain/$1',
         '^@config/(.*)$': '<rootDir>/src/config/$1',
         '^src/(.*)$': '<rootDir>/src/$1',
+        '^nanoid$': '<rootDir>/__mocks__/nanoid.js',
         '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
         '^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
         '^.+\\.(png|jpg|jpeg|svg|gif)$': '<rootDir>/__mocks__/fileMock.js'
