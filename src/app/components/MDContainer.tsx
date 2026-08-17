@@ -202,7 +202,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					sx={{
 						height: '100%',
 						overflowY: 'auto',
-						p: { xs: 2, sm: 3, md: 4 },
+						px: { xs: 2, sm: 3, md: 4 },
 						boxSizing: 'border-box',
 					}}
 				>
