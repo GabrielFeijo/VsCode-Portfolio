@@ -43,10 +43,10 @@ export const StorageService = {
 		const parsedData = StorageService.getData();
 
 		const updatedData = parsedData.some(
-			(page: Page) => page.index === data.index
+			(page: Page) => page.name === data.name
 		)
 			? parsedData.map((page: Page) =>
-				page.index === data.index ? data : page
+				page.name === data.name ? data : page
 			)
 			: [...parsedData, data];
 

@@ -44,16 +44,24 @@ describe('StorageService', () => {
         expect(stored[0].name).toBe('a');
     });
 
-    it('saveOrUpdateData updates existing page', () => {
-        const page: Page = { index: 2, name: 'a', route: 'a' };
-        const otherPage: Page = { index: 3, name: 'other', route: 'other' };
-        localStorage.setItem('markdown-editor-data', JSON.stringify([page, otherPage]));
-        const updated: Page = { index: 2, name: 'b', route: 'b' };
-        StorageService.saveOrUpdateData(updated);
+    it('saveOrUpdateData updates existing page by name without overwriting other language files sharing same index', () => {
+        const ptPage: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT original' };
+        const enPage: Page = { index: 0, name: 'about-me.html', route: 'about-me', content: 'EN original' };
+        StorageService.saveOrUpdateData(ptPage);
+        StorageService.saveOrUpdateData(enPage);
+
         const stored = StorageService.getData();
-		expect(stored).toHaveLength(2);
-        expect(stored[0].name).toBe('b');
-		expect(stored[1]).toEqual(otherPage);
+        expect(stored).toHaveLength(2);
+        expect(stored.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT original');
+        expect(stored.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
+
+        const updatedPt: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT edited' };
+        StorageService.saveOrUpdateData(updatedPt);
+
+        const storedAfter = StorageService.getData();
+        expect(storedAfter).toHaveLength(2);
+        expect(storedAfter.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT edited');
+        expect(storedAfter.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
     });
 
     it('createFile and createFolder produce correct shapes', () => {
