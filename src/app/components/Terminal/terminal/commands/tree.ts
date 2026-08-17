@@ -14,7 +14,7 @@ export const treeCommand: ICommandDefinition = {
 			ctx.addEntry(rawCommand, [`\x1b[91m${result.error}\x1b[0m`], ctx.terminalColors.error);
 			return true;
 		}
-		ctx.addEntry(rawCommand, result.lines || []);
+		ctx.addEntry(rawCommand, result.lines!);
 		return true;
 	},
 };

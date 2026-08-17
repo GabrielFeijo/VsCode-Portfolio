@@ -44,6 +44,24 @@ describe('fileLookup', () => {
 		expect(lines).toEqual(['line a', 'line b']);
 	});
 
+	it('resolves altHtml file when query is baseName without extension', async () => {
+		const fs = {
+			'/home/gabriel': [{ name: 'about.html', type: 'file' as const, content: ['html content'] }],
+		};
+
+		const lines = await getFileLinesAsync(fs, '/home/gabriel', 'about');
+		expect(lines).toEqual(['html content']);
+	});
+
+	it('resolves altMd file when query is baseName without extension', async () => {
+		const fs = {
+			'/home/gabriel': [{ name: 'skills.md', type: 'file' as const, content: ['markdown content'] }],
+		};
+
+		const lines = await getFileLinesAsync(fs, '/home/gabriel', 'skills');
+		expect(lines).toEqual(['markdown content']);
+	});
+
 	it('fetches remote content when not present locally and updates exact entry', async () => {
 		(fetchFileContent as jest.Mock).mockResolvedValue('remote line 1\nremote line 2');
 		const fileEntry = { name: 'remote.html', type: 'file' as const, content: [] };
@@ -54,6 +72,13 @@ describe('fileLookup', () => {
 		const lines = await getFileLinesAsync(fs, '/home/gabriel', 'remote.html', 'pt');
 		expect(lines).toEqual(['remote line 1', 'remote line 2']);
 		expect(fileEntry.content).toEqual(['remote line 1', 'remote line 2']);
+	});
+
+	it('fetches remote content when file entry does not exist locally', async () => {
+		(fetchFileContent as jest.Mock).mockResolvedValue('standalone remote content');
+
+		const lines = await getFileLinesAsync({}, '/home/gabriel', 'remote.html', 'pt');
+		expect(lines).toEqual(['standalone remote content']);
 	});
 
 	it('does not cross-match different language files sharing the same route', async () => {

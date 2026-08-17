@@ -24,7 +24,7 @@ export const filesystemCommands: ICommandDefinition[] = [
 
 			setFs((prev) => {
 				const next = { ...prev };
-				const currentEntries = [...(next[parent] || [])];
+				const currentEntries = [...next[parent]];
 				if (!currentEntries.some((e) => e.name === fileName && e.type === 'file')) {
 					currentEntries.push({ name: fileName, type: 'file', content: [] });
 					next[parent] = currentEntries;
@@ -55,7 +55,7 @@ export const filesystemCommands: ICommandDefinition[] = [
 
 			setFs((prev) => {
 				const next = { ...prev };
-				const parentEntries = [...(next[parent] || [])];
+				const parentEntries = [...next[parent]];
 				if (!parentEntries.some((e) => e.name === dirName && e.type === 'dir')) {
 					parentEntries.push({ name: dirName, type: 'dir' });
 					next[parent] = parentEntries;
