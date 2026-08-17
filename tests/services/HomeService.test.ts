@@ -40,6 +40,6 @@ describe('HomeService', () => {
         const mod = await import('../../src/services/api/home/HomeService');
         const result = await mod.HomeService.getResponse();
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 });

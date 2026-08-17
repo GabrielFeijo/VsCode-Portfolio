@@ -6,8 +6,9 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { Page } from '../../domain/page';
-import { StorageService } from '../../services/storageService';
+import { Page } from '@/domain/page';
+import { StorageService } from '@/services/storageService';
+import { getStaticPageContent } from '@/services/pageContentService';
 import MarkdownRenderer from './MarkdownRenderer';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
@@ -18,8 +19,50 @@ interface Props {
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
 
+import { stripFileExtension } from '../../utils/stripFileExtension';
+
+const DEFAULT_PAGE_NAMES = new Set([
+	'about-me',
+	'skills',
+	'projects',
+	'experience',
+	'accomplishments',
+	'certificates',
+	'sobre-mim',
+	'habilidades',
+	'projetos',
+	'experiencia',
+	'conquistas',
+	'certificados',
+]);
+
+function isDefaultPage(page?: Page): boolean {
+	const baseName = stripFileExtension(page?.name || '').toLowerCase();
+	const baseRoute = page?.route.replace(/^\//, '').toLowerCase() || '';
+	return DEFAULT_PAGE_NAMES.has(baseName) || DEFAULT_PAGE_NAMES.has(baseRoute);
+}
+
 function hasEditableContent(page?: Page): page is Page & { content?: string } {
-	return Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+	return !isDefaultPage(page) && Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+}
+
+function getStoredPageContent(page?: Page): string | null {
+	if (!page) return null;
+	const baseName = stripFileExtension(page.name);
+	const stored = StorageService.getData().find(
+		(p) =>
+			p.name === page.name ||
+			p.name === `${baseName}.md` ||
+			p.name === `${baseName}.html` ||
+			p.name === baseName
+	);
+	if (stored?.content !== undefined) {
+		return stored.content;
+	}
+	if (page.content !== undefined) {
+		return page.content;
+	}
+	return null;
 }
 
 export default function MDContainer({ path, page, setPages }: Props) {
@@ -28,38 +71,60 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 	useEffect(() => {
 		if (editMode) {
-			setContent(page.content || '');
+			setContent(page?.content || '');
 			return;
 		}
 
-		const controller = new AbortController();
-		void fetch(path, {
-			cache: 'force-cache',
-			signal: controller.signal,
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(`Failed to load content (${response.status})`);
-				}
-				return response.text();
-			})
-			.then(setContent)
-			.catch((error: unknown) => {
-				if (error instanceof DOMException && error.name === 'AbortError') return;
-				setContent('# Error\n\nFailed to load content.');
-			});
+		let activeController: AbortController | null = null;
 
-		return () => controller.abort();
+		const load = () => {
+			const stored = getStoredPageContent(page);
+			if (stored !== null) {
+				setContent(stored);
+				return;
+			}
+
+			const staticContent = getStaticPageContent(path);
+			if (staticContent !== null) {
+				setContent(staticContent);
+				return;
+			}
+
+			activeController?.abort();
+			const controller = new AbortController();
+			activeController = controller;
+
+			void fetch(path, {
+				cache: 'force-cache',
+				signal: controller.signal,
+			})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error(`Failed to load content (${response.status})`);
+					}
+					return response.text();
+				})
+				.then(setContent)
+				.catch((error: unknown) => {
+					if (error instanceof DOMException && error.name === 'AbortError') return;
+					setContent('# Error\n\nFailed to load content.');
+				});
+		};
+
+		load();
+		window.addEventListener('storage', load);
+		return () => {
+			activeController?.abort();
+			window.removeEventListener('storage', load);
+		};
 	}, [editMode, page, path]);
 
 	const handleChange = useCallback(
 		(newContent: string) => {
 			setContent(newContent);
-			if (!page) return;
-
 			setPages((currentPages) =>
 				currentPages.map((currentPage) =>
-					currentPage.index === page.index
+					currentPage.index === page!.index
 						? { ...currentPage, content: newContent, isSaved: false }
 						: currentPage
 				)
@@ -68,71 +133,89 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		[page, setPages]
 	);
 
+	const handleSave = useCallback(() => {
+		if (!page) return;
+
+		const updatedPage = {
+			...page,
+			content,
+			isSaved: true,
+		};
+
+		StorageService.saveOrUpdateData(updatedPage);
+
+		setPages((currentPages) =>
+			currentPages.map((currentPage) =>
+				currentPage.index === page.index ? updatedPage : currentPage
+			)
+		);
+	}, [content, page, setPages]);
+
 	useEffect(() => {
-		function savePage(event: KeyboardEvent) {
-			if (!event.ctrlKey || event.key.toLowerCase() !== 's' || !editMode) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.ctrlKey && event.key === 's') {
+				event.preventDefault();
+				handleSave();
+			}
+		};
 
-			event.preventDefault();
-			const updatedPage = { ...page, content, isSaved: true };
-			StorageService.saveOrUpdateData(updatedPage);
-			setPages((currentPages) =>
-				currentPages.map((currentPage) =>
-					currentPage.index === page.index ? updatedPage : currentPage
-				)
-			);
-		}
-
-		window.addEventListener('keydown', savePage);
-		return () => window.removeEventListener('keydown', savePage);
-	}, [content, editMode, page, setPages]);
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [handleSave]);
 
 	return (
 		<Container
+			maxWidth={false}
 			sx={{
 				height: '100%',
-				padding: { xs: 1, sm: 2, md: 3 },
-				'& h1, & h2, & h3': { wordBreak: 'break-word' },
-				'& p, & li': {
-					wordBreak: 'break-word',
-					overflowWrap: 'break-word',
-				},
-				'& img': { maxWidth: '100%', height: 'auto' },
+				width: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				padding: '0 !important',
 			}}
 		>
-			{editMode ? (
-				<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+			<Grid container sx={{ flex: 1, height: '100%', overflow: 'hidden' }}>
+				{editMode && (
 					<Grid
-						container
-						sx={{ height: '100%', pt: 2, pb: 2 }}
+						item
+						xs={12}
+						md={6}
+						sx={{
+							height: '100%',
+							borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+						}}
 					>
-						<Grid
-							item
-							xs={5}
-							sx={{ pt: 2 }}
-						>
-							<Suspense fallback={null}>
-								<MarkdownEditor
-									value={content}
-									onChange={handleChange}
-								/>
-							</Suspense>
-						</Grid>
-
-						<Grid
-							item
-							xs={7}
-							sx={{ pl: 2, borderLeft: '1px solid #8686867b' }}
-						>
-							<MarkdownRenderer content={content} />
-						</Grid>
+						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>
+							<MarkdownEditor
+								value={content}
+								onChange={handleChange}
+							/>
+						</Suspense>
 					</Grid>
-				</Box>
-			) : (
-				<MarkdownRenderer
-					content={content}
-					allowRawHtml
-				/>
-			)}
+				)}
+				<Grid
+					item
+					xs={12}
+					md={editMode ? 6 : 12}
+					sx={{
+						height: '100%',
+						overflowY: 'auto',
+						px: { xs: 2, sm: 3, md: 4 },
+						boxSizing: 'border-box',
+					}}
+				>
+					<Box
+						sx={{
+							maxWidth: editMode ? '100%' : '960px',
+							width: '100%',
+							mx: 'auto',
+							pb: 6,
+						}}
+					>
+						<MarkdownRenderer content={content} allowRawHtml={true} />
+					</Box>
+				</Grid>
+			</Grid>
 		</Container>
 	);
 }

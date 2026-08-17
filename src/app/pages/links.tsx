@@ -1,10 +1,11 @@
 import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { siteConfig } from '../../config/site';
 
 export const contact = [
 	{
 		index: 0,
 		title: 'Find me on Github',
-		href: 'https://github.com/GabrielFeijo',
+		href: siteConfig.githubUrl,
 		icon: <FaGithub />,
 	},
 	{
@@ -25,7 +26,7 @@ export const contato = [
 	{
 		index: 0,
 		title: 'Encontre-me no Github',
-		href: 'https://github.com/GabrielFeijo',
+		href: siteConfig.githubUrl,
 		icon: <FaGithub />,
 	},
 	{

@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockCreate = jest.fn();
 jest.mock('../../src/services/api/review/ReviewService', () => ({
@@ -24,6 +25,21 @@ jest.mock('react-i18next', () => ({
 
 const { useTheme } = require('../../src/contexts/ThemeContext');
 import BoxRating from '../../src/app/components/Rating/BoxRating';
+
+const createWrapper = () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
+    });
+    return ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+};
+
+const render = (ui: React.ReactElement, options = {}) =>
+    rtlRender(ui, { wrapper: createWrapper(), ...options });
 
 describe('BoxRating component', () => {
     beforeEach(() => {
@@ -445,12 +461,78 @@ describe('BoxRating component', () => {
     it('uses fallback aria-labels when translation returns falsy', () => {
         mockT.mockImplementation(() => '');
         const setRanking = jest.fn();
-        const { container } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
 
         const closeButton = screen.getByLabelText('Close rating modal');
         const submitButton = screen.getByLabelText('Submit rating');
 
         expect(closeButton).toBeInTheDocument();
         expect(submitButton).toBeInTheDocument();
+    });
+
+    it('clears the previous error timeout when another failing review is submitted', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('API Error') as any;
+        mockCreate.mockResolvedValue(error);
+
+        render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+    });
+
+    it('clears the pending error timer when the modal is closed', async () => {
+        const setRanking = jest.fn();
+        const error = new Error('API Error') as any;
+        mockCreate.mockResolvedValue(error);
+
+        const { rerender } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        const usernameInput = screen.getByLabelText('rating.name');
+        const commentTextarea = screen.getByLabelText('rating.comment');
+        const submit = screen.getByRole('button', { name: /rating.submit/i });
+
+        await userEvent.type(usernameInput, 'Test User');
+        await userEvent.type(commentTextarea, 'Great portfolio!');
+
+        const stars = screen.getAllByRole('radio');
+        if (stars.length > 0) {
+            fireEvent.click(stars[0]);
+        }
+
+        await act(async () => {
+            fireEvent.click(submit);
+        });
+        await waitFor(() => {
+            expect(screen.getByText('rating.errors.unknownError')).toBeInTheDocument();
+        });
+
+        rerender(<BoxRating ranking={false} setRanking={setRanking} />);
+        rerender(<BoxRating ranking={true} setRanking={setRanking} />);
+
+        expect(screen.queryByText('rating.errors.unknownError')).not.toBeInTheDocument();
     });
 });

@@ -1,6 +1,70 @@
-.text {
-	min-width: calc(100% - 360px);
+.terminal {
+	--term-fg: var(--text-primary);
+	--term-muted: var(--text-muted);
+	--term-cursor: var(--accent-yellow);
 }
-.text::placeholder {
-	color: #7b7c81;
+
+.output {
+	scrollbar-width: thin;
+	scrollbar-color: var(--scrollbar) transparent;
+}
+
+.output::-webkit-scrollbar {
+	width: 6px;
+}
+
+.output::-webkit-scrollbar-thumb {
+	background: var(--scrollbar);
+	border-radius: 3px;
+}
+
+.inputRow {
+	gap: 6px;
+}
+
+.inputWrapper {
+	position: relative;
+	flex: 1;
+	min-width: 120px;
+}
+
+.input {
+	outline: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	background: transparent;
+	resize: none;
+	font-family: inherit;
+	font-size: 0.85rem;
+	line-height: 1.6;
+	color: inherit;
+	width: 100%;
+	caret-color: var(--term-cursor);
+	overflow: hidden;
+}
+
+.input::placeholder {
+	color: var(--term-muted);
+	opacity: 0.7;
+}
+
+.ghost {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	font-family: inherit;
+	font-size: 0.85rem;
+	line-height: 1.6;
+	white-space: pre;
+}
+
+.invisible {
+	visibility: hidden;
+}
+
+.ghostText {
+	color: var(--term-muted);
+	opacity: 0.5;
 }

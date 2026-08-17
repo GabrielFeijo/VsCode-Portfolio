@@ -52,7 +52,7 @@ describe('ReviewService', () => {
         const mod = await import('../../src/services/api/review/ReviewService');
         const result = await mod.ReviewService.findAll();
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns Error for non-axios failures', async () => {
@@ -60,7 +60,7 @@ describe('ReviewService', () => {
         const mod = await import('../../src/services/api/review/ReviewService');
         const result = await mod.ReviewService.findAll();
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns Error for non-axios failures in create', async () => {
@@ -68,7 +68,7 @@ describe('ReviewService', () => {
         const mod = await import('../../src/services/api/review/ReviewService');
         const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 });
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns Error for axios-like failures in create', async () => {
@@ -85,7 +85,7 @@ describe('ReviewService', () => {
         const mod = await import('../../src/services/api/review/ReviewService');
         const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 });
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns ApiError with statusCode 400 and validationErrors for bad request', async () => {

@@ -1,17 +1,14 @@
-import { Box, Typography } from '@mui/material';
-import { useState } from 'react';
-import styles from './Cmd.module.css';
-import { useNavigate } from 'react-router-dom';
-import {
-	IRate,
-	ReviewService,
-} from '../../../services/api/review/ReviewService';
-import { CommandService } from '../../../services/api/command/CommandService';
-import { useTheme } from '../../../contexts/ThemeContext';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
-import { Language } from '../../../domain/page';
-import { getLocalizedPath } from '../../../config/seo';
+import { Language } from '@/domain/page';
+import { fonts } from '@/app/theme/typography';
+import styles from './Cmd.module.css';
+import TerminalLine from './terminal/TerminalLine';
+import TerminalPrompt from './terminal/TerminalPrompt';
+import NanoEditor from './terminal/NanoEditor';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getTerminalColors } from './terminal/terminalConfig';
+import { useTerminal } from './terminal/useTerminal';
 
 interface Props {
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,20 +18,30 @@ interface Props {
 
 const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 	const { t } = useTranslation();
-	const { toggleTheme } = useTheme();
-	const navigate = useNavigate();
-	const [command, setCommand] = useState('');
-	const [results, setResults] = useState<
-		{
-			command: string;
-			response: string[];
-			color: string;
-		}[]
-	>([]);
+	const { theme } = useTheme();
+	const colors = getTerminalColors(theme);
+	const {
+		cwd,
+		entries,
+		command,
+		setCommand,
+		isDark,
+		fs,
+		setFs,
+		activeEditor,
+		closeEditor,
+		inputRef,
+		scrollRef,
+		handleKeyDown,
+		submitCommand,
+		getCompletions,
+	} = useTerminal({ language, setRanking, changeLanguage });
 
-	const saveResult = (response: string[], color = '') => {
-		setResults((prevState) => [...prevState, { command, response, color }]);
-	};
+	const completions = getCompletions(command.trim());
+	const ghostText =
+		completions.length === 1 && completions[0].startsWith(command.trim()) && command.trim()
+			? completions[0].slice(command.trim().length)
+			: '';
 
 	const isEnterKeyPressed = (e: React.ChangeEvent<HTMLTextAreaElement>): boolean => {
 		const inputEvent = e.nativeEvent as InputEvent;
@@ -44,167 +51,125 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 		);
 	};
 
-	const formatReviewResponse = (rates: IRate[]): string[] => {
-		return rates.map((rate) => {
-			const date = dayjs(rate.createdAt).format('DD/MM/YYYY HH:mm:ss');
-			return `${date} - [${rate.username}] ${rate.comment} ${t('terminal.info.feedback')}: ${rate.stars} - ${t(`terminal.rating.${String(rate.stars).replace('.', '_')}`)}`;
-		});
-	};
-
-	const handleReviewsCommand = async (): Promise<void> => {
-		const responseData = await ReviewService.findAll();
-
-		if (responseData instanceof Error) {
-			saveResult([t('terminal.info.error')], '#ed4337');
-			return;
-		}
-
-		const response = ['', ...formatReviewResponse(responseData)];
-		saveResult(response);
-	};
-
-	const handleEvaluateCommand = (): void => {
-		setRanking(true);
-		saveResult(['']);
-	};
-
-	const handleChangeThemeCommand = (): void => {
-		toggleTheme();
-		saveResult([t('terminal.info.theme')]);
-	};
-
-	const handleChangeLanguageCommand = (): void => {
-		changeLanguage();
-		saveResult([t('terminal.info.language')]);
-	};
-
-	const handleClearCommand = (): void => {
-		setResults([]);
-	};
-
-	const handleRouteCommand = (route: string): void => {
-		navigate(getLocalizedPath(`/${route}`, language));
-		saveResult(['']);
-	};
-
-	const handleDefaultCommand = async (): Promise<void> => {
-		const responseData = await CommandService.getResponse(command);
-
-		if (responseData instanceof Error) {
-			saveResult([t('terminal.info.error')], '#ed4337');
-			return;
-		}
-
-		saveResult(responseData.response);
-	};
-
-	const executeCommand = async (): Promise<void> => {
-		const lowerCommand = command.toLowerCase();
-
-		const commandMap: Record<string, () => void | Promise<void>> = {
-			'reviews': handleReviewsCommand,
-			'avaliacoes': handleReviewsCommand,
-			'evaluate': handleEvaluateCommand,
-			'avaliar': handleEvaluateCommand,
-			'changetheme': handleChangeThemeCommand,
-			'mudartema': handleChangeThemeCommand,
-			'changelanguage': handleChangeLanguageCommand,
-			'mudaridioma': handleChangeLanguageCommand,
-			'clear': handleClearCommand,
-			'limpar': handleClearCommand,
-		};
-
-		const handler = commandMap[lowerCommand];
-		if (handler) {
-			await handler();
-			return;
-		}
-
-		const spaceIndex = command.indexOf(' ');
-		if (spaceIndex > 0) {
-			const cmd = command.substring(0, spaceIndex).toLowerCase();
-			const arg = command.substring(spaceIndex + 1);
-
-			if (cmd === 'route' || cmd === 'rota') {
-				handleRouteCommand(arg);
-				return;
-			}
-		}
-
-		await handleDefaultCommand();
-	};
-
-	const verifyCommand = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+	const handleChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		if (!isEnterKeyPressed(e)) {
 			setCommand(e.target.value);
 			return;
 		}
-
-		if (command.length <= 1) {
-			return;
-		}
-
-		setCommand('');
-		await executeCommand();
+		await submitCommand();
 	};
 
-	return (
-		<Box id='cmd-terminal'>
-			<Box>
-				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
-					GG Console [{t('terminal.info.version')} 1.0.0.19045.2728]
-				</Typography>
-				<Typography sx={{ fontSize: '.9rem', fontWeight: 'bold' }}>
-					(c) Feijó Corporation. {t('terminal.info.allRightsReserved')}
-				</Typography>
+	if (activeEditor) {
+		return (
+			<Box
+				id="cmd-terminal"
+				sx={{
+					height: '100%',
+					borderRadius: '4px',
+					overflow: 'hidden',
+				}}
+			>
+				<NanoEditor
+					fileName={activeEditor.fileName}
+					filePath={activeEditor.filePath}
+					initialContent={activeEditor.initialContent}
+					cwd={cwd}
+					fs={fs}
+					setFs={setFs}
+					onClose={closeEditor}
+					isDark={isDark}
+				/>
 			</Box>
-			<Box sx={{ wordBreak: 'break-word', mt: 1 }}>
-				{results.length > 0 ? (
-					results.map((result, index) => (
-						<Box key={index}>
-							<Typography>
-								D:\GG\Desktop\workspace\React\react-vscode{'>'}{' '}
-								{result.command}
-							</Typography>
+		);
+	}
+
+	return (
+		<Box
+			id="cmd-terminal"
+			className={styles.terminal}
+			onClick={() => inputRef.current?.focus()}
+			sx={{
+				height: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				fontFamily: fonts.mono,
+				color: colors.text,
+				backgroundColor: colors.bg,
+				borderRadius: '4px',
+				overflow: 'hidden',
+			}}
+		>
+			<Box
+				ref={scrollRef}
+				className={styles.output}
+				sx={{
+					flex: 1,
+					overflow: 'auto',
+					px: 1.5,
+					py: 0.5,
+				}}
+			>
+				{entries.map((entry) => (
+					<Box key={entry.id} sx={{ mb: 1 }}>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'flex-start',
+								flexWrap: 'wrap',
+								gap: 0.5,
+							}}
+						>
+							<TerminalPrompt cwd={entry.cwd} isDark={isDark} />
 							<Box
-								style={result.color !== '' ? { color: result.color } : {}}
+								component="span"
+								sx={{
+									fontFamily: 'inherit',
+									fontSize: '0.85rem',
+									wordBreak: 'break-all',
+								}}
 							>
-								{result.response.length > 0 &&
-									result.response.map((res, index) => (
-										<Typography key={index}>{res}</Typography>
-									))}
-								<br />
+								{entry.command}
 							</Box>
 						</Box>
-					))
-				) : (
-					<></>
-				)}
+						{entry.response.length > 0 && (
+							<TerminalLine lines={entry.response} color={entry.color} />
+						)}
+					</Box>
+				))}
+
 				<Box
-					display={'flex'}
-					alignItems={'center'}
-					flexWrap={'wrap'}
-					gap={1}
+					className={styles.inputRow}
+					sx={{
+						display: 'flex',
+						alignItems: 'flex-start',
+						flexWrap: 'nowrap',
+						position: 'relative',
+						minHeight: '1.6em',
+					}}
 				>
-					<Typography>
-						D:\GG\Desktop\workspace\React\react-vscode{'>'}
-					</Typography>
-					<textarea
-						placeholder={t('terminal.info.placeholder')}
-						className={styles.text}
-						rows={1}
-						aria-label={t('terminal.info.placeholder') || 'Terminal command input'}
-						style={{
-							outline: 0,
-							border: 0,
-							paddingLeft: 1.2,
-							backgroundColor: 'transparent',
-							resize: 'none',
-							fontSize: '.9rem',
-						}}
-						onChange={(e) => verifyCommand(e)}
-						value={command}
-					></textarea>
+					<TerminalPrompt cwd={cwd} isDark={isDark} />
+					<Box className={styles.inputWrapper}>
+						{ghostText && (
+							<Box className={styles.ghost} aria-hidden="true">
+								<span className={styles.invisible}>{command}</span>
+								<span className={styles.ghostText}>{ghostText}</span>
+							</Box>
+						)}
+						<textarea
+							ref={inputRef}
+							placeholder={t('terminal.info.placeholder')}
+							className={styles.input}
+							rows={1}
+							spellCheck={false}
+							autoComplete="off"
+							autoCorrect="off"
+							autoCapitalize="off"
+							aria-label={t('terminal.info.placeholder') || 'Terminal command input'}
+							onChange={handleChange}
+							onKeyDown={handleKeyDown}
+							value={command}
+						/>
+					</Box>
 				</Box>
 			</Box>
 		</Box>

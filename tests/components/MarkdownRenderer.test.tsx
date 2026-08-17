@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import MarkdownRenderer, {
 	getAllowedEmbedSource,
 } from '../../src/app/components/MarkdownRenderer';
+import { STYLE_FILES } from '../mocks/styleContentGlob';
 
 let mockIframeSource = 'https://www.youtube.com/embed/video-id';
 let mockTheme = 'dark';
@@ -31,6 +32,8 @@ jest.mock('react-markdown', () => {
 				React.createElement(components.code, null, 'plain code'),
 				React.createElement(components.img, { src: '/profile.webp', alt: 'Profile', className: 'profile' }),
 				React.createElement(components.img, { src: '/project.png', alt: 'Project' }),
+				React.createElement(components.img, { src: '../../gabrielfeijo.webp', alt: 'Relative' }),
+				React.createElement(components.img, { src: undefined, alt: 'NoSrc' }),
 				React.createElement(components.iframe, { src: mockIframeSource }),
 				React.createElement(components.link, {
 					href: mockStylesheetHref,
@@ -73,6 +76,9 @@ jest.mock('src/contexts/ThemeContext', () => ({
 
 describe('MarkdownRenderer', () => {
 	beforeEach(() => {
+		for (const key of Object.keys(STYLE_FILES)) {
+			delete STYLE_FILES[key];
+		}
 		mockIframeSource = 'https://www.youtube.com/embed/video-id';
 		mockTheme = 'dark';
 		mockStylesheetHref =
@@ -200,6 +206,19 @@ describe('MarkdownRenderer', () => {
 		const stylesheet = container.querySelector('link');
 		expect(stylesheet).toHaveAttribute('href', '../../styles/projects.css');
 		expect(stylesheet).not.toHaveAttribute('crossorigin');
+	});
+
+	it('inlines local stylesheets when css content is available', () => {
+		STYLE_FILES['../styles/projects.css'] = '.line { height: 35px; }';
+		mockStylesheetHref = '../../styles/projects.css';
+
+		const { container } = render(
+			<MarkdownRenderer allowRawHtml content='raw content' />
+		);
+
+		const styleTag = container.querySelector('style[data-stylesheet="../../styles/projects.css"]');
+		expect(styleTag).toBeInTheDocument();
+		expect(styleTag).toHaveTextContent('.line { height: 35px; }');
 	});
 
 	it('does not interpret raw HTML by default', () => {

@@ -44,16 +44,24 @@ describe('StorageService', () => {
         expect(stored[0].name).toBe('a');
     });
 
-    it('saveOrUpdateData updates existing page', () => {
-        const page: Page = { index: 2, name: 'a', route: 'a' };
-        const otherPage: Page = { index: 3, name: 'other', route: 'other' };
-        localStorage.setItem('markdown-editor-data', JSON.stringify([page, otherPage]));
-        const updated: Page = { index: 2, name: 'b', route: 'b' };
-        StorageService.saveOrUpdateData(updated);
+    it('saveOrUpdateData updates existing page by name without overwriting other language files sharing same index', () => {
+        const ptPage: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT original' };
+        const enPage: Page = { index: 0, name: 'about-me.html', route: 'about-me', content: 'EN original' };
+        StorageService.saveOrUpdateData(ptPage);
+        StorageService.saveOrUpdateData(enPage);
+
         const stored = StorageService.getData();
-		expect(stored).toHaveLength(2);
-        expect(stored[0].name).toBe('b');
-		expect(stored[1]).toEqual(otherPage);
+        expect(stored).toHaveLength(2);
+        expect(stored.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT original');
+        expect(stored.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
+
+        const updatedPt: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT edited' };
+        StorageService.saveOrUpdateData(updatedPt);
+
+        const storedAfter = StorageService.getData();
+        expect(storedAfter).toHaveLength(2);
+        expect(storedAfter.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT edited');
+        expect(storedAfter.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
     });
 
     it('createFile and createFolder produce correct shapes', () => {
@@ -67,10 +75,19 @@ describe('StorageService', () => {
         expect(Array.isArray(folder.children)).toBe(true);
     });
 
-	it('creates a file with empty content by default', () => {
-		const file = StorageService.createFile('empty.md');
+	it('creates a file with empty content by default and auto-increments index above stored pages', () => {
+		const storedPages = [
+			{ index: 1500, name: 'stored.md', route: 'stored.md' },
+			{ index: 1200, name: 'stored2.md', route: 'stored2.md' },
+		];
+		localStorage.setItem('markdown-editor-data', JSON.stringify(storedPages));
 
-		expect(file.content).toBe('');
+		const file1 = StorageService.createFile('empty.md');
+		expect(file1.content).toBe('');
+		expect(file1.index).toBeGreaterThan(1500);
+
+		const file2 = StorageService.createFile('empty2.md');
+		expect(file2.index).toBeGreaterThan(file1.index);
 	});
 
     it('deleteFile removes by index and by name', () => {
@@ -90,5 +107,14 @@ describe('StorageService', () => {
 		StorageService.deleteFile('missing');
 
 		expect(StorageService.getData()).toEqual([page]);
+	});
+
+	it('clearData removes markdown editor data from localStorage', () => {
+		const page: Page = { index: 10, name: 'one', route: 'one' };
+		StorageService.saveOrUpdateData(page);
+		expect(StorageService.getData()).toHaveLength(1);
+
+		StorageService.clearData();
+		expect(StorageService.getData()).toHaveLength(0);
 	});
 });

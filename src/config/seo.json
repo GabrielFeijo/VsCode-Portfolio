@@ -5,7 +5,10 @@
 		"image": "/og-image.png",
 		"name": "Gabriel Feijó",
 		"title": "Gabriel Feijó | Desenvolvedor Full Stack",
-		"url": "https://www.gabrielfeijo.com.br"
+		"url": "https://www.gabrielfeijo.com.br",
+		"repoUrl": "https://github.com/GabrielFeijo/vscode-portfolio",
+		"githubUrl": "https://github.com/GabrielFeijo",
+		"linkedinUrl": "https://www.linkedin.com/in/gabriel-feijo/"
 	},
 	"pages": [
 		{

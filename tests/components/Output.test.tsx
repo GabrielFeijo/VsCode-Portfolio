@@ -13,8 +13,8 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('Output', () => {
-    it('renders output messages', () => {
-        render(<Output language="en" />);
+    it('renders output messages with default props', () => {
+        render(<Output />);
 
         expect(screen.getByText('Message 1')).toBeInTheDocument();
         expect(screen.getByText('Message 2')).toBeInTheDocument();

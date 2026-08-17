@@ -82,9 +82,12 @@ describe('index.tsx', () => {
         const renderArg = mockRender.mock.calls[0][0];
 
         const strictModeChildren = renderArg.props.children;
-        expect(strictModeChildren.type.displayName || strictModeChildren.type.name).toBe('HelmetProvider');
+        expect(strictModeChildren.type.displayName || strictModeChildren.type.name).toBe('QueryClientProvider');
 
-        const helmetChildren = strictModeChildren.props.children;
+        const queryClientChildren = strictModeChildren.props.children;
+        expect(queryClientChildren.type.displayName || queryClientChildren.type.name).toBe('HelmetProvider');
+
+        const helmetChildren = queryClientChildren.props.children;
         expect(helmetChildren.type.displayName || helmetChildren.type.name).toBe('ThemeProvider');
 
         const themeChildren = helmetChildren.props.children;

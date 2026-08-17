@@ -1,7 +1,23 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
-import App, { initVisiblePageIndexes } from '../../src/app/layout/App';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import App, { initVisiblePageIndexes, loadPages } from '../../src/app/layout/App';
+
+const createWrapper = () => {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
+    });
+    return ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+};
+
+const render = (ui: React.ReactElement, options = {}) =>
+    rtlRender(ui, { wrapper: createWrapper(), ...options });
 
 jest.mock('@mui/material', () => {
     const filterProps = (props: any) => {
@@ -40,7 +56,8 @@ jest.mock('@mui/material', () => {
 
 let mockCalled = false;
 let appTreeMode = 'default';
-jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedIndex, setPages }: any) => {
+jest.mock('src/app/layout/AppTree', () => () => {
+    const { setVisiblePageIndexes, setSelectedIndex, setPages } = require('src/contexts/EditorContext').useEditorContext();
     React.useEffect(() => {
         if (!mockCalled) {
             mockCalled = true;
@@ -63,16 +80,22 @@ jest.mock('src/app/layout/AppTree', () => ({ setVisiblePageIndexes, setSelectedI
                     setVisiblePageIndexes([1]);
             }
         }
-    }, []);
+    }, [setPages, setSelectedIndex, setVisiblePageIndexes]);
     return <div data-testid="app-tree" />;
 });
 jest.mock('src/app/layout/Footer', () => () => <div data-testid="footer" />);
-jest.mock('src/app/layout/Sidebar', () => ({ setExpanded, expanded, terminal, setTerminal, language, changeLanguage }: any) => (
-    <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded} data-language={language}>
-        <button data-testid="toggle-terminal" onClick={() => setTerminal(!terminal)}>Toggle Terminal</button>
-        <button data-testid="change-language" onClick={changeLanguage}>Change Language</button>
-    </div>
-));
+jest.mock('src/app/layout/Sidebar', () => {
+    const { useLayoutContext } = require('src/contexts/LayoutContext');
+    return ({ language, changeLanguage }: any) => {
+        const { expanded, setExpanded, terminal, setTerminal } = useLayoutContext();
+        return (
+            <div data-testid="sidebar" onClick={() => setExpanded(!expanded)} data-expanded={expanded} data-language={language}>
+                <button data-testid="toggle-terminal" onClick={() => setTerminal(!terminal)}>Toggle Terminal</button>
+                <button data-testid="change-language" onClick={changeLanguage}>Change Language</button>
+            </div>
+        );
+    };
+});
 let mockPathname = '/';
 jest.mock('react-router-dom', () => ({
     Routes: ({ children }: any) => (
@@ -87,9 +110,10 @@ jest.mock('react-router-dom', () => ({
     useLocation: () => ({ pathname: mockPathname }),
     Navigate: () => <div data-testid="navigate" />,
 }));
-jest.mock('src/app/layout/AppButtons', () => ({ pages }: any) => (
-    <div data-testid="app-buttons" data-pages={pages ? pages.length : 0} />
-));
+jest.mock('src/app/layout/AppButtons', () => () => {
+    const { visiblePages } = require('src/contexts/EditorContext').useEditorContext();
+    return <div data-testid="app-buttons" data-pages={visiblePages ? visiblePages.length : 0} />;
+});
 jest.mock('src/app/components/MDContainer', () => ({ path }: any) => (
     <div
         data-testid="md-container"
@@ -378,5 +402,38 @@ describe('App', () => {
         });
         mockStorage.getData.mockReturnValue([]);
         appTreeMode = 'default';
+    });
+
+    it('handles open-tab custom events for workspace and specific pages', async () => {
+        render(<App />);
+
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+        });
+        expect(navigateMock).toHaveBeenCalledWith('/');
+
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: 'sobre-mim.html' } }));
+        });
+        expect(navigateMock).toHaveBeenCalledWith('/about-me');
+
+        act(() => {
+            window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '' } }));
+        });
+    });
+
+    it('reloads pages on storage event', () => {
+        render(<App />);
+        act(() => {
+            window.dispatchEvent(new Event('storage'));
+        });
+        expect(screen.getByTestId('app-tree')).toBeInTheDocument();
+    });
+
+    it('re-exports loadPages and initVisiblePageIndexes correctly', () => {
+        const pages = loadPages('pt');
+        expect(pages.length).toBeGreaterThan(0);
+        const visible = initVisiblePageIndexes(pages);
+        expect(visible.length).toBe(pages.length);
     });
 });

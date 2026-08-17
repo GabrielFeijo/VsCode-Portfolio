@@ -39,8 +39,8 @@ export default function MetadataComponent() {
 					addressCountry: 'BR',
 				},
 				sameAs: [
-					'https://github.com/GabrielFeijo',
-					'https://www.linkedin.com/in/gabriel-feijo/',
+					siteConfig.githubUrl,
+					siteConfig.linkedinUrl,
 				],
 				knowsAbout: [
 					'React',
@@ -86,7 +86,7 @@ export default function MetadataComponent() {
 			/>
 			<meta
 				name='theme-color'
-				content='#282A36'
+				content='#1e1e2e'
 			/>
 			<meta
 				name='robots'

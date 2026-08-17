@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const DEFAULT_ERROR_MESSAGE = 'Ocorreu um erro interno no servidor';
+export const DEFAULT_ERROR_MESSAGE = 'An unexpected error occurred.';
 
 export class ApiError extends Error {
 	statusCode?: number;

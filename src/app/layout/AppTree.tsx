@@ -1,8 +1,7 @@
-import * as React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useAppPalette } from '../theme/useAppPalette';
 import {
 	VscMarkdown,
 	VscNewFile,
@@ -14,42 +13,32 @@ import {
 import { convertFileName } from '../../utils/convertFileName';
 import { useTranslation } from 'react-i18next';
 import { Box, IconButton, InputBase } from '@mui/material';
-import { StorageService } from '../../services/storageService';
 import { Language, Page } from '../../domain/page';
 import ContextMenu from '../components/ContextMenu/ContextMenu';
-import { normalizeFileName } from '../../utils/normalizeFileName';
 import { getBasePath, getLocalizedPath } from '../../config/seo';
+import { useEditorContext } from '../../contexts/EditorContext';
+import { useFileCreation } from '../hooks/useFileCreation';
+import { useTreeContextMenu } from '../hooks/useTreeContextMenu';
 
 interface Props {
-	pages: Page[];
-	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
-	selectedIndex: number;
-	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	currentComponent: string;
-	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-	visiblePageIndexes: number[];
-	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 	language: Language;
 }
 
-export default function AppTree({
-	pages,
-	setPages,
-	selectedIndex,
-	setSelectedIndex,
-	currentComponent,
-	setCurrentComponent,
-	visiblePageIndexes,
-	setVisiblePageIndexes,
-	language,
-}: Props) {
+export default function AppTree({ language }: Props) {
+	const {
+		pages,
+		setPages,
+		selectedIndex,
+		setSelectedIndex,
+		currentComponent,
+		setCurrentComponent,
+		visiblePageIndexes,
+		setVisiblePageIndexes,
+	} = useEditorContext();
 	const navigate = useNavigate();
-	const theme = useTheme();
+	const colors = useAppPalette();
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-	const [isCreatingFile, setIsCreatingFile] = useState(false);
-	const [newFileName, setNewFileName] = useState('');
-	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const page: Page | undefined = pages.find(
 		(item) => `/${item.route}` === getBasePath(pathname)
@@ -61,157 +50,52 @@ export default function AppTree({
 		}
 	}, [page, setSelectedIndex]);
 
-	useEffect(() => {
-		if (isCreatingFile && fileInputRef.current) {
-			fileInputRef.current.focus();
+	const openFile = useCallback((filePage: Page) => {
+		if (!visiblePageIndexes.includes(filePage.index)) {
+			setVisiblePageIndexes((prev) => [...prev, filePage.index]);
 		}
-	}, [isCreatingFile]);
+		setSelectedIndex(filePage.index);
+		navigate(getLocalizedPath(`/${filePage.route}`, language));
+	}, [language, navigate, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes]);
+
+	const {
+		isCreatingFile,
+		newFileName,
+		setNewFileName,
+		fileInputRef,
+		handleCreateFile,
+		handleConfirmCreateFile,
+		handleCancelCreateFile,
+		handleKeyDown,
+	} = useFileCreation({ pages, setPages, openFile });
+
+	const {
+		contextMenu,
+		handleContextMenu,
+		handleClose,
+		handleDelete,
+		handleOpenFile,
+		handleOpenFileOnGithub,
+	} = useTreeContextMenu({
+		pages,
+		setPages,
+		setVisiblePageIndexes,
+		setSelectedIndex,
+		navigate,
+		language,
+		openFile,
+	});
 
 	function renderTreeItemBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#313341' : '#21222c';
-		}
-		return selectedIndex === index ? '#295fbf' : '#f3f3f3';
+		return selectedIndex === index ? colors.bgElevated : colors.bgExplorer;
 	}
 
 	function renderTreeItemColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index && currentComponent === 'tree'
-				? '#ffffff'
-				: '#d0d0d0';
+		if (selectedIndex === index && currentComponent === 'tree') {
+			return colors.textPrimary;
 		}
-		return selectedIndex === index ? '#e2ffff' : '#2a2a2a';
+		return selectedIndex === index ? colors.accent : colors.textSecondary;
 	}
-
-	function handleCreateFile(e: React.MouseEvent) {
-		e.stopPropagation();
-		setIsCreatingFile(true);
-	}
-
-	function handleCancelCreateFile() {
-		resetFileCreationState();
-	}
-
-	function resetFileCreationState() {
-		setIsCreatingFile(false);
-		setNewFileName('');
-	}
-
-	function openFile(page: Page) {
-		if (!visiblePageIndexes.includes(page.index)) {
-			setVisiblePageIndexes((prev) => [...prev, page.index]);
-		}
-		setSelectedIndex(page.index);
-		navigate(getLocalizedPath(`/${page.route}`, language));
-	}
-
-	function createNewFile() {
-		if (newFileName.trim() === '') {
-			setIsCreatingFile(false);
-			return;
-		}
-
-		const normalizedName = normalizeFileName(newFileName);
-		const fullFileName = `${normalizedName}.md`;
-		const existingPage = pages.find((x) => x.route === fullFileName);
-
-		if (existingPage) {
-			openFile(existingPage);
-			resetFileCreationState();
-			return;
-		}
-
-		const newFile = StorageService.createFile(fullFileName);
-		StorageService.saveOrUpdateData(newFile);
-		setPages([...pages, newFile]);
-		openFile(newFile);
-		resetFileCreationState();
-	}
-
-	function handleKeyDown(e: React.KeyboardEvent) {
-		const keyActions: Record<string, () => void> = {
-			Enter: createNewFile,
-			Escape: handleCancelCreateFile,
-		};
-
-		const action = keyActions[e.key];
-		if (action) {
-			e.preventDefault();
-			action();
-		}
-	}
-
-	const handleDeleteFile = (pageIndex: number) => {
-		setPages((prev) => prev.filter((x) => x.index !== pageIndex));
-		setVisiblePageIndexes((prev) => prev.filter((x) => x !== pageIndex));
-		StorageService.deleteFile(pageIndex);
-		setSelectedIndex(0);
-		navigate(getLocalizedPath('/about-me', language));
-	};
-
-	const [contextMenu, setContextMenu] = useState<{
-		mouseX: number;
-		mouseY: number;
-		pageIndex: number | null;
-	} | null>(null);
-
-	const handleContextMenu = (event: React.MouseEvent, index: number) => {
-		event.preventDefault();
-		setContextMenu(
-			contextMenu === null
-				? {
-					mouseX: event.clientX - 2,
-					mouseY: event.clientY - 4,
-					pageIndex: index,
-				}
-				: null
-		);
-	};
-
-	const handleClose = () => {
-		setContextMenu(null);
-	};
-
-	const handleDelete = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			handleDeleteFile(contextMenu.pageIndex);
-		}
-		handleClose();
-	};
-	const handleOpenFile = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
-
-			if (!existingPage) return;
-
-			openFile(existingPage);
-		}
-		handleClose();
-	};
-
-	const handleOpenFileOnGithub = () => {
-		if (
-			contextMenu?.pageIndex !== null &&
-			contextMenu?.pageIndex !== undefined
-		) {
-			const existingPage = pages.find((x) => x.index === contextMenu.pageIndex);
-
-			if (!existingPage) return;
-
-			window.open(
-				`https://github.com/GabrielFeijo/VsCode-Portfolio/tree/main/public/pages/${language}/${existingPage.name}`,
-				'_blank',
-				'noopener,noreferrer'
-			);
-		}
-		handleClose();
-	};
 
 	return (
 		<>
@@ -297,12 +181,12 @@ export default function AppTree({
 									{isSaved !== undefined && !isSaved && (
 										<Box
 											sx={{
-												backgroundColor: '#fff',
+												backgroundColor: colors.accentPink,
 												borderRadius: '100%',
 												width: '10px',
 												height: '10px',
 											}}
-										></Box>
+										/>
 									)}
 								</Box>
 							}
@@ -313,7 +197,7 @@ export default function AppTree({
 									backgroundColor: renderTreeItemBgColor(index),
 								},
 							}}
-							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
+							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							onClick={() => {
 								if (!visiblePageIndexes.includes(index)) {
 									const newIndexes = [...visiblePageIndexes, index];
@@ -329,17 +213,18 @@ export default function AppTree({
 					{isCreatingFile && (
 						<TreeItem
 							itemId='-2'
-							slots={{ icon: () => <VscMarkdown color='#6997d5' /> }}
+							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							label={
 								<Box
+									onClick={(e) => e.stopPropagation()}
+									onMouseDown={(e) => e.stopPropagation()}
 									sx={{
 										maxWidth: '100%',
 									}}
-									onClick={(e: React.MouseEvent) => e.stopPropagation()}
 								>
 									<InputBase
 										inputRef={fileInputRef}
-										value={`${normalizeFileName(newFileName)}`}
+										value={newFileName}
 										onChange={(e) => setNewFileName(e.target.value)}
 										onKeyDown={handleKeyDown}
 										placeholder={t('prompts.enter_filename')}
@@ -356,7 +241,7 @@ export default function AppTree({
 												<IconButton
 													size='small'
 													aria-label={t('sidebar.confirm') || 'Confirm'}
-													onClick={createNewFile}
+													onClick={handleConfirmCreateFile}
 												>
 													<VscCheck size={12} />
 												</IconButton>

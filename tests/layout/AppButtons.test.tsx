@@ -33,7 +33,6 @@ jest.mock('@mui/material', () => {
     };
 });
 
-
 jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(),
 }));
@@ -51,8 +50,17 @@ jest.mock('src/utils/convertFileName', () => ({
     convertFileName: jest.fn(),
 }));
 
+let mockEditorContext: any = {};
+
+jest.mock('src/contexts/EditorContext', () => ({
+    useEditorContext: () => mockEditorContext,
+}));
+
+let latestTabContextMenuProps: any = null;
+
 jest.mock('src/app/components/TabContextMenu/TabContextMenu', () => {
     return function MockTabContextMenu(props: any) {
+        latestTabContextMenuProps = props;
         return (
             <div data-testid="tab-context-menu">
                 <button data-testid="close-tab" onClick={props.handleCloseTab} />
@@ -72,12 +80,17 @@ const mockConvertFileName = require('src/utils/convertFileName').convertFileName
 
 describe('AppButtons', () => {
     const defaultProps = {
-    pages: [
+        pages: [
             { index: 0, name: 'Home', route: 'home' },
             { index: 1, name: 'About', route: 'about' },
             { index: 2, name: 'Projects', route: 'projects' },
-    ],
-	language: 'pt' as const,
+        ],
+        visiblePages: [
+            { index: 0, name: 'Home', route: 'home' },
+            { index: 1, name: 'About', route: 'about' },
+            { index: 2, name: 'Projects', route: 'projects' },
+        ],
+        language: 'pt' as const,
         selectedIndex: 0,
         setSelectedIndex: jest.fn(),
         currentComponent: 'Home',
@@ -95,13 +108,17 @@ describe('AppButtons', () => {
         defaultProps.setSelectedIndex.mockClear();
         defaultProps.setVisiblePageIndexes.mockClear();
         defaultProps.setCurrentComponent.mockClear();
+        mockEditorContext = {
+            ...defaultProps,
+        };
+        latestTabContextMenuProps = null;
     });
 
     it('renders buttons with dark theme', () => {
         mockUseTheme.mockReturnValue({
             palette: { mode: 'dark' },
         });
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         expect(screen.getByText('Home')).toBeInTheDocument();
         expect(screen.getByText('About')).toBeInTheDocument();
         expect(screen.getByText('Projects')).toBeInTheDocument();
@@ -110,7 +127,7 @@ describe('AppButtons', () => {
     it('calls setSelectedIndex and navigate when button is clicked', () => {
         const navigate = jest.fn();
         mockUseNavigate.mockReturnValue(navigate);
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.click(aboutButton);
         expect(defaultProps.setSelectedIndex).toHaveBeenCalledWith(1);
@@ -120,39 +137,57 @@ describe('AppButtons', () => {
     it('navigates with the English locale prefix', () => {
         const navigate = jest.fn();
         mockUseNavigate.mockReturnValue(navigate);
-        render(<AppButtons {...defaultProps} language="en" />);
+        render(<AppButtons language="en" />);
 
         fireEvent.click(screen.getByText('Projects'));
         expect(navigate).toHaveBeenCalledWith('/en/projects');
     });
 
     it('calls setVisiblePageIndexes when close button is pressed with Enter', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const closeButtons = screen.getAllByLabelText(/Close/);
         fireEvent.keyDown(closeButtons[1], { key: 'Enter' });
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
     });
 
     it('calls setVisiblePageIndexes when close button is pressed with Space', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const closeButtons = screen.getAllByLabelText(/Close/);
         fireEvent.keyDown(closeButtons[1], { key: ' ' });
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
     });
 
     it('handles close tab from context menu', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeTabButton = screen.getByTestId('close-tab');
         fireEvent.click(closeTabButton);
-        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith([0, 2]);
+        expect(defaultProps.setVisiblePageIndexes).toHaveBeenCalledWith(expect.any(Function));
+        const updater = defaultProps.setVisiblePageIndexes.mock.calls[0][0];
+        expect(updater([0, 1, 2])).toEqual([0, 2]);
+    });
+
+    it('does nothing on context menu handlers when contextMenu state is null', () => {
+        render(<AppButtons language={defaultProps.language} />);
+        expect(latestTabContextMenuProps).toBeDefined();
+
+        latestTabContextMenuProps.handleCloseTab();
+        latestTabContextMenuProps.handleCloseOthers();
+        latestTabContextMenuProps.handleCloseToRight();
+        latestTabContextMenuProps.handleCloseToLeft();
+
+        expect(defaultProps.setVisiblePageIndexes).not.toHaveBeenCalled();
     });
 
     it('handles close others from context menu', () => {
         const navigate = jest.fn();
         mockUseNavigate.mockReturnValue(navigate);
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeOthersButton = screen.getByTestId('close-others');
@@ -163,7 +198,7 @@ describe('AppButtons', () => {
     });
 
     it('handles close to right from context menu', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeToRightButton = screen.getByTestId('close-to-right');
@@ -172,7 +207,7 @@ describe('AppButtons', () => {
     });
 
     it('handles close to left from context menu', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const projectsButton = screen.getByText('Projects');
         fireEvent.contextMenu(projectsButton, { clientX: 100, clientY: 200 });
         const closeToLeftButton = screen.getByTestId('close-to-left');
@@ -183,7 +218,7 @@ describe('AppButtons', () => {
     it('handles close all from context menu', () => {
         const navigate = jest.fn();
         mockUseNavigate.mockReturnValue(navigate);
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeAllButton = screen.getByTestId('close-all');
@@ -193,7 +228,7 @@ describe('AppButtons', () => {
     });
 
     it('closes context menu', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const aboutButton = screen.getByText('About');
         fireEvent.contextMenu(aboutButton, { clientX: 100, clientY: 200 });
         const closeMenuButton = screen.getByTestId('close-menu');
@@ -201,7 +236,7 @@ describe('AppButtons', () => {
     });
 
     it('does not call setSelectedIndex when close button is clicked', () => {
-        render(<AppButtons {...defaultProps} />);
+        render(<AppButtons language={defaultProps.language} />);
         const closeButtons = screen.getAllByLabelText(/Close/);
         fireEvent.click(closeButtons[1]);
         expect(defaultProps.setSelectedIndex).not.toHaveBeenCalled();

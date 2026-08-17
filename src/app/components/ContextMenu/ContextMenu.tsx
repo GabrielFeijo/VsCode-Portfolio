@@ -29,15 +29,15 @@ export default function ContextMenu({
 	const { t } = useTranslation();
 
 	useEffect(() => {
+		if (contextMenu === null) return;
+
 		const handleClickOutside = (event: MouseEvent) => {
 			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
 				handleClose();
 			}
 		};
 
-		if (contextMenu !== null) {
-			document.addEventListener('mousedown', handleClickOutside);
-		}
+		document.addEventListener('mousedown', handleClickOutside);
 
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);

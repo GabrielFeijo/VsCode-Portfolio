@@ -6,8 +6,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getReviewSchema } from './schemas/BoxRatingSchema';
 import styles from './BoxRating.module.css';
-import { ApiError, ReviewService } from '../../../services/api/review/ReviewService';
-import { fadeInOut } from '../../../utils/motionVariants';
+import { ApiError } from '@/services/api/review/ReviewService';
+import { useCreateReviewMutation } from '@/hooks/queries/useReviewsQuery';
+import { fadeInOut } from '@/utils/motionVariants';
 import { Rating } from '@mui/material';
 import { Star, StarBorder } from '@mui/icons-material';
 
@@ -24,6 +25,7 @@ interface ReviewFormData {
 
 export default function BoxRating({ ranking, setRanking }: Props) {
 	const { t } = useTranslation();
+	const createReviewMutation = useCreateReviewMutation();
 
 	const reviewSchema = getReviewSchema(t);
 
@@ -58,54 +60,36 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	};
 
 	const getErrorMessage = (error: ApiError): string => {
-		const statusCode = error.statusCode;
+		const { statusCode, validationErrors } = error;
 
-		if (statusCode === 400 && error.validationErrors) {
-			const validationError = error.validationErrors[0];
-
-			if (validationError.includes('Username must be at least')) {
-				return t('rating.errors.usernameMin');
-			}
-			if (validationError.includes('Comment must be at least')) {
-				return t('rating.errors.commentMin');
-			}
-			if (validationError.includes('Stars must not exceed')) {
-				return t('rating.errors.starsMax');
-			}
-
+		if (statusCode === 400 && validationErrors && validationErrors.length > 0) {
+			const validationError = validationErrors[0];
+			if (validationError.includes('Username must be at least')) return t('rating.errors.usernameMin');
+			if (validationError.includes('Comment must be at least')) return t('rating.errors.commentMin');
+			if (validationError.includes('Stars must not exceed')) return t('rating.errors.starsMax');
 			return validationError;
 		}
 
-		if (statusCode === 429) {
-			return t('rating.errors.tooManyRequests');
-		}
-
-		if (statusCode && statusCode >= 500) {
-			return t('rating.errors.serverError');
-		}
-
-		if (error.message.toLowerCase().includes('network')) {
-			return t('rating.errors.networkError');
-		}
+		if (statusCode === 429) return t('rating.errors.tooManyRequests');
+		if (statusCode && statusCode >= 500) return t('rating.errors.serverError');
+		if (error.message.toLowerCase().includes('network')) return t('rating.errors.networkError');
 
 		return t('rating.errors.unknownError');
 	};
 
 	const onSubmit = async (data: ReviewFormData) => {
-		const response = await ReviewService.create({
-			username: data.username.trim(),
-			comment: data.comment.trim(),
-			stars: data.stars,
-		});
-
-		if (response instanceof Error) {
-			const errorMessage = getErrorMessage(response);
+		try {
+			await createReviewMutation.mutateAsync({
+				username: data.username.trim(),
+				comment: data.comment.trim(),
+				stars: data.stars,
+			});
+			reset();
+			setRanking(false);
+		} catch (response) {
+			const errorMessage = getErrorMessage(response as ApiError);
 			showError(errorMessage);
-			return;
 		}
-
-		reset();
-		setRanking(false);
 	};
 
 	useEffect(() => {

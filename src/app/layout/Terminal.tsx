@@ -1,26 +1,16 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
-import {
-	VscAdd,
-	VscClose,
-	VscEllipsis,
-	VscTrash,
-	VscTerminalCmd,
-	VscSplitHorizontal,
-	VscChevronDown,
-} from 'react-icons/vsc';
 import Problems from '../components/Terminal/Problems';
 import Output from '../components/Terminal/Output';
 import Debug from '../components/Terminal/Debug';
 import Cmd from '../components/Terminal/Cmd';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useAppPalette } from '../theme/useAppPalette';
 import { Language } from '../../domain/page';
+import { TerminalToolbar } from './TerminalToolbar';
 
 interface Props {
 	language: Language;
-	selectedTerminalIndex: number;
-	setSelectedTerminalIndex: React.Dispatch<React.SetStateAction<number>>;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
 	changeLanguage: () => void;
@@ -28,43 +18,29 @@ interface Props {
 
 const Terminal = ({
 	language,
-	selectedTerminalIndex,
-	setSelectedTerminalIndex,
 	setTerminal,
 	setRanking,
 	changeLanguage,
 }: Props) => {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
-	const isDarkMode = theme === 'dark';
+	const colors = useAppPalette();
+	const [selectedTerminalIndex, setSelectedTerminalIndex] = useState(3);
 
-	function renderTerminalBgColor(index: number) {
-		if (isDarkMode) {
-			return selectedTerminalIndex === index ? '#ff79c6' : 'transparent';
-		}
-		return selectedTerminalIndex === index ? '#000' : 'transparent';
-	}
-	function renderTerminalColor(index: number) {
-		if (isDarkMode) {
-			return selectedTerminalIndex === index ? '#ffffff' : '#b0b8d0';
-		}
-		return selectedTerminalIndex === index ? '#000000' : '#2a2a2a';
-	}
-	const opc = [
+	const terminalTabs = useMemo(() => [
 		{
 			index: 0,
 			name: t('terminal.tabs.problems'),
-			element: <Problems language={language} />,
+			element: <Problems />,
 		},
 		{
 			index: 1,
 			name: t('terminal.tabs.output'),
-			element: <Output language={language} />,
+			element: <Output />,
 		},
 		{
 			index: 2,
 			name: t('terminal.tabs.debug'),
-			element: <Debug language={language} />,
+			element: <Debug />,
 		},
 		{
 			index: 3,
@@ -77,16 +53,23 @@ const Terminal = ({
 				/>
 			),
 		},
-	];
+	], [t, language, setRanking, changeLanguage]);
+
+	function renderTerminalBgColor(index: number) {
+		return selectedTerminalIndex === index ? colors.tabIndicator : 'transparent';
+	}
+
+	function renderTerminalColor(index: number) {
+		return selectedTerminalIndex === index ? colors.textPrimary : colors.textSecondary;
+	}
 
 	return (
 		<Box
 			sx={{
-				height: `100%`,
-				width: `100%`,
-				backgroundColor: isDarkMode ? '#282A36' : '#fff',
-				borderTop: `1px solid transparent`,
-				borderColor: isDarkMode ? '#bd93f9' : '#000',
+				height: '100%',
+				width: '100%',
+				backgroundColor: colors.bgTerminal,
+				borderTop: `1px solid ${colors.border}`,
 			}}
 			component={Paper}
 			square
@@ -106,7 +89,7 @@ const Terminal = ({
 					spacing={2}
 					role="tablist"
 				>
-					{opc.map(({ index, name }) => (
+					{terminalTabs.map(({ index, name }) => (
 						<Box
 							key={index}
 							component="button"
@@ -124,12 +107,12 @@ const Terminal = ({
 								setSelectedTerminalIndex(index);
 							}}
 							sx={{
-								borderBottom: `1px solid transparent`,
+								borderBottom: '1px solid transparent',
 								borderColor: renderTerminalBgColor(index),
 								color: renderTerminalColor(index),
 								cursor: 'pointer',
 								'&:hover': {
-									color: isDarkMode ? 'white' : '#000',
+									color: colors.textPrimary,
 								},
 								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 								p: 0.8,
@@ -145,184 +128,18 @@ const Terminal = ({
 						</Box>
 					))}
 				</Stack>
-				<Stack
-					direction='row'
-					spacing={0}
-					role="toolbar"
-					aria-label="Terminal toolbar"
-				>
-					<Box
-						component="button"
-						aria-label="Open terminal command"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-							}
-						}}
-						display='flex'
-						gap={0.5}
-						alignItems='center'
-						sx={{
-							cursor: 'pointer',
-							height: 33,
-							'&:hover': {
-								backgroundColor: '#383a4294',
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-						}}
-					>
-						<VscTerminalCmd />
-						<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
-					</Box>
-					<Box
-						component="button"
-						aria-label="Add new terminal"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-							}
-						}}
-						display='flex'
-						gap={0.5}
-						alignItems='center'
-						sx={{
-							cursor: 'pointer',
-							height: 33,
-
-							'&:hover': {
-								backgroundColor: '#383a4294',
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-						}}
-					>
-						<VscAdd />
-						<VscChevronDown />
-					</Box>
-					<Box
-						component="button"
-						aria-label="Split terminal"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-							}
-						}}
-						sx={{
-							cursor: 'pointer',
-							'&:hover ': {
-								backgroundColor: '#383a4294',
-								height: 33,
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-					>
-						<VscSplitHorizontal />
-					</Box>
-					<Box
-						component="button"
-						aria-label="Delete terminal"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-							}
-						}}
-						sx={{
-							cursor: 'pointer',
-							'&:hover ': {
-								backgroundColor: '#383a4294',
-								height: 33,
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-					>
-						<VscTrash />
-					</Box>
-					<Box
-						component="button"
-						aria-label="More options"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-							}
-						}}
-						sx={{
-							cursor: 'pointer',
-							'&:hover ': {
-								backgroundColor: '#383a4294',
-								height: 33,
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-					>
-						<VscEllipsis />
-					</Box>
-					<Box
-						component="button"
-						aria-label="Close terminal"
-						tabIndex={0}
-						onKeyDown={(e: { key: string; preventDefault: () => void; }) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								setTerminal(false);
-							}
-						}}
-						onClick={() => setTerminal(false)}
-						sx={{
-							cursor: 'pointer',
-							'&:hover': {
-								backgroundColor: '#383a4294',
-								height: 33,
-							},
-							WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-							p: 1,
-							border: 'none',
-							background: 'transparent',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-					>
-						<VscClose />
-					</Box>
-				</Stack>
+				<TerminalToolbar onCloseTerminal={() => setTerminal(false)} />
 			</Box>
 			<Box
 				height={'86%'}
 				position={'relative'}
 				overflow={'auto'}
 				sx={{
-					px: 2,
+					px: selectedTerminalIndex === 3 ? 0 : 2,
+					backgroundColor: selectedTerminalIndex === 3 ? colors.bgTerminal : 'transparent',
 				}}
 			>
-				{opc[selectedTerminalIndex].element}
+				{terminalTabs[selectedTerminalIndex].element}
 			</Box>
 		</Box>
 	);

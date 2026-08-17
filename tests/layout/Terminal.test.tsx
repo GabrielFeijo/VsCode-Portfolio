@@ -30,8 +30,6 @@ const mockUseTranslation = require('react-i18next').useTranslation;
 describe('Terminal', () => {
     const defaultProps = {
         language: 'en' as 'en',
-        selectedTerminalIndex: 0,
-        setSelectedTerminalIndex: jest.fn(),
         setTerminal: jest.fn(),
         setRanking: jest.fn(),
         changeLanguage: jest.fn(),
@@ -44,7 +42,6 @@ describe('Terminal', () => {
         mockUseTranslation.mockReturnValue({
             t: (key: string) => key,
         });
-        defaultProps.setSelectedTerminalIndex.mockClear();
         defaultProps.setTerminal.mockClear();
         defaultProps.setRanking.mockClear();
         defaultProps.changeLanguage.mockClear();
@@ -59,14 +56,30 @@ describe('Terminal', () => {
         expect(screen.getByText('TERMINAL.TABS.TERMINAL')).toBeInTheDocument();
     });
 
-    it('renders with selectedTerminalIndex 1', () => {
-        render(<Terminal {...defaultProps} selectedTerminalIndex={1} />);
+    it('renders terminal tab (index 3) by default', () => {
+        render(<Terminal {...defaultProps} />);
+        expect(screen.getByTestId('cmd')).toBeInTheDocument();
+    });
+
+    it('switches to output tab (index 1) when clicked', () => {
+        render(<Terminal {...defaultProps} />);
+        const outputTab = screen.getByText('TERMINAL.TABS.OUTPUT');
+        fireEvent.click(outputTab);
         expect(screen.getByTestId('output')).toBeInTheDocument();
     });
 
-    it('renders with selectedTerminalIndex 2', () => {
-        render(<Terminal {...defaultProps} selectedTerminalIndex={2} />);
+    it('switches to debug tab (index 2) when clicked', () => {
+        render(<Terminal {...defaultProps} />);
+        const debugTab = screen.getByText('TERMINAL.TABS.DEBUG');
+        fireEvent.click(debugTab);
         expect(screen.getByTestId('debug')).toBeInTheDocument();
+    });
+
+    it('switches to problems tab (index 0) when clicked', () => {
+        render(<Terminal {...defaultProps} />);
+        const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
+        fireEvent.click(problemsTab);
+        expect(screen.getByTestId('problems')).toBeInTheDocument();
     });
 
     it('renders with dark theme', () => {
@@ -77,40 +90,25 @@ describe('Terminal', () => {
         expect(screen.getByText('TERMINAL.TABS.PROBLEMS')).toBeInTheDocument();
     });
 
-    it('renders with dark theme and selectedTerminalIndex 1', () => {
-        mockUseTheme.mockReturnValue({
-            theme: 'dark',
-        });
-        render(<Terminal {...defaultProps} selectedTerminalIndex={1} />);
-        expect(screen.getByTestId('output')).toBeInTheDocument();
-    });
-
-    it('calls setSelectedTerminalIndex when tab is clicked', () => {
-        render(<Terminal {...defaultProps} />);
-        const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
-        fireEvent.click(problemsTab);
-        expect(defaultProps.setSelectedTerminalIndex).toHaveBeenCalledWith(0);
-    });
-
-    it('calls setSelectedTerminalIndex when tab is pressed with Enter', () => {
+    it('switches tab when tab is pressed with Enter', () => {
         render(<Terminal {...defaultProps} />);
         const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
         fireEvent.keyDown(problemsTab, { key: 'Enter' });
-        expect(defaultProps.setSelectedTerminalIndex).toHaveBeenCalledWith(0);
+        expect(screen.getByTestId('problems')).toBeInTheDocument();
     });
 
-    it('calls setSelectedTerminalIndex when tab is pressed with Space', () => {
+    it('switches tab when tab is pressed with Space', () => {
         render(<Terminal {...defaultProps} />);
         const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
         fireEvent.keyDown(problemsTab, { key: ' ' });
-        expect(defaultProps.setSelectedTerminalIndex).toHaveBeenCalledWith(0);
+        expect(screen.getByTestId('problems')).toBeInTheDocument();
     });
 
-    it('does not call setSelectedTerminalIndex when tab is pressed with other key', () => {
+    it('does not switch tab when pressed with other key', () => {
         render(<Terminal {...defaultProps} />);
         const problemsTab = screen.getByText('TERMINAL.TABS.PROBLEMS');
         fireEvent.keyDown(problemsTab, { key: 'A' });
-        expect(defaultProps.setSelectedTerminalIndex).not.toHaveBeenCalled();
+        expect(screen.getByTestId('cmd')).toBeInTheDocument();
     });
 
     it('calls setTerminal when close button is clicked', () => {
@@ -159,22 +157,10 @@ describe('Terminal', () => {
         fireEvent.keyDown(addButton, { key: 'Enter' });
     });
 
-    it('handles keyboard on add button with Space', () => {
-        render(<Terminal {...defaultProps} />);
-        const addButton = screen.getByLabelText('Add new terminal');
-        fireEvent.keyDown(addButton, { key: ' ' });
-    });
-
     it('handles keyboard on split button', () => {
         render(<Terminal {...defaultProps} />);
         const splitButton = screen.getByLabelText('Split terminal');
         fireEvent.keyDown(splitButton, { key: 'Enter' });
-    });
-
-    it('handles keyboard on split button with Space', () => {
-        render(<Terminal {...defaultProps} />);
-        const splitButton = screen.getByLabelText('Split terminal');
-        fireEvent.keyDown(splitButton, { key: ' ' });
     });
 
     it('handles keyboard on delete button', () => {
@@ -183,21 +169,9 @@ describe('Terminal', () => {
         fireEvent.keyDown(deleteButton, { key: 'Enter' });
     });
 
-    it('handles keyboard on delete button with Space', () => {
-        render(<Terminal {...defaultProps} />);
-        const deleteButton = screen.getByLabelText('Delete terminal');
-        fireEvent.keyDown(deleteButton, { key: ' ' });
-    });
-
     it('handles keyboard on more options button', () => {
         render(<Terminal {...defaultProps} />);
         const moreButton = screen.getByLabelText('More options');
         fireEvent.keyDown(moreButton, { key: 'Enter' });
-    });
-
-    it('handles keyboard on more options button with Space', () => {
-        render(<Terminal {...defaultProps} />);
-        const moreButton = screen.getByLabelText('More options');
-        fireEvent.keyDown(moreButton, { key: ' ' });
     });
 });

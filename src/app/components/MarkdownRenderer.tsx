@@ -18,7 +18,8 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { useTheme } from '../../contexts/ThemeContext';
+import { fonts } from '../theme/typography';
+import { getStyleContent } from '@/services/styleContentService';
 
 interface MarkdownRendererProps {
 	allowRawHtml?: boolean;
@@ -29,10 +30,35 @@ const markdownPlugins = [remarkGfm, remarkBreaks];
 const rawHtmlSchema = {
 	...defaultSchema,
 	strip: [...defaultSchema.strip!, 'title'],
-	tagNames: [...defaultSchema.tagNames!, 'iframe', 'link', 'main'],
+	tagNames: [
+		...defaultSchema.tagNames!,
+		'iframe',
+		'link',
+		'style',
+		'main',
+		'section',
+		'header',
+		'article',
+		'nav',
+		'aside',
+		'figure',
+		'figcaption',
+		'span',
+		'div',
+		'img',
+	],
 	attributes: {
 		...defaultSchema.attributes,
-		'*': [...defaultSchema.attributes!['*']!, 'className'],
+		'*': [
+			...defaultSchema.attributes!['*']!,
+			'className',
+			'class',
+			'id',
+			'style',
+			'ariaLabel',
+			'ariaDescribedBy',
+			'ariaLabelledBy',
+		],
 		iframe: [
 			'src',
 			'title',
@@ -42,17 +68,32 @@ const rawHtmlSchema = {
 			'allow',
 			'allowFullScreen',
 		],
-		link: ['href', ['rel', 'stylesheet']],
+		link: ['href', 'rel', 'integrity', 'crossOrigin', 'referrerPolicy'],
+		img: [
+			'src',
+			'alt',
+			'width',
+			'height',
+			'loading',
+			'decoding',
+			'className',
+			'class',
+		],
 		section: [
 			'dataFootnotes',
-			['className', 'footnotes', 'desc', 'exp', 'flex', 'header'],
+			'className',
+			'class',
+			'id',
 		],
 		ul: [
 			'ariaDescribedBy',
 			'ariaLabel',
 			'ariaLabelledBy',
-			['className', 'contains-task-list', 'flex'],
+			'className',
+			'class',
 		],
+		span: ['className', 'class', 'id'],
+		div: ['className', 'class', 'id'],
 	},
 };
 const rawHtmlPlugins: NonNullable<ReactMarkdownOptions['rehypePlugins']> = [
@@ -73,7 +114,7 @@ const allowedStylesheets = new Set([
 	deviconStylesheet,
 	'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0',
 ]);
-const localStylesheetPattern = /^\.\.\/\.\.\/styles\/[a-z0-9-]+\.css$/;
+const localStylesheetPattern = /^((\.\.\/)+|\/)styles\/[a-z0-9-]+\.css$/;
 
 export function getAllowedEmbedSource(source?: string): string | null {
 	if (!source) return null;
@@ -90,8 +131,15 @@ export function getAllowedEmbedSource(source?: string): string | null {
 
 function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
 	if (props.rel !== 'stylesheet' || !props.href) return null;
+
 	const isRemoteStylesheet = allowedStylesheets.has(props.href);
-	if (!isRemoteStylesheet && !localStylesheetPattern.test(props.href)) return null;
+	if (!isRemoteStylesheet) {
+		if (!localStylesheetPattern.test(props.href)) return null;
+		const localContent = getStyleContent(props.href);
+		if (localContent) {
+			return <style data-stylesheet={props.href}>{localContent}</style>;
+		}
+	}
 
 	return (
 		<link
@@ -119,10 +167,12 @@ function MarkdownLink(props: ComponentPropsWithoutRef<'a'>) {
 
 function MarkdownImage(props: ComponentPropsWithoutRef<'img'>) {
 	const isProfileImage = props.className?.split(' ').includes('profile');
+	const src = props.src ? props.src.replace(/^(\.\.\/)+/, '/') : props.src;
 
 	return (
 		<img
 			{...props}
+			src={src}
 			loading={isProfileImage ? 'eager' : 'lazy'}
 			decoding='async'
 		/>
@@ -167,11 +217,9 @@ function MarkdownTableCell({ children }: { children: ReactNode }) {
 function MarkdownCode({
 	children,
 	className,
-	isDarkTheme,
 }: {
 	children: ReactNode;
 	className?: string;
-	isDarkTheme: boolean;
 }) {
 	const language = className?.split('-')[1] || 'md';
 
@@ -182,9 +230,9 @@ function MarkdownCode({
 				overflowX: 'auto',
 				p: 2,
 				borderRadius: 1,
-				backgroundColor: isDarkTheme ? '#1e1e1e' : '#f5f5f5',
-				color: isDarkTheme ? '#d4d4d4' : '#24292f',
-				fontFamily: '"Fira Code", "Fira Mono", monospace',
+				backgroundColor: 'var(--bg-tertiary)',
+				color: 'var(--text-primary)',
+				fontFamily: fonts.mono,
 				fontSize: 14,
 			}}
 		>
@@ -227,17 +275,11 @@ export default function MarkdownRenderer({
 	allowRawHtml = false,
 	content,
 }: MarkdownRendererProps) {
-	const { theme } = useTheme();
-	const isDarkTheme = theme === 'dark';
-
 	return (
 		<ReactMarkdown
 			components={{
 				code: ({ children, className }) => (
-					<MarkdownCode
-						className={className}
-						isDarkTheme={isDarkTheme}
-					>
+					<MarkdownCode className={className}>
 						{children}
 					</MarkdownCode>
 				),

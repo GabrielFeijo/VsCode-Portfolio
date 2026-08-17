@@ -24,7 +24,7 @@ describe('Loading', () => {
             justifyContent: 'center',
             alignItems: 'center',
             flexDirection: 'column',
-            backgroundColor: '#282a36',
+            backgroundColor: 'var(--bg-primary)',
             zIndex: '99'
         });
     });

@@ -7,15 +7,13 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import logo from '../../static/favicon.png';
 import { useLocation } from 'react-router-dom';
 import Loading from '../components/Loading/Loading';
-import { HomeService } from '../../services/api/home/HomeService';
+import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useTranslation } from 'react-i18next';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
-import { CacheService } from '../../services/cacheService';
-import dayjs from 'dayjs';
 import { siteConfig } from '../../config/site';
 
 interface Props {
@@ -25,9 +23,9 @@ interface Props {
 export default function Home({ setSelectedIndex }: Props) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-	const [loading, setLoading] = useState(true);
+	const { isLoading } = useHomeQuery();
 
-	const contactLinks = [
+	const contactLinks = useMemo(() => [
 		{
 			index: 0,
 			icon: <FaGithub />,
@@ -46,41 +44,19 @@ export default function Home({ setSelectedIndex }: Props) {
 			title: t('contact.email.title'),
 			href: t('contact.email.href'),
 		},
-	];
-
-	const getConnection = async () => {
-		if (!CacheService.has24HoursPassed()) {
-			return;
-		}
-
-		const response = await HomeService.getResponse();
-		if (response instanceof Error) throw response;
-
-		CacheService.setCache({ lastFetch: dayjs().toISOString() });
-	};
+	], [t]);
 
 	useEffect(() => {
 		setSelectedIndex(-1);
 	}, [setSelectedIndex]);
 
 	useEffect(() => {
-		let active = true;
 		document.title = siteConfig.name;
-
-		void getConnection()
-			.catch(() => undefined)
-			.finally(() => {
-				if (active) setLoading(false);
-			});
-
-		return () => {
-			active = false;
-		};
 	}, [pathname]);
 
 	return (
 		<>
-			{loading && <Loading></Loading>}
+			{isLoading && <Loading />}
 			<Grid
 				container
 				spacing={0}

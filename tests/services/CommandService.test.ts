@@ -33,7 +33,7 @@ describe('CommandService', () => {
         const mod = await import('../../src/services/api/command/CommandService');
         const result = await mod.CommandService.getResponse('nothing');
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
     });
 
     it('returns default error for non-axios errors', async () => {
@@ -42,6 +42,29 @@ describe('CommandService', () => {
         const mod = await import('../../src/services/api/command/CommandService');
         const result = await mod.CommandService.getResponse('test');
         expect(result).toBeInstanceOf(Error);
-        expect((result as Error).message).toBe('Ocorreu um erro interno no servidor');
+        expect((result as Error).message).toBe('An unexpected error occurred.');
+    });
+
+    it('findAll returns data on success', async () => {
+        const commands = [{ command: 'help', response: ['help text'] }];
+        (apiFetch.get as jest.Mock).mockResolvedValue({ data: commands });
+        const mod = await import('../../src/services/api/command/CommandService');
+        const result = await mod.CommandService.findAll();
+        expect(result).toEqual(commands);
+        expect(apiFetch.get).toHaveBeenCalledWith('/command');
+    });
+
+    it('findAll returns Error when response contains no data', async () => {
+        (apiFetch.get as jest.Mock).mockResolvedValue({ data: null });
+        const mod = await import('../../src/services/api/command/CommandService');
+        const result = await mod.CommandService.findAll();
+        expect(result).toBeInstanceOf(Error);
+    });
+
+    it('findAll returns Error when request fails', async () => {
+        (apiFetch.get as jest.Mock).mockRejectedValue(new Error('offline'));
+        const mod = await import('../../src/services/api/command/CommandService');
+        const result = await mod.CommandService.findAll();
+        expect(result).toBeInstanceOf(Error);
     });
 });

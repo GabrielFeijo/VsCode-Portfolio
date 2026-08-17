@@ -21,7 +21,6 @@ export const CacheService = {
 				return parsed as HomeCache;
 			}
 		} catch {
-			// Invalid cache entries are treated as expired and removed below.
 		}
 
 		localStorage.removeItem(CACHE_KEY);

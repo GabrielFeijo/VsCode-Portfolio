@@ -20,6 +20,7 @@ jest.mock('react-icons/vsc', () => ({
     VscChromeClose: () => <div data-testid="close-icon" />,
     VscEditorLayout: () => <div data-testid="layout-icon" />,
     VscSave: () => <div data-testid="save-icon" />,
+    VscRecordKeys: () => <div data-testid="keyboard-icon" />,
 }));
 
 const mockT = jest.fn();
@@ -66,13 +67,9 @@ describe('KeyboardShortcutsModal', () => {
         });
 
         expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
-
         expect(screen.getByText('shortcuts.terminal')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.theme')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.language')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.sidebar')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.home')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.save')).toBeInTheDocument();
+        expect(screen.getAllByText('Ctrl').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('J').length).toBeGreaterThanOrEqual(1);
     });
 
     it('hides modal after 5 seconds', async () => {

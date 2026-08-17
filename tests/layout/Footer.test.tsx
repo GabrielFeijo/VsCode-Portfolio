@@ -43,11 +43,12 @@ describe('Footer', () => {
     });
 
     it('renders the GitHub link with correct attributes', () => {
+        const { siteConfig } = require('../../src/config/site');
         render(<Footer />);
 
         const link = screen.getByRole('link', { name: /view source code on github - main branch/i });
         expect(link).toBeInTheDocument();
-        expect(link).toHaveAttribute('href', 'https://github.com/GabrielFeijo');
+        expect(link).toHaveAttribute('href', siteConfig.githubUrl);
         expect(link).toHaveAttribute('target', '_blank');
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });

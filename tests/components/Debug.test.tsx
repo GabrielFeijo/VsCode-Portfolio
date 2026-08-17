@@ -12,14 +12,14 @@ jest.mock('react-icons/vsc', () => ({
 }));
 
 describe('Debug', () => {
-    it('renders debug component with correct text', () => {
-        render(<Debug language="en" />);
+    it('renders debug component with default props', () => {
+        render(<Debug />);
 
         expect(screen.getByText('terminal.debug')).toBeInTheDocument();
         expect(screen.getByTestId('chevron-icon')).toBeInTheDocument();
     });
 
-    it('renders with different language prop', () => {
+    it('renders with explicit language prop', () => {
         render(<Debug language="pt" />);
 
         expect(screen.getByText('terminal.debug')).toBeInTheDocument();

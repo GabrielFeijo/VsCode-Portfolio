@@ -1,13 +1,17 @@
 import { Box, Typography } from '@mui/material';
 import { VscChevronRight } from 'react-icons/vsc';
 import { useTranslation } from 'react-i18next';
+import { useAppPalette } from '../../theme/useAppPalette';
+import { fonts } from '../../theme/typography';
 
 interface Props {
-	language: string;
+	language?: string;
 }
 
-const Debug = ({ language }: Props) => {
+const Debug = (_props?: Props) => {
 	const { t } = useTranslation();
+	const colors = useAppPalette();
+
 	return (
 		<Box
 			position={'absolute'}
@@ -16,12 +20,16 @@ const Debug = ({ language }: Props) => {
 			width={'100%'}
 			display='flex'
 			alignItems='center'
-			borderTop={`1px solid black`}
+			borderTop={`1px solid ${colors.border}`}
 		>
-			<VscChevronRight />
+			<VscChevronRight color={colors.textMuted} />
 			<Typography
-				sx={{ fontFamily: 'Monospace', fontSize: '.9rem', fontWeight: 'bold' }}
-				color={'#7b7c81'}
+				sx={{
+					fontFamily: fonts.mono,
+					fontSize: '.9rem',
+					fontWeight: 'bold',
+					color: colors.textMuted,
+				}}
 			>
 				{t('terminal.debug')}
 			</Typography>

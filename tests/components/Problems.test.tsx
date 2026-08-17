@@ -8,8 +8,8 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('Problems', () => {
-    it('renders problems text', () => {
-        render(<Problems language="en" />);
+    it('renders problems text with default props', () => {
+        render(<Problems />);
 
         expect(screen.getByText('terminal.problems')).toBeInTheDocument();
     });

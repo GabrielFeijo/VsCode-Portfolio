@@ -22,6 +22,18 @@ function parseStoredPages(raw: string | null): Page[] {
 
 export type { Page } from '../domain/page';
 
+let _nextIndex = 1000;
+function getNextIndex(): number {
+	const stored = StorageService.getData();
+	const maxStoredIndex = stored.reduce(
+		(max, p) => (p.index > max ? p.index : max),
+		999
+	);
+	const next = Math.max(maxStoredIndex + 1, _nextIndex);
+	_nextIndex = next + 1;
+	return next;
+}
+
 export const StorageService = {
 	getData: (): Page[] => {
 		return parseStoredPages(localStorage.getItem(STORAGE_KEY));
@@ -31,10 +43,10 @@ export const StorageService = {
 		const parsedData = StorageService.getData();
 
 		const updatedData = parsedData.some(
-			(page: Page) => page.index === data.index
+			(page: Page) => page.name === data.name
 		)
 			? parsedData.map((page: Page) =>
-				page.index === data.index ? data : page
+				page.name === data.name ? data : page
 			)
 			: [...parsedData, data];
 
@@ -43,7 +55,7 @@ export const StorageService = {
 
 	createFile: (name: string, content = ''): Page => {
 		return {
-			index: Date.now(),
+			index: getNextIndex(),
 			name,
 			route: name,
 			content,
@@ -53,7 +65,7 @@ export const StorageService = {
 
 	createFolder: (name: string): Page => {
 		return {
-			index: Date.now(),
+			index: getNextIndex(),
 			name,
 			route: name,
 			isFolder: true,
@@ -63,12 +75,15 @@ export const StorageService = {
 
 	deleteFile: (identifier: number | string) => {
 		const data = StorageService.getData();
-		const updatedData = data.filter((page) => {
-			if (typeof identifier === 'number') {
-				return page.index !== identifier;
-			}
-			return page.name !== identifier;
-		});
+		const updatedData = data.filter((page) =>
+			typeof identifier === 'number'
+				? page.index !== identifier
+				: page.name !== identifier
+		);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+	},
+
+	clearData: () => {
+		localStorage.removeItem(STORAGE_KEY);
 	},
 };

@@ -1,219 +1,185 @@
 import { Button, Box, Container } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
 import { convertFileName } from '../../utils/convertFileName';
 import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
 import { Language, Page } from '../../domain/page';
 import { getLocalizedPath } from '../../config/seo';
+import { useAppPalette } from '../theme/useAppPalette';
+import { useEditorContext } from '../../contexts/EditorContext';
 
 interface Props {
-	pages: Page[];
 	language: Language;
-	selectedIndex: number;
-	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-	currentComponent: string;
-	setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-	visiblePageIndexes: number[];
-	setVisiblePageIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-export default function AppButtons({
-	pages,
-	language,
-	selectedIndex,
-	setSelectedIndex,
-	currentComponent,
-	setCurrentComponent,
-	visiblePageIndexes,
-	setVisiblePageIndexes,
-}: Props) {
+interface PageTabProps {
+	page: Page;
+	isSelected: boolean;
+	onOpen: () => void;
+	onClose: (e: React.MouseEvent | React.KeyboardEvent) => void;
+	onContextMenu: (e: React.MouseEvent) => void;
+}
+
+function PageTab({
+	page,
+	isSelected,
+	onOpen,
+	onClose,
+	onContextMenu,
+}: PageTabProps) {
+	const colors = useAppPalette();
+	const displayName = convertFileName(page.name);
+
+	const handleCloseKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			e.stopPropagation();
+			onClose(e);
+		}
+	};
+
+	return (
+		<Box
+			sx={{
+				display: 'inline-flex',
+				alignItems: 'center',
+				borderRight: 1,
+				borderColor: colors.border,
+			}}
+		>
+			<Button
+				disableRipple
+				disableElevation
+				disableFocusRipple
+				aria-label={`Open ${displayName} page`}
+				onClick={onOpen}
+				onContextMenu={onContextMenu}
+				sx={{
+					borderRadius: 0,
+					px: 2,
+					pr: 0.5,
+					textTransform: 'none',
+					backgroundColor: isSelected ? colors.bgTabActive : colors.bgTabInactive,
+					color: isSelected ? colors.textPrimary : colors.textSecondary,
+					'&.MuiButtonBase-root:hover': {
+						bgcolor: isSelected ? colors.bgTabActive : colors.bgHover,
+					},
+					transition: 'none',
+					pb: 0.2,
+					display: 'inline-flex',
+					alignItems: 'center',
+					gap: 0.5,
+				}}
+			>
+				<Box
+					component="span"
+					sx={{
+						color: colors.iconMarkdown,
+						width: 20,
+						height: 20,
+						display: 'flex',
+						alignItems: 'center',
+					}}
+					aria-hidden="true"
+				>
+					<VscMarkdown />
+				</Box>
+				{displayName}
+			</Button>
+
+			<Box
+				component="span"
+				role="button"
+				aria-label={`Close ${displayName}`}
+				tabIndex={0}
+				onKeyDown={handleCloseKeyDown}
+				onClick={(e: React.MouseEvent<HTMLElement>) => {
+					e.stopPropagation();
+					onClose(e);
+				}}
+				sx={{
+					mx: 0.5,
+					backgroundColor: isSelected ? colors.bgTabActive : colors.bgTabInactive,
+					color: isSelected ? colors.textPrimary : colors.textSecondary,
+					'&:hover': {
+						bgcolor: colors.bgHover,
+						color: colors.textPrimary,
+					},
+					width: 20,
+					height: 20,
+					flexShrink: 0,
+					transition: 'none',
+					cursor: 'pointer',
+					border: 'none',
+					padding: 0,
+					display: 'inline-flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					borderRadius: '2px',
+				}}
+			>
+				<VscChromeClose aria-hidden="true" />
+			</Box>
+		</Box>
+	);
+}
+
+export default function AppButtons({ language }: Props) {
+	const {
+		visiblePages,
+		pages,
+		selectedIndex,
+		setSelectedIndex,
+		setCurrentComponent,
+		visiblePageIndexes,
+		setVisiblePageIndexes,
+	} = useEditorContext();
 	const navigate = useNavigate();
-	const theme = useTheme();
+	const colors = useAppPalette();
 	const [contextMenu, setContextMenu] = useState<{
 		mouseX: number;
 		mouseY: number;
 		tabIndex: number;
 	} | null>(null);
 
-	function renderButtonBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282A36' : '#21222c';
-		}
-		return selectedIndex === index ? '#ffffff' : '#ececec';
-	}
-
-	function renderButtonColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
-	}
-
-	function renderCloseButtonBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#282A36' : '#21222c';
-		}
-		return selectedIndex === index ? '#ffffff' : '#ececec';
-	}
-
-	function renderCloseButtonColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#ffffff' : '#d0d0d0';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#2a2a2a';
-	}
-
-	function renderCloseButtonHoverBgColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex === index ? '#333c43' : '#333c43';
-		}
-		return selectedIndex === index ? '#e6e4e5' : '#dadada';
-	}
-
-	function renderCloseButtonHoverColor(index: number) {
-		if (theme.palette.mode === 'dark') {
-			return selectedIndex !== index ? '#d0d0d0' : '#ffffff';
-		}
-		return selectedIndex === index ? '#1a1a1a' : '#1a1a1a';
-	}
-
-	const handleContextMenu = (event: React.MouseEvent, index: number) => {
+	const handleContextMenu = useCallback((event: React.MouseEvent, index: number) => {
 		event.preventDefault();
-		setContextMenu({
-			mouseX: event.clientX,
-			mouseY: event.clientY,
-			tabIndex: index,
-		});
-	};
+		setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, tabIndex: index });
+	}, []);
 
-	const handleCloseContextMenu = () => {
-		setContextMenu(null);
-	};
+	const handleCloseContextMenu = useCallback(() => setContextMenu(null), []);
 
-	const handleCloseTab = () => {
-		if (contextMenu) {
-			setVisiblePageIndexes(
-				visiblePageIndexes.filter((x) => x !== contextMenu.tabIndex)
-			);
-		}
-	};
+	const handleCloseTab = useCallback(() => {
+		if (!contextMenu) return;
+		setVisiblePageIndexes((prev) => prev.filter((x) => x !== contextMenu.tabIndex));
+	}, [contextMenu, setVisiblePageIndexes]);
 
-	const handleCloseOthers = () => {
-		if (contextMenu) {
-			setVisiblePageIndexes([contextMenu.tabIndex]);
-			setSelectedIndex(contextMenu.tabIndex);
-			const page = pages.find((x) => x.index === contextMenu.tabIndex);
-			if (page) navigate(getLocalizedPath(`/${page.route}`, language));
-		}
-	};
+	const handleCloseOthers = useCallback(() => {
+		if (!contextMenu) return;
+		setVisiblePageIndexes([contextMenu.tabIndex]);
+		setSelectedIndex(contextMenu.tabIndex);
+		const page = pages.find((x) => x.index === contextMenu.tabIndex);
+		if (page) navigate(getLocalizedPath(`/${page.route}`, language));
+	}, [contextMenu, language, navigate, pages, setSelectedIndex, setVisiblePageIndexes]);
 
-	const handleCloseToRight = () => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			const newIndexes = visiblePageIndexes.slice(0, currentPosition + 1);
-			setVisiblePageIndexes(newIndexes);
-		}
-	};
+	const handleCloseToRight = useCallback(() => {
+		if (!contextMenu) return;
+		const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+		setVisiblePageIndexes(visiblePageIndexes.slice(0, currentPosition + 1));
+	}, [contextMenu, setVisiblePageIndexes, visiblePageIndexes]);
 
-	const handleCloseToLeft = () => {
-		if (contextMenu) {
-			const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
-			const newIndexes = visiblePageIndexes.slice(currentPosition);
-			setVisiblePageIndexes(newIndexes);
-		}
-	};
+	const handleCloseToLeft = useCallback(() => {
+		if (!contextMenu) return;
+		const currentPosition = visiblePageIndexes.indexOf(contextMenu.tabIndex);
+		setVisiblePageIndexes(visiblePageIndexes.slice(currentPosition));
+	}, [contextMenu, setVisiblePageIndexes, visiblePageIndexes]);
 
-	const handleCloseAll = () => {
+	const handleCloseAll = useCallback(() => {
 		setVisiblePageIndexes([]);
+		setSelectedIndex(-1);
 		navigate(getLocalizedPath('/', language));
-	};
-
-	function renderPageButton(index: number, name: string, route: string) {
-		return (
-			<Box
-				key={index}
-				sx={{
-					display: 'inline-block',
-					borderRight: 1,
-					borderColor: theme.palette.mode === 'dark' ? '#252525' : '#f3f3f3',
-				}}
-			>
-				<Button
-					disableRipple
-					disableElevation
-					disableFocusRipple
-					aria-label={`Open ${convertFileName(name)} page`}
-					onClick={() => {
-						setSelectedIndex(index);
-						setCurrentComponent('button');
-						navigate(getLocalizedPath(`/${route}`, language));
-					}}
-					onContextMenu={(e: React.MouseEvent<Element, MouseEvent>) => handleContextMenu(e, index)}
-					sx={{
-						borderRadius: 0,
-						px: 2,
-						textTransform: 'none',
-						backgroundColor: renderButtonBgColor(index),
-						color: renderButtonColor(index),
-						'&.MuiButtonBase-root:hover': {
-							bgcolor: renderButtonBgColor(index),
-						},
-						transition: 'none',
-						pb: 0.2,
-					}}
-				>
-					<Box
-						sx={{ color: '#6997d5', width: 20, height: 20, mr: 0.4, ml: -1 }}
-					>
-						<VscMarkdown />
-					</Box>
-					{convertFileName(name)}
-					<Box
-						aria-label={`Close ${convertFileName(name)} tab`}
-						tabIndex={0}
-						onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								e.stopPropagation();
-								setVisiblePageIndexes(
-									visiblePageIndexes.filter((x) => x !== index)
-								);
-							}
-						}}
-						sx={{
-							ml: 1,
-							mr: -1,
-							backgroundColor: renderCloseButtonBgColor(index),
-							color: renderCloseButtonColor(index),
-							'&:hover': {
-								bgcolor: renderCloseButtonHoverBgColor(index),
-								color: renderCloseButtonHoverColor(index),
-							},
-							width: 20,
-							height: 20,
-							transition: 'none',
-							cursor: 'pointer',
-							border: 'none',
-							padding: 0,
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-						onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-							e.stopPropagation();
-							setVisiblePageIndexes(
-								visiblePageIndexes.filter((x) => x !== index)
-							);
-						}}
-					>
-						<VscChromeClose />
-					</Box>
-				</Button>
-			</Box>
-		);
-	}
+	}, [language, navigate, setSelectedIndex, setVisiblePageIndexes]);
 
 	return (
 		<>
@@ -221,23 +187,31 @@ export default function AppButtons({
 				maxWidth={false}
 				disableGutters
 				sx={{
-					display: 'inline-block',
+					display: 'inline-flex',
 					overflowX: 'auto',
 					overflowY: 'hidden',
 					whiteSpace: 'nowrap',
-					backgroundColor: theme.palette.mode === 'dark' ? '#191a21' : '#f3f3f3',
-					'&::-webkit-scrollbar': {
-						height: '3px',
-					},
-					'&::-webkit-scrollbar-thumb': {
-						backgroundColor:
-							theme.palette.mode === 'dark' ? '#535353' : '#8c8c8c',
-					},
+					backgroundColor: colors.bgTabs,
+					'&::-webkit-scrollbar': { height: '3px' },
+					'&::-webkit-scrollbar-thumb': { backgroundColor: colors.scrollbar },
 				}}
 			>
-				{pages.map(({ index, name, route }) =>
-					renderPageButton(index, name, route)
-				)}
+				{visiblePages.map((page) => (
+					<PageTab
+						key={page.index}
+						page={page}
+						isSelected={selectedIndex === page.index}
+						onOpen={() => {
+							setSelectedIndex(page.index);
+							setCurrentComponent('button');
+							navigate(getLocalizedPath(`/${page.route}`, language));
+						}}
+						onClose={() =>
+							setVisiblePageIndexes((prev) => prev.filter((x) => x !== page.index))
+						}
+						onContextMenu={(e) => handleContextMenu(e, page.index)}
+					/>
+				))}
 			</Container>
 
 			<TabContextMenu

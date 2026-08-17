@@ -1,4 +1,4 @@
-import { isLanguage, isPage } from '../../src/domain/page';
+import { isLanguage, isPage, pageSchema } from '../../src/domain/page';
 
 describe('page domain contracts', () => {
 	it('recognizes supported languages', () => {
@@ -8,23 +8,24 @@ describe('page domain contracts', () => {
 	});
 
 	it('accepts valid files and nested folders', () => {
-		expect(
-			isPage({
-				index: 1,
-				name: 'folder',
-				route: 'folder',
-				isFolder: true,
-				children: [
-					{
-						index: 2,
-						name: 'notes.md',
-						route: 'notes.md',
-						content: '',
-						isSaved: false,
-					},
-				],
-			})
-		).toBe(true);
+		const validPage = {
+			index: 1,
+			name: 'folder',
+			route: 'folder',
+			isFolder: true,
+			children: [
+				{
+					index: 2,
+					name: 'notes.md',
+					route: 'notes.md',
+					content: '',
+					isSaved: false,
+				},
+			],
+		};
+
+		expect(isPage(validPage)).toBe(true);
+		expect(pageSchema.safeParse(validPage).success).toBe(true);
 	});
 
 	it.each([
@@ -39,5 +40,6 @@ describe('page domain contracts', () => {
 		{ index: 1, name: 'a', route: 'a', children: [{}] },
 	])('rejects invalid page data: %p', (value) => {
 		expect(isPage(value)).toBe(false);
+		expect(pageSchema.safeParse(value).success).toBe(false);
 	});
 });

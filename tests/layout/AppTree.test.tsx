@@ -84,6 +84,12 @@ jest.mock('src/app/components/ContextMenu/ContextMenu', () => ({
 		) : null,
 }));
 
+let mockEditorContext: any = {};
+
+jest.mock('src/contexts/EditorContext', () => ({
+	useEditorContext: () => mockEditorContext,
+}));
+
 const defaultPages: Page[] = [
 	{ index: 0, name: 'about-me.html', route: 'about-me' },
 	{ index: 1, name: 'projects.html', route: 'projects', isSaved: false },
@@ -94,17 +100,18 @@ function renderTree(options?: {
 	language?: 'pt' | 'en';
 	visiblePageIndexes?: number[];
 	theme?: 'dark' | 'light';
+	currentComponent?: string;
 }) {
 	const pages = options?.pages || defaultPages;
 	const visiblePageIndexes = options?.visiblePageIndexes || [0];
-	const props = {
+	mockEditorContext = {
 		pages,
 		setPages: jest.fn((update: SetStateAction<Page[]>) =>
 			typeof update === 'function' ? update(pages) : undefined
 		),
 		selectedIndex: 0,
 		setSelectedIndex: jest.fn(),
-		currentComponent: 'tree',
+		currentComponent: options?.currentComponent || 'tree',
 		setCurrentComponent: jest.fn(),
 		visiblePageIndexes,
 		setVisiblePageIndexes: jest.fn((update: SetStateAction<number[]>) =>
@@ -116,15 +123,16 @@ function renderTree(options?: {
 	const theme = createTheme({ palette: { mode: options?.theme || 'dark' } });
 	const view = render(
 		<ThemeProvider theme={theme}>
-			<AppTree {...props} />
+			<AppTree language={mockEditorContext.language} />
 		</ThemeProvider>
 	);
 	return {
-		...props,
+		...mockEditorContext,
 		rerenderPages(nextPages: Page[]) {
+			mockEditorContext.pages = nextPages;
 			view.rerender(
 				<ThemeProvider theme={theme}>
-					<AppTree {...props} pages={nextPages} />
+					<AppTree language={mockEditorContext.language} />
 				</ThemeProvider>
 			);
 		},
@@ -152,6 +160,13 @@ describe('AppTree', () => {
 		expect(screen.getByText('projects.md')).toBeInTheDocument();
 	});
 
+	it('highlights the selected item when the editor is focused', () => {
+		renderTree({ currentComponent: 'editor' });
+
+		expect(screen.getByTestId('tree-item-0')).toBeInTheDocument();
+		expect(screen.getByTestId('tree-item-1')).toBeInTheDocument();
+	});
+
 	it('opens a page and adds a hidden tab to the visible list', () => {
 		const props = renderTree({ visiblePageIndexes: [0] });
 
@@ -176,7 +191,7 @@ describe('AppTree', () => {
 
 		const input = screen.getByPlaceholderText('prompts.enter_filename');
 		fireEvent.change(input, { target: { value: 'New File.md' } });
-		expect(input).toHaveValue('new-file');
+		expect(input).toHaveValue('New File.md');
 		fireEvent.keyDown(input, { key: 'Enter' });
 
 		expect(createFile).toHaveBeenCalledWith('new-file.md');
@@ -188,6 +203,39 @@ describe('AppTree', () => {
 			expect.objectContaining({ index: 10 }),
 		]);
 		expect(navigate).toHaveBeenCalledWith('/new-file.md');
+	});
+
+	it('creates file using confirm button', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'notes' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.confirm' }));
+
+		expect(createFile).toHaveBeenCalledWith('notes.md');
+	});
+
+	it('creates file with fallback name when input contains only special characters', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: '$$$' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.confirm' }));
+
+		expect(createFile).toHaveBeenCalledWith('novo-arquivo.md');
+	});
+
+	it('cancels file creation using cancel button', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'notes' } });
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.cancel' }));
+
+		expect(screen.queryByPlaceholderText('prompts.enter_filename')).not.toBeInTheDocument();
 	});
 
 	it('opens an existing custom file instead of duplicating it', () => {
@@ -223,6 +271,23 @@ describe('AppTree', () => {
 		expect(screen.queryByPlaceholderText('prompts.enter_filename')).not.toBeInTheDocument();
 	});
 
+	it('allows blurring and refocusing the file creation input without losing interactive input control', () => {
+		renderTree();
+		fireEvent.click(screen.getByRole('button', { name: 'sidebar.createFile' }));
+
+		const input = screen.getByPlaceholderText('prompts.enter_filename');
+		fireEvent.change(input, { target: { value: 'initial' } });
+		fireEvent.blur(input);
+
+		const wrapper = input.parentElement?.parentElement!;
+		fireEvent.mouseDown(wrapper);
+		fireEvent.click(wrapper);
+		fireEvent.change(input, { target: { value: 'initial-updated' } });
+		fireEvent.keyDown(input, { key: 'Enter' });
+
+		expect(createFile).toHaveBeenCalledWith('initial-updated.md');
+	});
+
 	it('supports context menu open, delete and GitHub actions', () => {
 		const props = renderTree();
 		const page = screen.getByTestId('tree-item-1');
@@ -241,7 +306,7 @@ describe('AppTree', () => {
 		fireEvent.contextMenu(page, { clientX: 20, clientY: 30 });
 		fireEvent.click(screen.getByRole('button', { name: 'Open on GitHub' }));
 		expect(open).toHaveBeenCalledWith(
-			expect.stringContaining('/public/pages/pt/projects.html'),
+			expect.stringContaining('/src/pages/pt/projects.html'),
 			'_blank',
 			'noopener,noreferrer'
 		);
