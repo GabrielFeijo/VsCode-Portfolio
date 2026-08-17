@@ -16,22 +16,6 @@ export interface VirtualFileEntry {
 
 export type VirtualDirectory = Record<string, VirtualFileEntry[]>;
 
-export interface TerminalColors {
-	user: string;
-	host: string;
-	path: string;
-	git: string;
-	arrow: string;
-	muted: string;
-	text: string;
-	bg: string;
-	error: string;
-	success: string;
-	warning: string;
-	info: string;
-	link: string;
-}
-
 export interface UseTerminalOptions {
 	language: Language;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;

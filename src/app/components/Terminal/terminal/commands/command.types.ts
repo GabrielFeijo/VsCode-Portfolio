@@ -1,5 +1,6 @@
 import { Language } from '@/domain/page';
-import { ActiveEditorSession, TerminalColors, VirtualDirectory } from '../types';
+import { TerminalColors } from '../terminalConfig';
+import { ActiveEditorSession, VirtualDirectory } from '../types';
 
 export interface CommandExecutionContext {
 	language: Language;
