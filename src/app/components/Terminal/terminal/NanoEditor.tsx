@@ -300,8 +300,8 @@ export default function NanoEditor({
 						minWidth: '2.5rem',
 					}}
 				>
-					{Array.from({ length: lineCount }, (_, i) => (
-						<div key={`line-${i + 1}`}>{i + 1}</div>
+					{Array.from({ length: lineCount }, (_, i) => i + 1).map((lineNumber) => (
+						<div key={lineNumber}>{lineNumber}</div>
 					))}
 				</Box>
 

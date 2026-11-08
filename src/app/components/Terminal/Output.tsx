@@ -15,8 +15,8 @@ const Output = (_props?: Props) => {
 
 	return (
 		<Box>
-			{messages.map((message: string, index: number) => (
-				<Box key={index} display='flex' alignItems='center' gap={1}>
+			{messages.map((message: string) => (
+				<Box key={message} display='flex' alignItems='center' gap={1}>
 					<Typography sx={{ fontSize: '.8rem', color: colors.textMuted, fontFamily: fonts.mono }}>
 						{today.replace(/,/g, ' ')}
 					</Typography>

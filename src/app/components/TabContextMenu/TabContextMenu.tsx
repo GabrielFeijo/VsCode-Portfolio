@@ -69,30 +69,35 @@ export default function TabContextMenu({
 
     const menuItems = [
         {
+            id: 'close',
             icon: <VscChromeClose className={styles.icon} />,
             label: t('tabContextMenu.close') || 'Close',
             onClick: handleCloseTab,
             enabled: true,
         },
         {
+            id: 'close-others',
             icon: <VscCloseAll className={styles.icon} />,
             label: t('tabContextMenu.closeOthers') || 'Close Others',
             onClick: handleCloseOthers,
             enabled: hasOtherTabs,
         },
         {
+            id: 'close-to-right',
             icon: <MdChevronRight className={styles.icon} />,
             label: t('tabContextMenu.closeToRight') || 'Close to the Right',
             onClick: handleCloseToRight,
             enabled: hasTabsToRight,
         },
         {
+            id: 'close-to-left',
             icon: <MdChevronLeft className={styles.icon} />,
             label: t('tabContextMenu.closeToLeft') || 'Close to the Left',
             onClick: handleCloseToLeft,
             enabled: hasTabsToLeft,
         },
         {
+            id: 'close-all',
             icon: <VscCloseAll className={styles.icon} />,
             label: t('tabContextMenu.closeAll') || 'Close All',
             onClick: handleCloseAll,
@@ -122,9 +127,9 @@ export default function TabContextMenu({
                     transition={{ duration: 0.1 }}
                 >
                     <div className={styles.menuItems} role="menu">
-                        {menuItems.map((item, index) => (
+                        {menuItems.map((item) => (
                             <button
-                                key={index}
+                                key={item.id}
                                 className={`${styles.menuItem} ${!item.enabled ? styles.disabled : ''
                                     }`}
                                 onClick={() => {

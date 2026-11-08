@@ -139,8 +139,8 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 						backgroundColor: palette.bgSidebar,
 					}}
 				>
-					{Array.from({ length: lineCount }, (_, i) => (
-						<div key={i}>{i + 1}</div>
+					{Array.from({ length: lineCount }, (_, i) => i + 1).map((lineNumber) => (
+						<div key={lineNumber}>{lineNumber}</div>
 					))}
 				</Box>
 
