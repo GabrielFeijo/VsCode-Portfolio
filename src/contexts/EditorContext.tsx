@@ -227,25 +227,42 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
     [],
   );
 
-  const value: EditorContextValue = {
-    pages,
-    setPages,
-    selectedIndex,
-    setSelectedIndex,
-    currentComponent,
-    setCurrentComponent,
-    visiblePageIndexes,
-    setVisiblePageIndexes,
-    visiblePages,
-    openTab,
-    closeTab,
-    closeOtherTabs,
-    closeTabsToRight,
-    closeTabsToLeft,
-    closeAllTabs,
-    openTabByTarget,
-    updatePageContent,
-  };
+  const value = useMemo<EditorContextValue>(
+    () => ({
+      pages,
+      setPages,
+      selectedIndex,
+      setSelectedIndex,
+      currentComponent,
+      setCurrentComponent,
+      visiblePageIndexes,
+      setVisiblePageIndexes,
+      visiblePages,
+      openTab,
+      closeTab,
+      closeOtherTabs,
+      closeTabsToRight,
+      closeTabsToLeft,
+      closeAllTabs,
+      openTabByTarget,
+      updatePageContent,
+    }),
+    [
+      pages,
+      selectedIndex,
+      currentComponent,
+      visiblePageIndexes,
+      visiblePages,
+      openTab,
+      closeTab,
+      closeOtherTabs,
+      closeTabsToRight,
+      closeTabsToLeft,
+      closeAllTabs,
+      openTabByTarget,
+      updatePageContent,
+    ],
+  );
 
   return (
     <EditorContext.Provider value={value}>{children}</EditorContext.Provider>
