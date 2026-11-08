@@ -23,6 +23,12 @@ interface ReviewFormData {
 	stars: number;
 }
 
+const VALIDATION_ERROR_KEYS = [
+	{ match: 'Username must be at least', key: 'rating.errors.usernameMin' },
+	{ match: 'Comment must be at least', key: 'rating.errors.commentMin' },
+	{ match: 'Stars must not exceed', key: 'rating.errors.starsMax' },
+] as const;
+
 export default function BoxRating({ ranking, setRanking }: Props) {
 	const { t } = useTranslation();
 	const createReviewMutation = useCreateReviewMutation();
@@ -63,11 +69,9 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		const { statusCode, validationErrors } = error;
 
 		if (statusCode === 400 && validationErrors && validationErrors.length > 0) {
-			const validationError = validationErrors[0];
-			if (validationError.includes('Username must be at least')) return t('rating.errors.usernameMin');
-			if (validationError.includes('Comment must be at least')) return t('rating.errors.commentMin');
-			if (validationError.includes('Stars must not exceed')) return t('rating.errors.starsMax');
-			return validationError;
+			const [validationError] = validationErrors;
+			const known = VALIDATION_ERROR_KEYS.find(({ match }) => validationError.includes(match));
+			return known ? t(known.key) : validationError;
 		}
 
 		if (statusCode === 429) return t('rating.errors.tooManyRequests');
