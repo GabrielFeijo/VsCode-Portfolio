@@ -244,6 +244,26 @@ describe('NanoEditor', () => {
 		expect(setFs).toHaveBeenCalled();
 	});
 
+	it('ignores keys without Ctrl when no save prompt is active', () => {
+		const onClose = jest.fn();
+		render(
+			<NanoEditor
+				fileName="test.md"
+				filePath="/home/gabriel/test.md"
+				initialContent="hello"
+				cwd="/home/gabriel"
+				fs={defaultFs}
+				setFs={jest.fn()}
+				onClose={onClose}
+				isDark={true}
+			/>,
+		);
+
+		fireEvent.keyDown(screen.getByRole('textbox'), { key: 'x' });
+		expect(onClose).not.toHaveBeenCalled();
+		expect(screen.queryByText('Save modified buffer? (Y/N/Ctrl+C)')).not.toBeInTheDocument();
+	});
+
 	it('displays line count with Ctrl+C', () => {
 		const onClose = jest.fn();
 		const setFs = jest.fn();
@@ -261,9 +281,13 @@ describe('NanoEditor', () => {
 			/>,
 		);
 
-		const textarea = screen.getByRole('textbox');
+		const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
 		fireEvent.keyDown(textarea, { key: 'c', ctrlKey: true });
-		expect(screen.getByText('[ Line 2 lines total ]')).toBeInTheDocument();
+		expect(screen.getByText('[ line 1/2 ]')).toBeInTheDocument();
+
+		textarea.setSelectionRange(10, 10);
+		fireEvent.keyDown(textarea, { key: 'c', ctrlKey: true });
+		expect(screen.getByText('[ line 2/2 ]')).toBeInTheDocument();
 	});
 
 	it('syncPageStorage updates existing page or creates new markdown file', () => {

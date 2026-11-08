@@ -129,85 +129,89 @@ export default function NanoEditor({
 		setStatus(`[ Wrote ${lines.length} lines to ${name} ]`);
 	};
 
+	const cutCurrentLine = (textarea: HTMLTextAreaElement) => {
+		const { value, selectionStart } = textarea;
+		const lineStart = value.substring(0, selectionStart).lastIndexOf('\n') + 1;
+		const nextBreak = value.indexOf('\n', selectionStart);
+		const lineEnd = nextBreak === -1 ? value.length : nextBreak + 1;
+
+		setClipboard(value.substring(lineStart, lineEnd));
+		setContent(value.substring(0, lineStart) + value.substring(lineEnd));
+		setIsModified(true);
+		setStatus('[ Cut line ]');
+	};
+
+	const pasteClipboardLine = (textarea: HTMLTextAreaElement) => {
+		if (!clipboard) return;
+
+		const { selectionStart } = textarea;
+		setContent(content.substring(0, selectionStart) + clipboard + content.substring(selectionStart));
+		setIsModified(true);
+		setStatus('[ Pasted line ]');
+	};
+
+	const reportCursorPosition = (textarea: HTMLTextAreaElement) => {
+		const currentLine = content.substring(0, textarea.selectionStart).split('\n').length;
+		setStatus(`[ line ${currentLine}/${lineCount} ]`);
+	};
+
+	const requestExit = () => {
+		if (!isModified) {
+			onClose();
+			return;
+		}
+		setPromptSave(true);
+		setStatus('Save modified buffer? (Y/N/Ctrl+C)');
+	};
+
+	const handleSavePromptKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		e.preventDefault();
+		const key = e.key.toLowerCase();
+
+		if (key === 'y' || key === 's') {
+			saveContent();
+			onClose();
+		} else if (key === 'n') {
+			onClose();
+		} else if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
+			setPromptSave(false);
+			setStatus('[ Cancelled ]');
+		}
+	};
+
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		e.stopPropagation();
+
 		if (promptSave) {
-			if (e.key === 'y' || e.key === 'Y' || e.key === 's' || e.key === 'S') {
+			handleSavePromptKey(e);
+			return;
+		}
+
+		if (!e.ctrlKey) return;
+
+		const textarea = e.currentTarget;
+		switch (e.key) {
+			case 'o':
+			case 's':
 				e.preventDefault();
 				saveContent();
-				onClose();
-				return;
-			}
-			if (e.key === 'n' || e.key === 'N') {
+				break;
+			case 'x':
 				e.preventDefault();
-				onClose();
-				return;
-			}
-			if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
+				requestExit();
+				break;
+			case 'k':
 				e.preventDefault();
-				setPromptSave(false);
-				setStatus('[ Cancelled ]');
-				return;
-			}
-			e.preventDefault();
-			return;
-		}
-
-		if ((e.key === 'o' && e.ctrlKey) || (e.key === 's' && e.ctrlKey)) {
-			e.preventDefault();
-			saveContent();
-			return;
-		}
-
-		if (e.key === 'x' && e.ctrlKey) {
-			e.preventDefault();
-			if (isModified) {
-				setPromptSave(true);
-				setStatus('Save modified buffer? (Y/N/Ctrl+C)');
-			} else {
-				onClose();
-			}
-			return;
-		}
-
-		if (e.key === 'k' && e.ctrlKey) {
-			e.preventDefault();
-			const textarea = e.currentTarget;
-
-			const val = textarea.value;
-			const selStart = textarea.selectionStart;
-			const before = val.substring(0, selStart);
-			const lineStart = before.lastIndexOf('\n') + 1;
-			const after = val.substring(selStart);
-			const lineEndIdx = after.indexOf('\n');
-			const lineEnd = lineEndIdx === -1 ? val.length : selStart + lineEndIdx + 1;
-
-			const cutText = val.substring(lineStart, lineEnd);
-			const remaining = val.substring(0, lineStart) + val.substring(lineEnd);
-
-			setClipboard(cutText);
-			setContent(remaining);
-			setIsModified(true);
-			setStatus(`[ Cut line ]`);
-			return;
-		}
-
-		if (e.key === 'u' && e.ctrlKey) {
-			e.preventDefault();
-			if (!clipboard) return;
-			const textarea = e.currentTarget;
-
-			const selStart = textarea.selectionStart;
-			const nextContent = content.substring(0, selStart) + clipboard + content.substring(selStart);
-			setContent(nextContent);
-			setIsModified(true);
-			setStatus(`[ Pasted line ]`);
-			return;
-		}
-
-		if (e.key === 'c' && e.ctrlKey) {
-			e.preventDefault();
-			setStatus(`[ Line ${lineCount} lines total ]`);
+				cutCurrentLine(textarea);
+				break;
+			case 'u':
+				e.preventDefault();
+				pasteClipboardLine(textarea);
+				break;
+			case 'c':
+				e.preventDefault();
+				reportCursorPosition(textarea);
+				break;
 		}
 	};
 
