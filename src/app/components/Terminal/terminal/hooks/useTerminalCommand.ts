@@ -4,6 +4,10 @@ import { TerminalColors } from '../terminalConfig';
 import { executeLocalCommand } from '../commandExecutor';
 import { Language } from '@/domain/page';
 
+const MIN_COMMAND_LENGTH = 2;
+const LOCALIZED_HELP_PREFIX = 'ajuda';
+const HELP_API_COMMAND = 'help';
+
 export interface CommandExecutionDependencies {
 	language: Language;
 	cwd: string;
@@ -65,7 +69,7 @@ export function useTerminalCommand(deps: CommandExecutionDependencies) {
 	const executeCommand = useCallback(
 		async (rawCommand: string): Promise<void> => {
 			const trimmed = rawCommand.trim();
-			if (trimmed.length <= 1) return;
+			if (trimmed.length < MIN_COMMAND_LENGTH) return;
 
 			const handled = await executeLocalCommand(trimmed, {
 				language,
@@ -94,12 +98,12 @@ export function useTerminalCommand(deps: CommandExecutionDependencies) {
 
 			const lower = trimmed.toLowerCase();
 			const cachedResponse = commandMap.get(lower);
-			if (cachedResponse && Array.isArray(cachedResponse)) {
+			if (cachedResponse) {
 				addEntry(trimmed, cachedResponse);
 				return;
 			}
 
-			const apiCommand = lower.startsWith('ajuda') ? 'help' : trimmed;
+			const apiCommand = lower.startsWith(LOCALIZED_HELP_PREFIX) ? HELP_API_COMMAND : trimmed;
 			const responseData = await fetchApiCommandResponse(apiCommand);
 
 			if (responseData instanceof Error) {
