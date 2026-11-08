@@ -49,6 +49,7 @@ import {
 import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { LAYOUT } from '../../constants/layout';
+import { onOpenTabRequest } from '../../utils/appEvents';
 import Loading from '../components/Loading/Loading';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 
@@ -104,18 +105,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 		toggleTheme,
 	});
 
-	useEffect(() => {
-		const handleOpenTab = (event: Event) => {
-			const customEvent = event as CustomEvent<{ target?: string }>;
-			const target = customEvent.detail?.target;
-			if (target !== undefined) {
-				openTabByTarget(target);
-			}
-		};
-
-		window.addEventListener('open-tab', handleOpenTab);
-		return () => window.removeEventListener('open-tab', handleOpenTab);
-	}, [openTabByTarget]);
+	useEffect(() => onOpenTabRequest(openTabByTarget), [openTabByTarget]);
 
 	return (
 		<>

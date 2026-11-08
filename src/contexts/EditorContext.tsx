@@ -15,6 +15,7 @@ import { getLocalizedPath } from '../config/seo';
 
 import { customAlphabet } from 'nanoid';
 import { stripFileExtension } from '../utils/stripFileExtension';
+import { onStorageChange } from '../utils/appEvents';
 import { getPageNameAliases, isSamePageName } from '../utils/pageName';
 
 const generatePageIndex = customAlphabet('123456789', 8);
@@ -128,9 +129,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
   }, [language, navigate, pages, selectedIndex, visiblePageIndexes]);
 
   useEffect(() => {
-    const handleStorage = () => setPages(loadPages(language));
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    return onStorageChange(() => setPages(loadPages(language)));
   }, [language]);
 
   const visiblePages = useMemo(

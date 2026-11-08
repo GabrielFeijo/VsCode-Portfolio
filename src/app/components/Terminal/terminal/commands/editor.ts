@@ -1,5 +1,6 @@
 import { getFileLinesAsync } from '../utils/fileLookup';
 import { normalizePath } from '../utils/pathUtils';
+import { requestOpenTab } from '@/utils/appEvents';
 import { ICommandDefinition } from './command.types';
 
 export const editorCommands: ICommandDefinition[] = [
@@ -45,7 +46,7 @@ export const editorCommands: ICommandDefinition[] = [
 		execute: (arg, ctx, rawCommand) => {
 			const targetArg = arg.trim();
 			if (!targetArg || targetArg === '.') {
-				window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+				requestOpenTab('.');
 				ctx.addEntry(rawCommand, ['\x1b[92mOpening workspace in VSCode editor...\x1b[0m']);
 				return true;
 			}
@@ -53,7 +54,7 @@ export const editorCommands: ICommandDefinition[] = [
 			const filePath = normalizePath(ctx.cwd, targetArg);
 			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
 
-			window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: fileName } }));
+			requestOpenTab(fileName);
 			ctx.addEntry(rawCommand, [`\x1b[92mOpening ${fileName} in editor...\x1b[0m`]);
 			return true;
 		},

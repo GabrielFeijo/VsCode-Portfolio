@@ -6,6 +6,7 @@ import { fonts } from '@/app/theme/typography';
 import { pageRoutes } from '@/app/pages/pages';
 import { VirtualDirectory } from './types';
 import { normalizePath } from './utils/pathUtils';
+import { notifyStorageChange } from '@/utils/appEvents';
 import { stripFileExtension } from '@/utils/stripFileExtension';
 import { getPageNameAliases, isSamePageName } from '@/utils/pageName';
 
@@ -65,7 +66,7 @@ function resolvePageData(fileName: string, content: string): Page {
 export function syncPageStorage(fileName: string, content: string): void {
 	const pageData = resolvePageData(fileName, content);
 	StorageService.saveOrUpdateData(pageData);
-	window.dispatchEvent(new Event('storage'));
+	notifyStorageChange();
 }
 
 export default function NanoEditor({

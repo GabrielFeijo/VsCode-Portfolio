@@ -12,6 +12,7 @@ import { getStaticPageContent } from '@/services/pageContentService';
 import MarkdownRenderer from './MarkdownRenderer';
 import { stripFileExtension } from '../../utils/stripFileExtension';
 import { isSamePageName } from '../../utils/pageName';
+import { onStorageChange } from '../../utils/appEvents';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 
@@ -109,10 +110,10 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		};
 
 		load();
-		window.addEventListener('storage', load);
+		const stopListening = onStorageChange(load);
 		return () => {
 			activeController?.abort();
-			window.removeEventListener('storage', load);
+			stopListening();
 		};
 	}, [editMode, page, path]);
 
