@@ -187,6 +187,19 @@ describe('ThemeContext', () => {
         expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
 
+    test('does not persist the theme on mount so system changes keep being followed', () => {
+        localStorageMock.getItem.mockReturnValue(null);
+        matchMediaMock.mockReturnValue({ matches: true, addEventListener: jest.fn(), removeEventListener: jest.fn() });
+
+        render(
+            <ThemeProvider>
+                <TestComponent />
+            </ThemeProvider>
+        );
+
+        expect(localStorageMock.setItem).not.toHaveBeenCalled();
+    });
+
     test('removes old theme class and adds new one', () => {
         localStorageMock.getItem.mockReturnValue('light');
         matchMediaMock.mockReturnValue({ matches: false, addEventListener: jest.fn(), removeEventListener: jest.fn() });

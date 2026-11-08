@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
 
@@ -7,39 +7,33 @@ interface ThemeContextType {
 	toggleTheme: () => void;
 }
 
+const THEME_STORAGE_KEY = 'theme';
+const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)';
+
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
-	const getInitialTheme = (): Theme => {
-		const savedTheme = localStorage.getItem('theme');
-		if (savedTheme === 'light' || savedTheme === 'dark') {
-			return savedTheme;
-		}
+function getSavedTheme(): Theme | null {
+	const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+	return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : null;
+}
 
-		const prefersDark =
-			window.matchMedia &&
-			window.matchMedia('(prefers-color-scheme: dark)').matches;
-		return prefersDark ? 'dark' : 'light';
-	};
+function getSystemTheme(): Theme {
+	return window.matchMedia?.(DARK_SCHEME_QUERY).matches ? 'dark' : 'light';
+}
 
-	const [theme, setTheme] = useState<Theme>(getInitialTheme);
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const [theme, setTheme] = useState<Theme>(() => getSavedTheme() ?? getSystemTheme());
 
 	useEffect(() => {
 		const root = window.document.documentElement;
 		root.classList.remove('light', 'dark');
 		root.classList.add(theme);
-
-		localStorage.setItem('theme', theme);
 	}, [theme]);
 
 	useEffect(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		const mediaQuery = window.matchMedia(DARK_SCHEME_QUERY);
 		const handleChange = () => {
-			const savedTheme = localStorage.getItem('theme');
-
-			if (!savedTheme) {
+			if (getSavedTheme() === null) {
 				setTheme(mediaQuery.matches ? 'dark' : 'light');
 			}
 		};
@@ -48,15 +42,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 		return () => mediaQuery.removeEventListener('change', handleChange);
 	}, []);
 
-	const toggleTheme = () => {
-		setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-	};
+	const toggleTheme = useCallback(() => {
+		const nextTheme: Theme = theme === 'light' ? 'dark' : 'light';
+		localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+		setTheme(nextTheme);
+	}, [theme]);
 
-	const value = { theme, toggleTheme };
-
-	return (
-		<ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-	);
+	return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = (): ThemeContextType => {
