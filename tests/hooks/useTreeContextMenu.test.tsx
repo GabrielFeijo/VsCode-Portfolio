@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useTreeContextMenu } from '@/app/hooks/useTreeContextMenu';
-import { Page } from '@/domain/page';
+import type { Page } from '@/domain/page';
 
 describe('useTreeContextMenu', () => {
 	const initialPages: Page[] = [
@@ -27,7 +27,7 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		expect(result.current.contextMenu).toBeNull();
@@ -49,13 +49,13 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
 			result.current.handleContextMenu(
 				{ preventDefault: jest.fn(), clientX: 100, clientY: 200 } as unknown as React.MouseEvent,
-				0
+				0,
 			);
 		});
 
@@ -88,13 +88,13 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
 			result.current.handleContextMenu(
 				{ preventDefault: jest.fn(), clientX: 100, clientY: 200 } as unknown as React.MouseEvent,
-				0
+				0,
 			);
 		});
 
@@ -122,7 +122,7 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
@@ -151,13 +151,13 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
 			result.current.handleContextMenu(
 				{ preventDefault: jest.fn(), clientX: 100, clientY: 200 } as unknown as React.MouseEvent,
-				999
+				999,
 			);
 		});
 
@@ -186,13 +186,13 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
 			result.current.handleContextMenu(
 				{ preventDefault: jest.fn(), clientX: 100, clientY: 200 } as unknown as React.MouseEvent,
-				0
+				0,
 			);
 		});
 
@@ -203,7 +203,7 @@ describe('useTreeContextMenu', () => {
 		expect(windowOpenSpy).toHaveBeenCalledWith(
 			expect.stringContaining('about-me.md'),
 			'_blank',
-			'noopener,noreferrer'
+			'noopener,noreferrer',
 		);
 		expect(result.current.contextMenu).toBeNull();
 	});
@@ -233,13 +233,13 @@ describe('useTreeContextMenu', () => {
 				navigate,
 				language: 'pt',
 				openFile,
-			})
+			}),
 		);
 
 		act(() => {
 			result.current.handleContextMenu(
 				{ preventDefault: jest.fn(), clientX: 100, clientY: 200 } as unknown as React.MouseEvent,
-				0
+				0,
 			);
 		});
 

@@ -1,7 +1,7 @@
+import { requestOpenTab } from '@/utils/appEvents';
 import { getFileLinesAsync } from '../utils/fileLookup';
 import { normalizePath } from '../utils/pathUtils';
-import { requestOpenTab } from '@/utils/appEvents';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const editorCommands: ICommandDefinition[] = [
 	{
@@ -20,7 +20,11 @@ export const editorCommands: ICommandDefinition[] = [
 
 			const filePath = normalizePath(cwd, targetArg);
 			if (fs[filePath]) {
-				addEntry(rawCommand, [`\x1b[91m${cmd}: ${targetArg}: Is a directory\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91m${cmd}: ${targetArg}: Is a directory\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 

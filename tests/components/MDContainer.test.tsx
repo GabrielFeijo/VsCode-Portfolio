@@ -7,10 +7,7 @@ import { PAGE_FILES } from '../mocks/pageContentGlob';
 jest.mock('../../src/app/components/MarkdownRenderer', () => ({
 	__esModule: true,
 	default: ({ content, allowRawHtml }: any) => (
-		<div
-			data-testid='markdown-renderer'
-			data-raw-html={Boolean(allowRawHtml)}
-		>
+		<div data-testid='markdown-renderer' data-raw-html={Boolean(allowRawHtml)}>
 			{content}
 		</div>
 	),
@@ -41,17 +38,12 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter initialEntries={['/about-me']}>
-				<MDContainer
-					path='/pages/pt/sobre-mim.html'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/pages/pt/sobre-mim.html' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() =>
-			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-				'# Bundled static content'
-			)
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Bundled static content'),
 		);
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
@@ -64,25 +56,17 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter initialEntries={['/about-me']}>
-				<MDContainer
-					path='/page.html'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/page.html' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() =>
-			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-				'# Loaded content'
-			)
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Loaded content'),
 		);
-		expect(screen.getByTestId('markdown-renderer')).toHaveAttribute(
-			'data-raw-html',
-			'true'
-		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveAttribute('data-raw-html', 'true');
 		expect(global.fetch).toHaveBeenCalledWith(
 			'/page.html',
-			expect.objectContaining({ cache: 'force-cache' })
+			expect.objectContaining({ cache: 'force-cache' }),
 		);
 	});
 
@@ -91,17 +75,12 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter initialEntries={['/missing']}>
-				<MDContainer
-					path='/missing.html'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/missing.html' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() =>
-			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-				'Failed to load content.'
-			)
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('Failed to load content.'),
 		);
 	});
 
@@ -118,26 +97,22 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/about.md'
-					page={page}
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/about.md' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() =>
-			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-				'# Static page'
-			)
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Static page'),
 		);
 		expect(screen.queryByLabelText('Markdown editor')).not.toBeInTheDocument();
 	});
 
 	it('loads content from storage if present for non-editable page metadata', async () => {
-		jest.spyOn(StorageService, 'getData').mockReturnValue([
-			{ index: 10, name: 'about.md', route: 'about-me', content: '# From storage' },
-		]);
+		jest
+			.spyOn(StorageService, 'getData')
+			.mockReturnValue([
+				{ index: 10, name: 'about.md', route: 'about-me', content: '# From storage' },
+			]);
 		global.fetch = jest.fn();
 
 		const page = {
@@ -148,42 +123,40 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/about.html'
-					page={page}
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/about.html' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
-		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-			'# From storage'
-		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# From storage');
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it('matches stored page by exact name, html extension, or base name', () => {
-		jest.spyOn(StorageService, 'getData').mockReturnValue([
-			{ index: 99, name: 'skills.html', route: 'skills', content: '# Skills html' },
-		]);
+		jest
+			.spyOn(StorageService, 'getData')
+			.mockReturnValue([
+				{ index: 99, name: 'skills.html', route: 'skills', content: '# Skills html' },
+			]);
 
 		const page1 = { index: 1, name: 'skills.md', route: 'skills' };
 		const { unmount } = render(
 			<MemoryRouter>
 				<MDContainer path='/skills.md' page={page1} setPages={jest.fn()} />
-			</MemoryRouter>
+			</MemoryRouter>,
 		);
 		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Skills html');
 		unmount();
 
-		jest.spyOn(StorageService, 'getData').mockReturnValue([
-			{ index: 99, name: 'projects', route: 'projects', content: '# Projects base' },
-		]);
+		jest
+			.spyOn(StorageService, 'getData')
+			.mockReturnValue([
+				{ index: 99, name: 'projects', route: 'projects', content: '# Projects base' },
+			]);
 		const page2 = { index: 2, name: 'projects.html', route: 'projects' };
 		const { unmount: unmount2 } = render(
 			<MemoryRouter>
 				<MDContainer path='/projects.html' page={page2} setPages={jest.fn()} />
-			</MemoryRouter>
+			</MemoryRouter>,
 		);
 		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Projects base');
 		unmount2();
@@ -202,23 +175,17 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/pages/pt/sobre-mim.html'
-					page={page}
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/pages/pt/sobre-mim.html' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
-		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-			'Live content'
-		);
+		expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('Live content');
 		expect(screen.queryByLabelText('Markdown editor')).not.toBeInTheDocument();
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it('reloads content on storage window event and aborts active controller', async () => {
-		let storageData: any[] = [];
+		const storageData: any[] = [];
 		jest.spyOn(StorageService, 'getData').mockImplementation(() => storageData);
 		global.fetch = jest.fn().mockImplementation(() => new Promise(() => undefined));
 
@@ -230,12 +197,8 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/about.md'
-					page={page}
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/about.md' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		act(() => {
@@ -246,22 +209,17 @@ describe('MDContainer', () => {
 	});
 
 	it('ignores abort errors while loading static content', async () => {
-		global.fetch = jest
-			.fn()
-			.mockRejectedValue(new DOMException('Request aborted', 'AbortError'));
+		global.fetch = jest.fn().mockRejectedValue(new DOMException('Request aborted', 'AbortError'));
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/cancelled.md'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/cancelled.md' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 		expect(screen.getByTestId('markdown-renderer')).not.toHaveTextContent(
-			'Failed to load content.'
+			'Failed to load content.',
 		);
 	});
 
@@ -270,11 +228,8 @@ describe('MDContainer', () => {
 		const abort = jest.spyOn(AbortController.prototype, 'abort');
 		const { unmount } = render(
 			<MemoryRouter>
-				<MDContainer
-					path='/pending.md'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/pending.md' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		unmount();
@@ -293,12 +248,8 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/unused'
-					page={page}
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/unused' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		expect(await screen.findByLabelText('Markdown editor')).toHaveValue('');
@@ -312,17 +263,12 @@ describe('MDContainer', () => {
 		});
 		render(
 			<MemoryRouter>
-				<MDContainer
-					path='/static.html'
-					setPages={jest.fn()}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/static.html' setPages={jest.fn()} />
+			</MemoryRouter>,
 		);
 
 		await waitFor(() =>
-			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
-				'# Content'
-			)
+			expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Content'),
 		);
 
 		fireEvent.keyDown(window, { key: 's', ctrlKey: true });
@@ -354,12 +300,8 @@ describe('MDContainer', () => {
 
 		render(
 			<MemoryRouter initialEntries={['/notes.md']}>
-				<MDContainer
-					path='/unused'
-					page={page}
-					setPages={setPages}
-				/>
-			</MemoryRouter>
+				<MDContainer path='/unused' page={page} setPages={setPages} />
+			</MemoryRouter>,
 		);
 
 		fireEvent.change(await screen.findByLabelText('Markdown editor'), {
@@ -367,7 +309,7 @@ describe('MDContainer', () => {
 		});
 		expect(setPages).toHaveBeenCalled();
 		expect(pages[0]).toEqual(
-			expect.objectContaining({ content: '# Updated notes', isSaved: false })
+			expect.objectContaining({ content: '# Updated notes', isSaved: false }),
 		);
 		expect(pages[1]).toBe(otherPage);
 
@@ -381,10 +323,10 @@ describe('MDContainer', () => {
 				index: 20,
 				content: '# Updated notes',
 				isSaved: true,
-			})
+			}),
 		);
 		expect(pages[0]).toEqual(
-			expect.objectContaining({ content: '# Updated notes', isSaved: true })
+			expect.objectContaining({ content: '# Updated notes', isSaved: true }),
 		);
 		expect(pages[1]).toBe(otherPage);
 		expect(global.fetch).not.toHaveBeenCalled();

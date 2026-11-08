@@ -1,4 +1,8 @@
-import { buildFileSystem, PROJECT_FS, PROJECT_ROOT } from '../../../src/services/terminal/projectFileSystem';
+import {
+	buildFileSystem,
+	PROJECT_FS,
+	PROJECT_ROOT,
+} from '../../../src/services/terminal/projectFileSystem';
 
 describe('buildFileSystem', () => {
 	it('creates the home directory containing the project root', () => {
@@ -57,7 +61,12 @@ describe('buildFileSystem', () => {
 			'gamma/file.ts': '3',
 			'delta.txt': '4',
 		});
-		expect(fs2[PROJECT_ROOT].map((entry) => entry.name)).toEqual(['alpha', 'gamma', 'beta.txt', 'delta.txt']);
+		expect(fs2[PROJECT_ROOT].map((entry) => entry.name)).toEqual([
+			'alpha',
+			'gamma',
+			'beta.txt',
+			'delta.txt',
+		]);
 	});
 
 	it('does not duplicate directory entries', () => {

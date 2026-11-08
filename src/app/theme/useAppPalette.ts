@@ -1,5 +1,5 @@
 import { useTheme as useMuiTheme } from '@mui/material/styles';
-import { getAppPalette, AppPaletteColors } from './palette';
+import { type AppPaletteColors, getAppPalette } from './palette';
 
 export function useAppPalette(): AppPaletteColors {
 	const mode = useMuiTheme().palette.mode;

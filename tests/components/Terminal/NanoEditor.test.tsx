@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import NanoEditor, { syncPageStorage } from '../../../src/app/components/Terminal/terminal/NanoEditor';
+import NanoEditor, {
+	syncPageStorage,
+} from '../../../src/app/components/Terminal/terminal/NanoEditor';
+import type { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 import { StorageService } from '../../../src/services/storageService';
-import { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 
 jest.mock('../../../src/services/storageService', () => ({
 	StorageService: {
@@ -13,9 +15,7 @@ jest.mock('../../../src/services/storageService', () => ({
 
 describe('NanoEditor', () => {
 	const defaultFs: VirtualDirectory = {
-		'/': [
-			{ name: 'root.md', type: 'file', content: ['root line 1'] },
-		],
+		'/': [{ name: 'root.md', type: 'file', content: ['root line 1'] }],
 		'/home/gabriel': [
 			{ name: 'test.md', type: 'file', content: ['initial line 1', 'initial line 2'] },
 		],
@@ -39,10 +39,10 @@ describe('NanoEditor', () => {
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
 				initialContent={'line 1\nline 2'}
-				cwd="/home/gabriel"
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -61,10 +61,10 @@ describe('NanoEditor', () => {
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
-				initialContent="line 1"
-				cwd="/home/gabriel"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
+				initialContent='line 1'
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -86,14 +86,16 @@ describe('NanoEditor', () => {
 
 	it('saves file in root directory with Ctrl+S', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
+		const setFs = jest.fn((updater) =>
+			typeof updater === 'function' ? updater(defaultFs) : updater,
+		);
 
 		render(
 			<NanoEditor
-				fileName="root.md"
-				filePath="/root.md"
-				initialContent="hello root"
-				cwd="/"
+				fileName='root.md'
+				filePath='/root.md'
+				initialContent='hello root'
+				cwd='/'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -108,14 +110,16 @@ describe('NanoEditor', () => {
 
 	it('exits immediately on Ctrl+X if unmodified', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
+		const setFs = jest.fn((updater) =>
+			typeof updater === 'function' ? updater(defaultFs) : updater,
+		);
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
-				initialContent="hello"
-				cwd="/home/gabriel"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
+				initialContent='hello'
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -130,14 +134,16 @@ describe('NanoEditor', () => {
 
 	it('prompts to save on Ctrl+X if modified, and handles Y/N/Ctrl+C and ignored keys', () => {
 		const onClose = jest.fn();
-		const setFs = jest.fn((updater) => (typeof updater === 'function' ? updater(defaultFs) : updater));
+		const setFs = jest.fn((updater) =>
+			typeof updater === 'function' ? updater(defaultFs) : updater,
+		);
 
 		const { unmount } = render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
-				initialContent="hello"
-				cwd="/home/gabriel"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
+				initialContent='hello'
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -167,10 +173,10 @@ describe('NanoEditor', () => {
 		const onClose2 = jest.fn();
 		render(
 			<NanoEditor
-				fileName="newfile.md"
-				filePath="/home/gabriel/newfile.md"
-				initialContent="hello"
-				cwd="/home/gabriel"
+				fileName='newfile.md'
+				filePath='/home/gabriel/newfile.md'
+				initialContent='hello'
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose2}
@@ -192,10 +198,10 @@ describe('NanoEditor', () => {
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
 				initialContent={'line 1\nline 2\nline 3'}
-				cwd="/home/gabriel"
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}
@@ -228,10 +234,10 @@ describe('NanoEditor', () => {
 
 		render(
 			<NanoEditor
-				fileName="new.txt"
-				filePath="/uninitialized/new.txt"
-				initialContent="content in new parent"
-				cwd="/"
+				fileName='new.txt'
+				filePath='/uninitialized/new.txt'
+				initialContent='content in new parent'
+				cwd='/'
 				fs={{}}
 				setFs={setFs}
 				onClose={onClose}
@@ -248,10 +254,10 @@ describe('NanoEditor', () => {
 		const onClose = jest.fn();
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
-				initialContent="hello"
-				cwd="/home/gabriel"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
+				initialContent='hello'
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={jest.fn()}
 				onClose={onClose}
@@ -270,10 +276,10 @@ describe('NanoEditor', () => {
 
 		render(
 			<NanoEditor
-				fileName="test.md"
-				filePath="/home/gabriel/test.md"
+				fileName='test.md'
+				filePath='/home/gabriel/test.md'
 				initialContent={'line 1\nline 2'}
-				cwd="/home/gabriel"
+				cwd='/home/gabriel'
 				fs={defaultFs}
 				setFs={setFs}
 				onClose={onClose}

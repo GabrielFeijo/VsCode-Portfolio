@@ -11,10 +11,7 @@ interface ErrorResponse {
 	message?: string | string[];
 }
 
-export function toApiError(
-	error: unknown,
-	includeValidationErrors = false
-): ApiError {
+export function toApiError(error: unknown, includeValidationErrors = false): ApiError {
 	if (!axios.isAxiosError<ErrorResponse>(error)) {
 		return new ApiError(DEFAULT_ERROR_MESSAGE);
 	}
@@ -23,11 +20,7 @@ export function toApiError(
 	apiError.statusCode = error.response?.status;
 
 	const validationMessage = error.response?.data?.message;
-	if (
-		includeValidationErrors &&
-		error.response?.status === 400 &&
-		validationMessage
-	) {
+	if (includeValidationErrors && error.response?.status === 400 && validationMessage) {
 		apiError.validationErrors = Array.isArray(validationMessage)
 			? validationMessage
 			: [validationMessage];

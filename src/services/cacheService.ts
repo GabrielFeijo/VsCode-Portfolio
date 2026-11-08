@@ -20,8 +20,7 @@ export const CacheService = {
 			) {
 				return parsed as HomeCache;
 			}
-		} catch {
-		}
+		} catch {}
 
 		localStorage.removeItem(CACHE_KEY);
 		return null;

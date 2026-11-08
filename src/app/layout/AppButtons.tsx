@@ -1,13 +1,14 @@
-import { Button, Box, Container } from '@mui/material';
-import React, { useCallback, useState } from 'react';
-import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
+import { Box, Button, Container } from '@mui/material';
+import type React from 'react';
+import { useCallback, useState } from 'react';
+import { VscChromeClose, VscMarkdown } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
+import { getLocalizedPath } from '../../config/seo';
+import { useEditorContext } from '../../contexts/EditorContext';
+import type { Language, Page } from '../../domain/page';
 import { convertFileName } from '../../utils/convertFileName';
 import TabContextMenu from '../components/TabContextMenu/TabContextMenu';
-import { Language, Page } from '../../domain/page';
-import { getLocalizedPath } from '../../config/seo';
 import { useAppPalette } from '../theme/useAppPalette';
-import { useEditorContext } from '../../contexts/EditorContext';
 
 interface Props {
 	language: Language;
@@ -21,13 +22,7 @@ interface PageTabProps {
 	onContextMenu: (e: React.MouseEvent) => void;
 }
 
-function PageTab({
-	page,
-	isSelected,
-	onOpen,
-	onClose,
-	onContextMenu,
-}: PageTabProps) {
+function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabProps) {
 	const colors = useAppPalette();
 	const displayName = convertFileName(page.name);
 
@@ -73,7 +68,7 @@ function PageTab({
 				}}
 			>
 				<Box
-					component="span"
+					component='span'
 					sx={{
 						color: colors.iconMarkdown,
 						width: 20,
@@ -81,7 +76,7 @@ function PageTab({
 						display: 'flex',
 						alignItems: 'center',
 					}}
-					aria-hidden="true"
+					aria-hidden='true'
 				>
 					<VscMarkdown />
 				</Box>
@@ -89,8 +84,8 @@ function PageTab({
 			</Button>
 
 			<Box
-				component="span"
-				role="button"
+				component='span'
+				role='button'
 				aria-label={`Close ${displayName}`}
 				tabIndex={0}
 				onKeyDown={handleCloseKeyDown}
@@ -119,7 +114,7 @@ function PageTab({
 					borderRadius: '2px',
 				}}
 			>
-				<VscChromeClose aria-hidden="true" />
+				<VscChromeClose aria-hidden='true' />
 			</Box>
 		</Box>
 	);
@@ -206,9 +201,7 @@ export default function AppButtons({ language }: Props) {
 							setCurrentComponent('button');
 							navigate(getLocalizedPath(`/${page.route}`, language));
 						}}
-						onClose={() =>
-							setVisiblePageIndexes((prev) => prev.filter((x) => x !== page.index))
-						}
+						onClose={() => setVisiblePageIndexes((prev) => prev.filter((x) => x !== page.index))}
 						onContextMenu={(e) => handleContextMenu(e, page.index)}
 					/>
 				))}

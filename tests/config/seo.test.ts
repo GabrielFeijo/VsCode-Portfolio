@@ -1,8 +1,8 @@
 import {
-	getPageMetadata,
 	getBasePath,
 	getLanguageFromPathname,
 	getLocalizedPath,
+	getPageMetadata,
 	indexablePaths,
 	normalizeSeoPath,
 } from '../../src/config/seo';
@@ -41,9 +41,7 @@ describe('SEO configuration', () => {
 		const metadata = getPageMetadata('/en/certificates/');
 
 		expect(metadata.title).toBe('Certificates and education | Gabriel Feijó');
-		expect(metadata.canonicalUrl).toBe(
-			'https://www.gabrielfeijo.com.br/en/certificates'
-		);
+		expect(metadata.canonicalUrl).toBe('https://www.gabrielfeijo.com.br/en/certificates');
 		expect(metadata.description.length).toBeGreaterThan(80);
 		expect(metadata.alternateUrls).toEqual({
 			pt: 'https://www.gabrielfeijo.com.br/certificates',
@@ -54,8 +52,6 @@ describe('SEO configuration', () => {
 
 	it('falls back to home metadata for unknown routes', () => {
 		expect(getPageMetadata('/unknown').path).toBe('/');
-		expect(getPageMetadata('/en/unknown').canonicalUrl).toBe(
-			'https://www.gabrielfeijo.com.br/en'
-		);
+		expect(getPageMetadata('/en/unknown').canonicalUrl).toBe('https://www.gabrielfeijo.com.br/en');
 	});
 });

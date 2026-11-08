@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
+import { highlight, languages } from 'prismjs';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/themes/prism-tomorrow.css';
 import { fonts } from '../theme/typography';
@@ -54,12 +54,9 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 
 			onChange(nextValue);
 			textarea.focus();
-			textarea.setSelectionRange(
-				start + before.length,
-				start + before.length + selected.length
-			);
+			textarea.setSelectionRange(start + before.length, start + before.length + selected.length);
 		},
-		[getTextarea, onChange, value]
+		[getTextarea, onChange, value],
 	);
 
 	const handleKeyDown = useCallback(
@@ -70,7 +67,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 				if (!textarea) return;
 				const start = textarea.selectionStart;
 				const end = textarea.selectionEnd;
-				const nextValue = value.substring(0, start) + '  ' + value.substring(end);
+				const nextValue = `${value.substring(0, start)}  ${value.substring(end)}`;
 				onChange(nextValue);
 				textarea.focus();
 				textarea.setSelectionRange(start + 2, start + 2);
@@ -88,7 +85,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 				wrapSelection('*', '*', 'italic');
 			}
 		},
-		[getTextarea, onChange, value, wrapSelection]
+		[getTextarea, onChange, value, wrapSelection],
 	);
 
 	const handleCursorSync = useCallback(() => {

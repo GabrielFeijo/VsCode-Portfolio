@@ -1,10 +1,10 @@
-import { StorageService, Page } from '../../src/services/storageService';
+import { type Page, StorageService } from '../../src/services/storageService';
 
 describe('StorageService', () => {
-    beforeEach(() => {
-        localStorage.clear();
-        jest.restoreAllMocks();
-    });
+	beforeEach(() => {
+		localStorage.clear();
+		jest.restoreAllMocks();
+	});
 
 	it('getData returns empty array when nothing stored', () => {
 		expect(StorageService.getData()).toEqual([]);
@@ -25,55 +25,65 @@ describe('StorageService', () => {
 
 	it('getData removes invalid entries while preserving valid pages', () => {
 		const validPage = { index: 1, name: 'valid.md', route: 'valid.md' };
-		localStorage.setItem(
-			'markdown-editor-data',
-			JSON.stringify([validPage, { index: 'invalid' }])
-		);
+		localStorage.setItem('markdown-editor-data', JSON.stringify([validPage, { index: 'invalid' }]));
 
 		expect(StorageService.getData()).toEqual([validPage]);
-		expect(JSON.parse(localStorage.getItem('markdown-editor-data') || '[]')).toEqual([
-			validPage,
-		]);
+		expect(JSON.parse(localStorage.getItem('markdown-editor-data') || '[]')).toEqual([validPage]);
 	});
 
-    it('saveOrUpdateData adds new page when none exists', () => {
-        const page: Page = { index: 1, name: 'a', route: 'a' };
-        StorageService.saveOrUpdateData(page);
-        const stored = JSON.parse(localStorage.getItem('markdown-editor-data') || '[]');
-        expect(stored).toHaveLength(1);
-        expect(stored[0].name).toBe('a');
-    });
+	it('saveOrUpdateData adds new page when none exists', () => {
+		const page: Page = { index: 1, name: 'a', route: 'a' };
+		StorageService.saveOrUpdateData(page);
+		const stored = JSON.parse(localStorage.getItem('markdown-editor-data') || '[]');
+		expect(stored).toHaveLength(1);
+		expect(stored[0].name).toBe('a');
+	});
 
-    it('saveOrUpdateData updates existing page by name without overwriting other language files sharing same index', () => {
-        const ptPage: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT original' };
-        const enPage: Page = { index: 0, name: 'about-me.html', route: 'about-me', content: 'EN original' };
-        StorageService.saveOrUpdateData(ptPage);
-        StorageService.saveOrUpdateData(enPage);
+	it('saveOrUpdateData updates existing page by name without overwriting other language files sharing same index', () => {
+		const ptPage: Page = {
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: 'PT original',
+		};
+		const enPage: Page = {
+			index: 0,
+			name: 'about-me.html',
+			route: 'about-me',
+			content: 'EN original',
+		};
+		StorageService.saveOrUpdateData(ptPage);
+		StorageService.saveOrUpdateData(enPage);
 
-        const stored = StorageService.getData();
-        expect(stored).toHaveLength(2);
-        expect(stored.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT original');
-        expect(stored.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
+		const stored = StorageService.getData();
+		expect(stored).toHaveLength(2);
+		expect(stored.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT original');
+		expect(stored.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
 
-        const updatedPt: Page = { index: 0, name: 'sobre-mim.html', route: 'about-me', content: 'PT edited' };
-        StorageService.saveOrUpdateData(updatedPt);
+		const updatedPt: Page = {
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: 'PT edited',
+		};
+		StorageService.saveOrUpdateData(updatedPt);
 
-        const storedAfter = StorageService.getData();
-        expect(storedAfter).toHaveLength(2);
-        expect(storedAfter.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT edited');
-        expect(storedAfter.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
-    });
+		const storedAfter = StorageService.getData();
+		expect(storedAfter).toHaveLength(2);
+		expect(storedAfter.find((p) => p.name === 'sobre-mim.html')?.content).toBe('PT edited');
+		expect(storedAfter.find((p) => p.name === 'about-me.html')?.content).toBe('EN original');
+	});
 
-    it('createFile and createFolder produce correct shapes', () => {
-        jest.spyOn(Date, 'now').mockReturnValue(123456);
-        const file = StorageService.createFile('file', 'ok');
-        expect(file.isFolder).toBeFalsy();
-        expect(file.content).toBe('ok');
+	it('createFile and createFolder produce correct shapes', () => {
+		jest.spyOn(Date, 'now').mockReturnValue(123456);
+		const file = StorageService.createFile('file', 'ok');
+		expect(file.isFolder).toBeFalsy();
+		expect(file.content).toBe('ok');
 
-        const folder = StorageService.createFolder('folder');
-        expect(folder.isFolder).toBeTruthy();
-        expect(Array.isArray(folder.children)).toBe(true);
-    });
+		const folder = StorageService.createFolder('folder');
+		expect(folder.isFolder).toBeTruthy();
+		expect(Array.isArray(folder.children)).toBe(true);
+	});
 
 	it('creates a file with empty content by default and auto-increments index above stored pages', () => {
 		const storedPages = [
@@ -90,15 +100,15 @@ describe('StorageService', () => {
 		expect(file2.index).toBeGreaterThan(file1.index);
 	});
 
-    it('deleteFile removes by index and by name', () => {
-        const p1: Page = { index: 10, name: 'one', route: 'one' };
-        const p2: Page = { index: 20, name: 'two', route: 'two' };
-        localStorage.setItem('markdown-editor-data', JSON.stringify([p1, p2]));
-        StorageService.deleteFile(10);
-        expect(StorageService.getData()).toHaveLength(1);
-        StorageService.deleteFile('two');
-        expect(StorageService.getData()).toHaveLength(0);
-    });
+	it('deleteFile removes by index and by name', () => {
+		const p1: Page = { index: 10, name: 'one', route: 'one' };
+		const p2: Page = { index: 20, name: 'two', route: 'two' };
+		localStorage.setItem('markdown-editor-data', JSON.stringify([p1, p2]));
+		StorageService.deleteFile(10);
+		expect(StorageService.getData()).toHaveLength(1);
+		StorageService.deleteFile('two');
+		expect(StorageService.getData()).toHaveLength(0);
+	});
 
 	it('preserves stored pages when deletion has no match', () => {
 		const page: Page = { index: 10, name: 'one', route: 'one' };

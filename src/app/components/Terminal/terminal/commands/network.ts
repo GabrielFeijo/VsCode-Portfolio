@@ -1,7 +1,7 @@
 import { API_HOST, API_ROOT_URL } from '@/config/terminalIdentity';
 import { ReviewService } from '@/services/api/review/ReviewService';
 import { formatReviews } from '../utils/formatters';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const networkCommands: ICommandDefinition[] = [
 	{
@@ -11,7 +11,11 @@ export const networkCommands: ICommandDefinition[] = [
 		execute: async (_arg, ctx, rawCommand) => {
 			const data = await ReviewService.findAll();
 			if (data instanceof Error) {
-				ctx.addEntry(rawCommand, [`\x1b[91m✗\x1b[0m ${ctx.t('terminal.info.errorShort')}`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91m✗\x1b[0m ${ctx.t('terminal.info.errorShort')}`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 			ctx.addEntry(rawCommand, ['', ...formatReviews(data, ctx.t)]);

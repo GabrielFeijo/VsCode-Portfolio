@@ -4,9 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = dirname(fileURLToPath(new URL('../package.json', import.meta.url)));
 const buildDirectory = join(projectRoot, 'build');
-const seoConfig = JSON.parse(
-	await readFile(join(projectRoot, 'src/config/seo.json'), 'utf8')
-);
+const seoConfig = JSON.parse(await readFile(join(projectRoot, 'src/config/seo.json'), 'utf8'));
 const indexHtml = await readFile(join(buildDirectory, 'index.html'), 'utf8');
 const languages = ['pt', 'en'];
 
@@ -25,19 +23,17 @@ function getLocalizedPath(path, language) {
 
 function getLocalizedUrl(path, language) {
 	const localizedPath = getLocalizedPath(path, language);
-	return localizedPath === '/'
-		? `${seoConfig.site.url}/`
-		: `${seoConfig.site.url}${localizedPath}`;
+	return localizedPath === '/' ? `${seoConfig.site.url}/` : `${seoConfig.site.url}${localizedPath}`;
 }
 
 function replaceMeta(html, attribute, key, content) {
 	const expression = new RegExp(
 		`<meta\\s+${attribute}=["']${key}["']\\s+content=["'][^"']*["']\\s*/?>`,
-		'i'
+		'i',
 	);
 	return html.replace(
 		expression,
-		`<meta ${attribute}="${key}" content="${escapeHtml(content)}" />`
+		`<meta ${attribute}="${key}" content="${escapeHtml(content)}" />`,
 	);
 }
 
@@ -52,10 +48,7 @@ function createStructuredData(page, language, canonicalUrl) {
 				url: seoConfig.site.url,
 				image: `${seoConfig.site.url}${seoConfig.site.image}`,
 				jobTitle: language === 'pt' ? 'Desenvolvedor Full Stack' : 'Full Stack Developer',
-				sameAs: [
-					'https://github.com/GabrielFeijo',
-					'https://www.linkedin.com/in/gabriel-feijo/',
-				],
+				sameAs: ['https://github.com/GabrielFeijo', 'https://www.linkedin.com/in/gabriel-feijo/'],
 			},
 			{
 				'@type': 'WebSite',
@@ -95,13 +88,10 @@ function createPageHtml(page, language) {
 	const alternateLocale = language === 'pt' ? 'en_US' : 'pt_BR';
 	let html = indexHtml
 		.replace(/<html\s+lang=["'][^"']+["']>/i, `<html lang="${htmlLanguage}">`)
-		.replace(
-			/<title>[^<]*<\/title>/i,
-			`<title>${escapeHtml(page[language].title)}</title>`
-		)
+		.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(page[language].title)}</title>`)
 		.replace(
 			/<link\s+rel=["']canonical["']\s+href=["'][^"']*["']\s*\/?>/i,
-			`<link rel="canonical" href="${canonicalUrl}" />\n\t${createAlternateLinks(page)}`
+			`<link rel="canonical" href="${canonicalUrl}" />\n\t${createAlternateLinks(page)}`,
 		);
 
 	html = replaceMeta(html, 'name', 'description', page[language].description);
@@ -114,12 +104,10 @@ function createPageHtml(page, language) {
 	html = replaceMeta(html, 'name', 'twitter:title', page[language].title);
 	html = replaceMeta(html, 'name', 'twitter:description', page[language].description);
 
-	const structuredData = JSON.stringify(
-		createStructuredData(page, language, canonicalUrl)
-	);
+	const structuredData = JSON.stringify(createStructuredData(page, language, canonicalUrl));
 	return html.replace(
 		/<script\s+id=["']structured-data["'][^>]*>[\s\S]*?<\/script>/i,
-		`<script id="structured-data" type="application/ld+json">${structuredData}</script>`
+		`<script id="structured-data" type="application/ld+json">${structuredData}</script>`,
 	);
 }
 
@@ -127,13 +115,8 @@ for (const page of seoConfig.pages) {
 	for (const language of languages) {
 		const localizedPath = getLocalizedPath(page.path, language);
 		const outputDirectory =
-			localizedPath === '/'
-				? buildDirectory
-				: join(buildDirectory, localizedPath.slice(1));
+			localizedPath === '/' ? buildDirectory : join(buildDirectory, localizedPath.slice(1));
 		await mkdir(outputDirectory, { recursive: true });
-		await writeFile(
-			join(outputDirectory, 'index.html'),
-			createPageHtml(page, language)
-		);
+		await writeFile(join(outputDirectory, 'index.html'), createPageHtml(page, language));
 	}
 }

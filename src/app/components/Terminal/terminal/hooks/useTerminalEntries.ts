@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { useCallback, useState } from 'react';
-import { TerminalEntry } from '../types';
+import type { TerminalEntry } from '../types';
 
 export function useTerminalEntries(cwd: string) {
 	const [entries, setEntries] = useState<TerminalEntry[]>([]);

@@ -22,9 +22,7 @@ export function useAppKeyboardShortcuts({
 			const target = event.target as HTMLElement | null;
 			if (
 				target &&
-				(target.tagName === 'INPUT' ||
-					target.tagName === 'TEXTAREA' ||
-					target.isContentEditable)
+				(target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
 			) {
 				return;
 			}
@@ -48,12 +46,5 @@ export function useAppKeyboardShortcuts({
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [
-		changeLanguage,
-		navigateHome,
-		terminalEnabled,
-		toggleExplorer,
-		toggleTerminal,
-		toggleTheme,
-	]);
+	}, [changeLanguage, navigateHome, terminalEnabled, toggleExplorer, toggleTerminal, toggleTheme]);
 }

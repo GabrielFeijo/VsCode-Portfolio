@@ -1,27 +1,29 @@
 import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from 'node:util';
 
 Object.assign(global, { TextDecoder, TextEncoder });
 
 jest.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: any, opts?: any) => (opts && opts.returnObjects ? [] : k) }),
-    Trans: ({ children }: any) => children,
+	useTranslation: () => ({ t: (k: any, opts?: any) => (opts?.returnObjects ? [] : k) }),
+	Trans: ({ children }: any) => children,
 }));
 
 jest.mock('react-router-dom', () => {
-    const actual = jest.requireActual('react-router-dom');
-    return {
-        ...actual,
-        useNavigate: () => jest.fn(),
-    };
+	const actual = jest.requireActual('react-router-dom');
+	return {
+		...actual,
+		useNavigate: () => jest.fn(),
+	};
 });
 
-global.fetch = (global.fetch as any) || jest.fn(() => Promise.resolve({ text: () => Promise.resolve('# hello') }));
+global.fetch =
+	(global.fetch as any) ||
+	jest.fn(() => Promise.resolve({ text: () => Promise.resolve('# hello') }));
 
 (global as any).import = {
-    meta: {
-        env: {
-            VITE_NAME: 'Test App',
-        },
-    },
+	meta: {
+		env: {
+			VITE_NAME: 'Test App',
+		},
+	},
 };

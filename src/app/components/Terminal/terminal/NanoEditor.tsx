@@ -1,15 +1,16 @@
 import { Box, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { Page } from '@/domain/page';
-import { StorageService } from '@/services/storageService';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { pageRoutes } from '@/app/pages/pages';
 import { getAppPalette } from '@/app/theme/palette';
 import { fonts } from '@/app/theme/typography';
-import { pageRoutes } from '@/app/pages/pages';
-import { VirtualDirectory } from './types';
-import { normalizePath } from './utils/pathUtils';
+import type { Page } from '@/domain/page';
+import { StorageService } from '@/services/storageService';
 import { notifyStorageChange } from '@/utils/appEvents';
-import { stripFileExtension } from '@/utils/stripFileExtension';
 import { getPageNameAliases, isSamePageName } from '@/utils/pageName';
+import { stripFileExtension } from '@/utils/stripFileExtension';
+import type { VirtualDirectory } from './types';
+import { normalizePath } from './utils/pathUtils';
 
 interface NanoEditorProps {
 	fileName: string;
@@ -105,7 +106,6 @@ export default function NanoEditor({
 	const palette = getAppPalette(isDark ? 'dark' : 'light');
 	const lineCount = content.split('\n').length;
 
-
 	useEffect(() => {
 		textareaRef.current?.focus();
 	}, []);
@@ -120,9 +120,7 @@ export default function NanoEditor({
 			const nextFs: VirtualDirectory = { ...prevFs };
 			nextFs[parent] = [...(nextFs[parent] || [])];
 
-			const existingIndex = nextFs[parent].findIndex(
-				(e) => e.name === name && e.type === 'file',
-			);
+			const existingIndex = nextFs[parent].findIndex((e) => e.name === name && e.type === 'file');
 
 			if (existingIndex >= 0) {
 				nextFs[parent][existingIndex] = {
@@ -163,7 +161,9 @@ export default function NanoEditor({
 		if (!clipboard) return;
 
 		const { selectionStart } = textarea;
-		setContent(content.substring(0, selectionStart) + clipboard + content.substring(selectionStart));
+		setContent(
+			content.substring(0, selectionStart) + clipboard + content.substring(selectionStart),
+		);
 		setIsModified(true);
 		setStatus('[ Pasted line ]');
 	};
@@ -263,14 +263,14 @@ export default function NanoEditor({
 					fontSize: '0.8rem',
 				}}
 			>
-				<Typography variant="caption" sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
+				<Typography variant='caption' sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
 					GNU nano 7.2
 				</Typography>
-				<Typography variant="caption" sx={{ fontFamily: 'inherit' }}>
+				<Typography variant='caption' sx={{ fontFamily: 'inherit' }}>
 					File: {fileName}
 				</Typography>
 				<Typography
-					variant="caption"
+					variant='caption'
 					sx={{
 						fontFamily: 'inherit',
 						color: isModified ? palette.accentYellow : 'inherit',
@@ -311,9 +311,9 @@ export default function NanoEditor({
 					onChange={handleChange}
 					onKeyDown={handleKeyDown}
 					spellCheck={false}
-					autoCapitalize="off"
-					autoComplete="off"
-					autoCorrect="off"
+					autoCapitalize='off'
+					autoComplete='off'
+					autoCorrect='off'
 					style={{
 						flex: 1,
 						height: '100%',

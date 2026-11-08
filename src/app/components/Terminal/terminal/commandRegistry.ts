@@ -1,4 +1,8 @@
-import { BUILTIN_COMMANDS, CommandExecutionContext, ICommandDefinition } from './commands';
+import {
+	BUILTIN_COMMANDS,
+	type CommandExecutionContext,
+	type ICommandDefinition,
+} from './commands';
 
 export class CommandRegistry {
 	private readonly commandMap = new Map<string, ICommandDefinition>();
@@ -46,7 +50,8 @@ export class CommandRegistry {
 		if (!trimmed) return false;
 
 		const spaceIdx = trimmed.indexOf(' ');
-		const cmdName = spaceIdx > 0 ? trimmed.substring(0, spaceIdx).toLowerCase() : trimmed.toLowerCase();
+		const cmdName =
+			spaceIdx > 0 ? trimmed.substring(0, spaceIdx).toLowerCase() : trimmed.toLowerCase();
 		const arg = spaceIdx > 0 ? trimmed.substring(spaceIdx + 1) : '';
 
 		const command = this.get(cmdName);

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
+import type React from 'react';
 import {
 	VscAdd,
 	VscChevronDown,
@@ -33,7 +33,7 @@ function TerminalIconButton({
 
 	return (
 		<Box
-			component="button"
+			component='button'
 			aria-label={ariaLabel}
 			tabIndex={0}
 			onClick={onClick}
@@ -65,38 +65,30 @@ interface TerminalToolbarProps {
 
 export function TerminalToolbar({ onCloseTerminal }: TerminalToolbarProps) {
 	return (
-		<Stack
-			direction="row"
-			spacing={0}
-			role="toolbar"
-			aria-label="Terminal toolbar"
-		>
-			<TerminalIconButton aria-label="Open terminal command">
+		<Stack direction='row' spacing={0} role='toolbar' aria-label='Terminal toolbar'>
+			<TerminalIconButton aria-label='Open terminal command'>
 				<VscTerminalCmd />
 				<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Add new terminal">
+			<TerminalIconButton aria-label='Add new terminal'>
 				<VscAdd />
 				<VscChevronDown />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Split terminal">
+			<TerminalIconButton aria-label='Split terminal'>
 				<VscSplitHorizontal />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Delete terminal">
+			<TerminalIconButton aria-label='Delete terminal'>
 				<VscTrash />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="More options">
+			<TerminalIconButton aria-label='More options'>
 				<VscEllipsis />
 			</TerminalIconButton>
 
-			<TerminalIconButton
-				aria-label="Close terminal"
-				onClick={onCloseTerminal}
-			>
+			<TerminalIconButton aria-label='Close terminal' onClick={onCloseTerminal}>
 				<VscClose />
 			</TerminalIconButton>
 		</Stack>

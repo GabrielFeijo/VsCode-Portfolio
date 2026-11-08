@@ -58,12 +58,8 @@ function renderCmd(language: 'pt' | 'en' = 'pt') {
 	});
 	render(
 		<QueryClientProvider client={queryClient}>
-			<Cmd
-				setRanking={setRanking}
-				changeLanguage={changeLanguage}
-				language={language}
-			/>
-		</QueryClientProvider>
+			<Cmd setRanking={setRanking} changeLanguage={changeLanguage} language={language} />
+		</QueryClientProvider>,
 	);
 	return { changeLanguage, setRanking };
 }
@@ -122,9 +118,7 @@ describe('Cmd', () => {
 	});
 
 	it('executes a cached server command instantly without getResponse API call', async () => {
-		findAll.mockResolvedValue([
-			{ command: 'cachedcmd', response: ['cached response line'] },
-		]);
+		findAll.mockResolvedValue([{ command: 'cachedcmd', response: ['cached response line'] }]);
 		renderCmd();
 		await waitFor(() => expect(findAll).toHaveBeenCalled());
 		submitCommand('cachedcmd');
@@ -156,9 +150,7 @@ describe('Cmd', () => {
 
 		findAllReviews.mockResolvedValueOnce(new Error('offline'));
 		submitCommand('avaliacoes');
-		await waitFor(() =>
-			expect(screen.getByText('terminal.info.errorShort')).toBeInTheDocument()
-		);
+		await waitFor(() => expect(screen.getByText('terminal.info.errorShort')).toBeInTheDocument());
 	});
 
 	it('runs evaluate, theme and language commands', async () => {
@@ -188,9 +180,7 @@ describe('Cmd', () => {
 		submitCommand('projects');
 		expect(await screen.findByText('command response')).toBeInTheDocument();
 		submitCommand('clear');
-		await waitFor(() =>
-			expect(screen.queryByText('command response')).not.toBeInTheDocument()
-		);
+		await waitFor(() => expect(screen.queryByText('command response')).not.toBeInTheDocument());
 	});
 
 	it('ignores empty and one-character submissions', async () => {
@@ -245,9 +235,7 @@ describe('Cmd', () => {
 
 		const input = getInput();
 		fireEvent.keyDown(input, { key: 'l', ctrlKey: true });
-		await waitFor(() =>
-			expect(screen.queryByText('command response')).not.toBeInTheDocument()
-		);
+		await waitFor(() => expect(screen.queryByText('command response')).not.toBeInTheDocument());
 	});
 
 	it('renders ghost text for a unique tab completion', async () => {
@@ -519,7 +507,9 @@ describe('Cmd', () => {
 		expect(await screen.findByText(/PING localhost/)).toBeInTheDocument();
 
 		submitCommand('curl');
-		expect(await screen.findByText(/GET https:\/\/api\.gabrielfeijo\.com\.br\/v2\//)).toBeInTheDocument();
+		expect(
+			await screen.findByText(/GET https:\/\/api\.gabrielfeijo\.com\.br\/v2\//),
+		).toBeInTheDocument();
 
 		submitCommand('curl https://example.com');
 		expect(await screen.findByText(/GET https:\/\/example\.com/)).toBeInTheDocument();
@@ -622,7 +612,9 @@ describe('Cmd', () => {
 		expect((await screen.findAllByText(/vscode-portfolio/)).length).toBeGreaterThanOrEqual(1);
 
 		submitCommand('tree /does-not-exist');
-		expect(await screen.findByText(/tree: '\/does-not-exist': No such directory/)).toBeInTheDocument();
+		expect(
+			await screen.findByText(/tree: '\/does-not-exist': No such directory/),
+		).toBeInTheDocument();
 	});
 
 	it('supports cat options, directory check and error handling', async () => {
@@ -641,9 +633,11 @@ describe('Cmd', () => {
 		submitCommand('cat sobre-mim.html');
 		expect(await screen.findByText(/Remote About/)).toBeInTheDocument();
 
-		jest.spyOn(StorageService, 'getData').mockReturnValue([
-			{ index: 99, name: 'custom.txt', route: 'custom.txt', content: 'Custom Stored Text' },
-		]);
+		jest
+			.spyOn(StorageService, 'getData')
+			.mockReturnValue([
+				{ index: 99, name: 'custom.txt', route: 'custom.txt', content: 'Custom Stored Text' },
+			]);
 		submitCommand('cat custom.txt');
 		expect(await screen.findByText(/Custom Stored Text/)).toBeInTheDocument();
 	});
@@ -668,7 +662,9 @@ describe('Cmd', () => {
 
 		const textarea = screen.getByRole('textbox');
 		fireEvent.keyDown(textarea, { key: 'x', ctrlKey: true });
-		expect(await screen.findByRole('textbox', { name: 'terminal.info.placeholder' })).toBeInTheDocument();
+		expect(
+			await screen.findByRole('textbox', { name: 'terminal.info.placeholder' }),
+		).toBeInTheDocument();
 	});
 
 	it('supports code command to open workspace and files in editor', async () => {
@@ -684,7 +680,9 @@ describe('Cmd', () => {
 		expect(await screen.findByText(/Opening workspace in VSCode editor\.\.\./)).toBeInTheDocument();
 
 		submitCommand('code .');
-		expect((await screen.findAllByText(/Opening workspace in VSCode editor\.\.\./)).length).toBeGreaterThanOrEqual(1);
+		expect(
+			(await screen.findAllByText(/Opening workspace in VSCode editor\.\.\./)).length,
+		).toBeGreaterThanOrEqual(1);
 
 		submitCommand('code sobre-mim.md');
 		expect(await screen.findByText(/Opening sobre-mim\.md in editor\.\.\./)).toBeInTheDocument();
@@ -694,13 +692,21 @@ describe('Cmd', () => {
 	it('supports reset, reset-data and restore commands to clear storage and restore virtual files', async () => {
 		renderCmd();
 		submitCommand('reset');
-		expect(await screen.findByText(/Portfolio data and files have been reset to factory defaults\./)).toBeInTheDocument();
+		expect(
+			await screen.findByText(/Portfolio data and files have been reset to factory defaults\./),
+		).toBeInTheDocument();
 
 		submitCommand('reset-data');
-		expect((await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./)).length).toBeGreaterThanOrEqual(2);
+		expect(
+			(await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./))
+				.length,
+		).toBeGreaterThanOrEqual(2);
 
 		submitCommand('restore');
-		expect((await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./)).length).toBeGreaterThanOrEqual(3);
+		expect(
+			(await screen.findAllByText(/Portfolio data and files have been reset to factory defaults\./))
+				.length,
+		).toBeGreaterThanOrEqual(3);
 	});
 
 	it('supports head and tail commands and error handling', async () => {
@@ -770,7 +776,9 @@ describe('Cmd', () => {
 
 		submitCommand('rm newfile.txt');
 		submitCommand('rm newdir');
-		expect(await screen.findByText(/rm: cannot remove 'newdir': Is a directory/)).toBeInTheDocument();
+		expect(
+			await screen.findByText(/rm: cannot remove 'newdir': Is a directory/),
+		).toBeInTheDocument();
 
 		submitCommand('rm -r newdir');
 		submitCommand('rm');

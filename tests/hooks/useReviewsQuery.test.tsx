@@ -1,6 +1,6 @@
-import { renderHook, waitFor, act } from '@testing-library/react';
-import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import type React from 'react';
 import { useCreateReviewMutation, useReviewsQuery } from '../../src/hooks/queries/useReviewsQuery';
 import { ReviewService } from '../../src/services/api/review/ReviewService';
 
@@ -52,7 +52,13 @@ describe('useReviewsQuery', () => {
 	});
 
 	it('creates review with mutation and invalidates cache', async () => {
-		const newReview = { _id: '2', username: 'Alice', comment: 'Nice', stars: 5, updatedAt: '2026-01-01' };
+		const newReview = {
+			_id: '2',
+			username: 'Alice',
+			comment: 'Nice',
+			stars: 5,
+			updatedAt: '2026-01-01',
+		};
 		(ReviewService.create as jest.Mock).mockResolvedValue(newReview);
 
 		const { result } = renderHook(() => useCreateReviewMutation(), {
@@ -60,7 +66,11 @@ describe('useReviewsQuery', () => {
 		});
 
 		await act(async () => {
-			const res = await result.current.mutateAsync({ username: 'Alice', comment: 'Nice', stars: 5 });
+			const res = await result.current.mutateAsync({
+				username: 'Alice',
+				comment: 'Nice',
+				stars: 5,
+			});
 			expect(res).toEqual(newReview);
 		});
 	});

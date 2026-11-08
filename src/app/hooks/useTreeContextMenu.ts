@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
-import { Language, Page } from '../../domain/page';
-import { StorageService } from '../../services/storageService';
-import { siteConfig } from '../../config/site';
+import { useCallback, useState } from 'react';
+import type { NavigateFunction } from 'react-router-dom';
 import { getLocalizedPath } from '../../config/seo';
-import { NavigateFunction } from 'react-router-dom';
+import { siteConfig } from '../../config/site';
+import type { Language, Page } from '../../domain/page';
+import { StorageService } from '../../services/storageService';
 
 interface UseTreeContextMenuParams {
 	pages: Page[];
@@ -35,11 +35,11 @@ export function useTreeContextMenu({
 		setContextMenu((prev) =>
 			prev === null
 				? {
-					mouseX: event.clientX - 2,
-					mouseY: event.clientY - 4,
-					pageIndex: index,
-				}
-				: null
+						mouseX: event.clientX - 2,
+						mouseY: event.clientY - 4,
+						pageIndex: index,
+					}
+				: null,
 		);
 	}, []);
 
@@ -56,7 +56,15 @@ export function useTreeContextMenu({
 		setSelectedIndex(0);
 		navigate(getLocalizedPath('/about-me', language));
 		handleClose();
-	}, [contextMenu, handleClose, language, navigate, setPages, setSelectedIndex, setVisiblePageIndexes]);
+	}, [
+		contextMenu,
+		handleClose,
+		language,
+		navigate,
+		setPages,
+		setSelectedIndex,
+		setVisiblePageIndexes,
+	]);
 
 	const handleOpenFile = useCallback(() => {
 		if (contextMenu?.pageIndex === null || contextMenu?.pageIndex === undefined) return;
@@ -73,7 +81,7 @@ export function useTreeContextMenu({
 		window.open(
 			`${siteConfig.repoUrl}/tree/main/src/pages/${language}/${existingPage.name}`,
 			'_blank',
-			'noopener,noreferrer'
+			'noopener,noreferrer',
 		);
 		handleClose();
 	}, [contextMenu, handleClose, language, pages]);

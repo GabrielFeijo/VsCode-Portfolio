@@ -1,4 +1,4 @@
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const pwdCommand: ICommandDefinition = {
 	name: 'pwd',

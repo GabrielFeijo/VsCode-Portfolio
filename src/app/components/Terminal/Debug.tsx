@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
-import { VscChevronRight } from 'react-icons/vsc';
 import { useTranslation } from 'react-i18next';
-import { useAppPalette } from '../../theme/useAppPalette';
+import { VscChevronRight } from 'react-icons/vsc';
 import { fonts } from '../../theme/typography';
+import { useAppPalette } from '../../theme/useAppPalette';
 
 interface Props {
 	language?: string;

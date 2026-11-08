@@ -5,9 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = dirname(fileURLToPath(new URL('../package.json', import.meta.url)));
 const buildDirectory = join(projectRoot, 'build');
-const seoConfig = JSON.parse(
-	await readFile(join(projectRoot, 'src/config/seo.json'), 'utf8')
-);
+const seoConfig = JSON.parse(await readFile(join(projectRoot, 'src/config/seo.json'), 'utf8'));
 const languages = ['pt', 'en'];
 
 function escapeExpression(value) {
@@ -21,9 +19,7 @@ function getLocalizedPath(path, language) {
 
 function getLocalizedUrl(path, language) {
 	const localizedPath = getLocalizedPath(path, language);
-	return localizedPath === '/'
-		? `${seoConfig.site.url}/`
-		: `${seoConfig.site.url}${localizedPath}`;
+	return localizedPath === '/' ? `${seoConfig.site.url}/` : `${seoConfig.site.url}${localizedPath}`;
 }
 
 function getHtmlPath(path, language) {
@@ -38,8 +34,8 @@ function expectMeta(html, attribute, key, content) {
 		html,
 		new RegExp(
 			`<meta\\s+${attribute}=["']${escapeExpression(key)}["']\\s+content=["']${escapeExpression(content)}["']\\s*/?>`,
-			'i'
-		)
+			'i',
+		),
 	);
 }
 
@@ -48,8 +44,8 @@ function expectLink(html, rel, attribute, key, href) {
 		html,
 		new RegExp(
 			`<(?:xhtml:)?link\\s+rel=["']${rel}["']\\s+${attribute}=["']${escapeExpression(key)}["']\\s+href=["']${escapeExpression(href)}["']\\s*/?>`,
-			'i'
-		)
+			'i',
+		),
 	);
 }
 
@@ -72,8 +68,8 @@ for (const page of seoConfig.pages) {
 			html,
 			new RegExp(
 				`<link\\s+rel=["']canonical["']\\s+href=["']${escapeExpression(canonicalUrl)}["']\\s*/?>`,
-				'i'
-			)
+				'i',
+			),
 		);
 		expectLink(html, 'alternate', 'hreflang', 'pt-BR', portugueseUrl);
 		expectLink(html, 'alternate', 'hreflang', 'en', englishUrl);
@@ -83,11 +79,11 @@ for (const page of seoConfig.pages) {
 		expectMeta(html, 'name', 'twitter:url', canonicalUrl);
 
 		const structuredDataMatch = html.match(
-			/<script\s+id=["']structured-data["'][^>]*>([\s\S]*?)<\/script>/i
+			/<script\s+id=["']structured-data["'][^>]*>([\s\S]*?)<\/script>/i,
 		);
 		assert.ok(
 			structuredDataMatch,
-			`Missing structured data for ${getLocalizedPath(page.path, language)}`
+			`Missing structured data for ${getLocalizedPath(page.path, language)}`,
 		);
 		const structuredData = JSON.parse(structuredDataMatch[1]);
 		const webPage = structuredData['@graph'][2];
@@ -104,9 +100,7 @@ for (const page of seoConfig.pages) {
 }
 
 const sitemap = await readFile(join(buildDirectory, 'sitemap.xml'), 'utf8');
-const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(
-	([, entry]) => entry
-);
+const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, entry]) => entry);
 const sitemapUrls = sitemapEntries.map((entry) => entry.match(/<loc>([^<]+)<\/loc>/)?.[1]);
 assert.deepEqual(sitemapUrls, expectedUrls);
 
@@ -126,8 +120,6 @@ for (let pageIndex = 0; pageIndex < seoConfig.pages.length; pageIndex += 1) {
 const robots = await readFile(join(buildDirectory, 'robots.txt'), 'utf8');
 assert.match(robots, /Sitemap: https:\/\/www\.gabrielfeijo\.com\.br\/sitemap\.xml/);
 
-const manifest = JSON.parse(
-	await readFile(join(buildDirectory, 'site.webmanifest'), 'utf8')
-);
+const manifest = JSON.parse(await readFile(join(buildDirectory, 'site.webmanifest'), 'utf8'));
 assert.equal(manifest.start_url, '/');
 assert.equal(manifest.icons.length, 2);

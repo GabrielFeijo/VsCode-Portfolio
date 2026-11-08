@@ -1,39 +1,16 @@
-import {
-	Box,
-	Container,
-	CssBaseline,
-	Grid,
-	Stack,
-	ThemeProvider,
-	Typography,
-} from '@mui/material';
-import {
-	lazy,
-	Suspense,
-	useCallback,
-	useEffect,
-	useMemo,
-} from 'react';
+import { Box, Container, CssBaseline, Grid, Stack, ThemeProvider, Typography } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
+import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
-import {
-	Navigate,
-	Route,
-	Routes,
-	useLocation,
-	useNavigate,
-} from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
-import {
-	getLanguageFromPathname,
-	getLocalizedPath,
-} from '../../config/seo';
+import { getLanguageFromPathname, getLocalizedPath } from '../../config/seo';
 import { LAYOUT } from '../../constants/layout';
 import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Language, Page } from '../../domain/page';
+import type { Language, Page } from '../../domain/page';
 import i18n from '../../i18n';
 import { onOpenTabRequest } from '../../utils/appEvents';
 import {
@@ -119,11 +96,7 @@ function ExplorerDrawer({
 						>
 							<Stack>
 								<motion.div variants={sidebarItemAnimations}>
-									<Typography
-										variant='caption'
-										color='text.secondary'
-										sx={{ ml: 4 }}
-									>
+									<Typography variant='caption' color='text.secondary' sx={{ ml: 4 }}>
 										{explorerTitle}
 									</Typography>
 								</motion.div>
@@ -221,15 +194,7 @@ function EditorWorkspace({
 							}
 						/>
 					))}
-					<Route
-						path='*'
-						element={
-							<Navigate
-								to={getLocalizedPath('/', language)}
-								replace
-							/>
-						}
-					/>
+					<Route path='*' element={<Navigate to={getLocalizedPath('/', language)} replace />} />
 				</Routes>
 			</motion.div>
 		</Grid>
@@ -278,12 +243,7 @@ function TerminalDock({
 							right: 0,
 						}}
 					>
-						<motion.div
-							variants={slideUpDown}
-							initial='initial'
-							animate='animate'
-							exit='exit'
-						>
+						<motion.div variants={slideUpDown} initial='initial' animate='animate' exit='exit'>
 							<Suspense fallback={null}>
 								<Terminal
 									language={language}
@@ -311,12 +271,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	const { pathname } = useLocation();
 	const language = getLanguageFromPathname(pathname);
 
-	const {
-		pages,
-		setPages,
-		setSelectedIndex,
-		openTabByTarget,
-	} = useEditorContext();
+	const { pages, setPages, setSelectedIndex, openTabByTarget } = useEditorContext();
 
 	const {
 		expanded,
@@ -354,10 +309,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 			{isLoading && <Loading />}
 			{!isLoading && ranking && (
 				<Suspense fallback={null}>
-					<BoxRating
-						ranking={ranking}
-						setRanking={setRanking}
-					/>
+					<BoxRating ranking={ranking} setRanking={setRanking} />
 				</Suspense>
 			)}
 			<KeyboardShortcutsModal visible={!isLoading} />
@@ -374,10 +326,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 					maxWidth={false}
 					disableGutters
 				>
-					<Grid
-						container
-						sx={{ height: '100%', overflow: 'hidden' }}
-					>
+					<Grid container sx={{ height: '100%', overflow: 'hidden' }}>
 						<Grid
 							container
 							sx={{ height: `calc(100% - ${LAYOUT.FOOTER_HEIGHT}px)`, overflow: 'hidden' }}
@@ -397,10 +346,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 									exit='exit'
 									style={{ height: '100%' }}
 								>
-									<Sidebar
-										language={language}
-										changeLanguage={changeLanguage}
-									/>
+									<Sidebar language={language} changeLanguage={changeLanguage} />
 								</motion.div>
 							</Grid>
 							<ExplorerDrawer
@@ -420,14 +366,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 							/>
 						</Grid>
 
-						<Grid
-							item
-							lg={12}
-							md={12}
-							sm={12}
-							xs={12}
-							zIndex={2}
-						>
+						<Grid item lg={12} md={12} sm={12} xs={12} zIndex={2}>
 							<Footer />
 						</Grid>
 					</Grid>

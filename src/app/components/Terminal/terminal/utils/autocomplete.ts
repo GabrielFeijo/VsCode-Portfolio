@@ -1,6 +1,6 @@
 import { PAGE_ROUTES } from '../terminalConfig';
-import { CompletionState, VirtualDirectory } from '../types';
-import { PATH_COMMANDS, completePathArgument } from './pathUtils';
+import type { CompletionState, VirtualDirectory } from '../types';
+import { completePathArgument, PATH_COMMANDS } from './pathUtils';
 
 const STATIC_COMPLETIONS: Record<string, readonly string[]> = {
 	route: PAGE_ROUTES,
@@ -66,7 +66,7 @@ export function getCompletionState(
 
 	if (raw.length === 1) {
 		const full = candidates[0];
-		const value = isPath && full.endsWith('/') ? full : full + ' ';
+		const value = isPath && full.endsWith('/') ? full : `${full} `;
 		return { value, candidates, list: raw, isPath };
 	}
 	return { value: null, candidates, list: raw, isPath };

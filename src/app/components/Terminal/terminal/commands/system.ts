@@ -4,7 +4,7 @@ import { notifyStorageChange, requestOpenTab } from '@/utils/appEvents';
 import { PROJECT_FS, PROJECT_ROOT } from '../terminalConfig';
 import { calculate, formatResult } from '../utils/calculator';
 import { buildNeofetch, formatUptime } from '../utils/formatters';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const systemCommands: ICommandDefinition[] = [
 	{
@@ -19,7 +19,9 @@ export const systemCommands: ICommandDefinition[] = [
 		name: 'date',
 		description: 'Print current system date and time',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, [new Date().toLocaleString(ctx.language === 'pt' ? 'pt-BR' : 'en-US')]);
+			ctx.addEntry(rawCommand, [
+				new Date().toLocaleString(ctx.language === 'pt' ? 'pt-BR' : 'en-US'),
+			]);
 			return true;
 		},
 	},
@@ -68,7 +70,11 @@ export const systemCommands: ICommandDefinition[] = [
 			}
 			const result = calculate(arg);
 			if (result === null) {
-				ctx.addEntry(rawCommand, [`\x1b[91mcalc: invalid expression: ${arg}\x1b[0m`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91mcalc: invalid expression: ${arg}\x1b[0m`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 			ctx.addEntry(rawCommand, [`${arg} = \x1b[92m${formatResult(result)}\x1b[0m`]);
@@ -79,11 +85,14 @@ export const systemCommands: ICommandDefinition[] = [
 		name: 'neofetch',
 		description: 'Display system information summary',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, buildNeofetch({
-				isDark: ctx.isDark,
-				language: ctx.language,
-				uptime: formatUptime(ctx.sessionStart),
-			}));
+			ctx.addEntry(
+				rawCommand,
+				buildNeofetch({
+					isDark: ctx.isDark,
+					language: ctx.language,
+					uptime: formatUptime(ctx.sessionStart),
+				}),
+			);
 			return true;
 		},
 	},

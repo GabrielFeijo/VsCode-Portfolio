@@ -1,8 +1,8 @@
+import type { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 import {
 	getCompletionState,
 	getCompletions,
 } from '../../../src/app/components/Terminal/terminal/utils/autocomplete';
-import { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 
 describe('autocomplete', () => {
 	const allCommands = [

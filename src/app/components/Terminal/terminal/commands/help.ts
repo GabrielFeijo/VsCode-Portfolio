@@ -1,5 +1,5 @@
 import { buildHelp } from '../utils/formatters';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const helpCommand: ICommandDefinition = {
 	name: 'help',

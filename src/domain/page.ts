@@ -13,7 +13,7 @@ export const pageSchema: z.ZodType<Page> = z.lazy(() =>
 		isSaved: z.boolean().optional(),
 		isFolder: z.boolean().optional(),
 		children: z.array(pageSchema).optional(),
-	})
+	}),
 );
 
 export interface Page {

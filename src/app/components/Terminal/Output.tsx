@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAppPalette } from '../../theme/useAppPalette';
 import { fonts } from '../../theme/typography';
+import { useAppPalette } from '../../theme/useAppPalette';
 
 interface Props {
 	language?: string;

@@ -1,6 +1,6 @@
 import { getLocalizedPath } from '@/config/seo';
 import { PAGE_ROUTES } from '../terminalConfig';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const navigationCommands: ICommandDefinition[] = [
 	{
@@ -17,7 +17,9 @@ export const navigationCommands: ICommandDefinition[] = [
 				return true;
 			}
 			ctx.navigate(getLocalizedPath(`/${route}`, ctx.language));
-			ctx.addEntry(rawCommand, [`\x1b[92m→\x1b[0m ${ctx.t('terminal.info.navigating', { route })}`]);
+			ctx.addEntry(rawCommand, [
+				`\x1b[92m→\x1b[0m ${ctx.t('terminal.info.navigating', { route })}`,
+			]);
 			return true;
 		},
 	},

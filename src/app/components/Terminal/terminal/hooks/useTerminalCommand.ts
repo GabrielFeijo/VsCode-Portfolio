@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
-import { Language } from '@/domain/page';
+import type { Language } from '@/domain/page';
 import { executeLocalCommand } from '../commandExecutor';
-import { TerminalColors } from '../terminalConfig';
-import { ActiveEditorSession, VirtualDirectory } from '../types';
+import type { TerminalColors } from '../terminalConfig';
+import type { ActiveEditorSession, VirtualDirectory } from '../types';
 
 const MIN_COMMAND_LENGTH = 2;
 const LOCALIZED_HELP_PREFIX = 'ajuda';

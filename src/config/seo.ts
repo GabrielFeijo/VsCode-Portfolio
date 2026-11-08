@@ -1,4 +1,4 @@
-import { Language } from '../domain/page';
+import type { Language } from '../domain/page';
 import seoConfig from './seo.json';
 import { siteConfig } from './site';
 
@@ -25,9 +25,7 @@ export function normalizeSeoPath(pathname: string): string {
 
 export function getLanguageFromPathname(pathname: string): Language {
 	const normalizedPath = normalizeSeoPath(pathname);
-	return normalizedPath === '/en' || normalizedPath.startsWith('/en/')
-		? 'en'
-		: 'pt';
+	return normalizedPath === '/en' || normalizedPath.startsWith('/en/') ? 'en' : 'pt';
 }
 
 export function getBasePath(pathname: string): string {
@@ -46,16 +44,13 @@ export function getLocalizedPath(pathname: string, language: Language): string {
 
 export function getLocalizedUrl(pathname: string, language: Language): string {
 	const localizedPath = getLocalizedPath(pathname, language);
-	return localizedPath === '/'
-		? `${siteConfig.url}/`
-		: `${siteConfig.url}${localizedPath}`;
+	return localizedPath === '/' ? `${siteConfig.url}/` : `${siteConfig.url}${localizedPath}`;
 }
 
 export function getPageMetadata(pathname: string): PageMetadata {
 	const language = getLanguageFromPathname(pathname);
 	const basePath = getBasePath(pathname);
-	const page =
-		seoConfig.pages.find(({ path }) => path === basePath) || seoConfig.pages[0];
+	const page = seoConfig.pages.find(({ path }) => path === basePath) || seoConfig.pages[0];
 	const portugueseUrl = getLocalizedUrl(page.path, 'pt');
 
 	return {

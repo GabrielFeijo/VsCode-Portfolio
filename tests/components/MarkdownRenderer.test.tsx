@@ -1,13 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import MarkdownRenderer, {
-	getAllowedEmbedSource,
-} from '../../src/app/components/MarkdownRenderer';
+import MarkdownRenderer, { getAllowedEmbedSource } from '../../src/app/components/MarkdownRenderer';
 import { STYLE_FILES } from '../mocks/styleContentGlob';
 
 let mockIframeSource = 'https://www.youtube.com/embed/video-id';
 let mockTheme = 'dark';
-let mockStylesheetHref =
-	'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
+let mockStylesheetHref = 'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
 let mockStylesheetRel = 'stylesheet';
 
 jest.mock('react-markdown', () => {
@@ -15,7 +12,13 @@ jest.mock('react-markdown', () => {
 
 	return {
 		__esModule: true,
-		default: ({ components, rehypePlugins }: { components: Record<string, React.ElementType>; rehypePlugins: unknown[] }) =>
+		default: ({
+			components,
+			rehypePlugins,
+		}: {
+			components: Record<string, React.ElementType>;
+			rehypePlugins: unknown[];
+		}) =>
 			React.createElement(
 				'div',
 				{
@@ -28,9 +31,17 @@ jest.mock('react-markdown', () => {
 				React.createElement(components.h1, null, 'Title'),
 				React.createElement(components.h2, null, 'Subtitle'),
 				React.createElement(components.a, { href: 'https://example.com' }, 'Portfolio'),
-				React.createElement(components.code, { className: 'language-typescript' }, 'const value = 1;\n'),
+				React.createElement(
+					components.code,
+					{ className: 'language-typescript' },
+					'const value = 1;\n',
+				),
 				React.createElement(components.code, null, 'plain code'),
-				React.createElement(components.img, { src: '/profile.webp', alt: 'Profile', className: 'profile' }),
+				React.createElement(components.img, {
+					src: '/profile.webp',
+					alt: 'Profile',
+					className: 'profile',
+				}),
 				React.createElement(components.img, { src: '/project.png', alt: 'Project' }),
 				React.createElement(components.img, { src: '../../gabrielfeijo.webp', alt: 'Relative' }),
 				React.createElement(components.img, { src: undefined, alt: 'NoSrc' }),
@@ -49,10 +60,10 @@ jest.mock('react-markdown', () => {
 							components.tr,
 							null,
 							React.createElement(components.th, null, 'Header'),
-							React.createElement(components.td, null, 'Cell')
-						)
-					)
-				)
+							React.createElement(components.td, null, 'Cell'),
+						),
+					),
+				),
 			),
 	};
 });
@@ -81,8 +92,7 @@ describe('MarkdownRenderer', () => {
 		}
 		mockIframeSource = 'https://www.youtube.com/embed/video-id';
 		mockTheme = 'dark';
-		mockStylesheetHref =
-			'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
+		mockStylesheetHref = 'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
 		mockStylesheetRel = 'stylesheet';
 	});
 
@@ -93,7 +103,7 @@ describe('MarkdownRenderer', () => {
 		expect(screen.getByRole('heading', { level: 2, name: 'Subtitle' })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute(
 			'rel',
-			'noopener noreferrer'
+			'noopener noreferrer',
 		);
 		expect(screen.getByRole('table', { name: 'Data table' })).toBeInTheDocument();
 	});
@@ -126,16 +136,10 @@ describe('MarkdownRenderer', () => {
 		expect(screen.getByRole('img', { name: 'Project' })).toHaveAttribute('loading', 'lazy');
 		const iframe = screen.getByTitle('Embedded content');
 		expect(iframe).toHaveAttribute('loading', 'lazy');
-		expect(iframe).toHaveAttribute(
-			'sandbox',
-			'allow-scripts allow-same-origin allow-presentation'
-		);
+		expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
 		expect(iframe).toHaveAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
 		expect(screen.getByTestId('markdown-root')).toHaveAttribute('data-raw-html', 'true');
-		expect(screen.getByTestId('markdown-root')).toHaveAttribute(
-			'data-strips-title',
-			'true'
-		);
+		expect(screen.getByTestId('markdown-root')).toHaveAttribute('data-strips-title', 'true');
 	});
 
 	it.each([
@@ -152,15 +156,13 @@ describe('MarkdownRenderer', () => {
 	});
 
 	it('allows privacy-enhanced YouTube embeds', () => {
-		expect(
-			getAllowedEmbedSource('https://www.youtube-nocookie.com/embed/video-id')
-		).toBe('https://www.youtube-nocookie.com/embed/video-id');
+		expect(getAllowedEmbedSource('https://www.youtube-nocookie.com/embed/video-id')).toBe(
+			'https://www.youtube-nocookie.com/embed/video-id',
+		);
 	});
 
 	it('loads the pinned Devicon stylesheet with integrity protection', () => {
-		const { container } = render(
-			<MarkdownRenderer allowRawHtml content='raw content' />
-		);
+		const { container } = render(<MarkdownRenderer allowRawHtml content='raw content' />);
 
 		const stylesheet = container.querySelector('link[rel="stylesheet"]');
 		expect(stylesheet).toHaveAttribute('href', mockStylesheetHref);
@@ -176,9 +178,7 @@ describe('MarkdownRenderer', () => {
 		mockStylesheetHref = href;
 		mockStylesheetRel = rel;
 
-		const { container } = render(
-			<MarkdownRenderer allowRawHtml content='raw content' />
-		);
+		const { container } = render(<MarkdownRenderer allowRawHtml content='raw content' />);
 
 		expect(container.querySelector('link')).not.toBeInTheDocument();
 	});
@@ -187,9 +187,7 @@ describe('MarkdownRenderer', () => {
 		mockStylesheetHref =
 			'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0';
 
-		const { container } = render(
-			<MarkdownRenderer allowRawHtml content='raw content' />
-		);
+		const { container } = render(<MarkdownRenderer allowRawHtml content='raw content' />);
 
 		const stylesheet = container.querySelector('link');
 		expect(stylesheet).toHaveAttribute('href', mockStylesheetHref);
@@ -199,9 +197,7 @@ describe('MarkdownRenderer', () => {
 	it('allows stylesheets from the local page styles directory', () => {
 		mockStylesheetHref = '../../styles/projects.css';
 
-		const { container } = render(
-			<MarkdownRenderer allowRawHtml content='raw content' />
-		);
+		const { container } = render(<MarkdownRenderer allowRawHtml content='raw content' />);
 
 		const stylesheet = container.querySelector('link');
 		expect(stylesheet).toHaveAttribute('href', '../../styles/projects.css');
@@ -212,9 +208,7 @@ describe('MarkdownRenderer', () => {
 		STYLE_FILES['../styles/projects.css'] = '.line { height: 35px; }';
 		mockStylesheetHref = '../../styles/projects.css';
 
-		const { container } = render(
-			<MarkdownRenderer allowRawHtml content='raw content' />
-		);
+		const { container } = render(<MarkdownRenderer allowRawHtml content='raw content' />);
 
 		const styleTag = container.querySelector('style[data-stylesheet="../../styles/projects.css"]');
 		expect(styleTag).toBeInTheDocument();

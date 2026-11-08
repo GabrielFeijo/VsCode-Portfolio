@@ -59,7 +59,9 @@
 	border-radius: 6px;
 	cursor: pointer;
 	color: var(--text-secondary);
-	transition: background-color 0.15s, color 0.15s;
+	transition:
+		background-color 0.15s,
+		color 0.15s;
 }
 
 .closeButton:hover {
@@ -106,27 +108,27 @@
 	color: var(--icon-accent);
 }
 
-.iconContainer[data-accent='green'] {
+.iconContainer[data-accent="green"] {
 	--icon-accent: var(--accent-green);
 }
 
-.iconContainer[data-accent='blue'] {
+.iconContainer[data-accent="blue"] {
 	--icon-accent: var(--accent);
 }
 
-.iconContainer[data-accent='cyan'] {
+.iconContainer[data-accent="cyan"] {
 	--icon-accent: var(--accent-cyan);
 }
 
-.iconContainer[data-accent='yellow'] {
+.iconContainer[data-accent="yellow"] {
 	--icon-accent: var(--accent-yellow);
 }
 
-.iconContainer[data-accent='mauve'] {
+.iconContainer[data-accent="mauve"] {
 	--icon-accent: var(--accent-muted);
 }
 
-.iconContainer[data-accent='peach'] {
+.iconContainer[data-accent="peach"] {
 	--icon-accent: var(--accent-peach);
 }
 

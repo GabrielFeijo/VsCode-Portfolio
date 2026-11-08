@@ -1,4 +1,4 @@
-import { VirtualDirectory } from '../types';
+import type { VirtualDirectory } from '../types';
 import { getCompletionState } from '../utils/autocomplete';
 
 export interface UseTerminalKeyboardOptions {

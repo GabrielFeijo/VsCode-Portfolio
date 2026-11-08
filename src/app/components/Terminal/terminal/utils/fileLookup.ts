@@ -1,8 +1,8 @@
 import { StorageService } from '@/services/storageService';
 import { fetchFileContent } from '@/services/terminal/remoteFileService';
-import { stripFileExtension } from '@/utils/stripFileExtension';
 import { isSamePageName } from '@/utils/pageName';
-import { VirtualDirectory } from '../types';
+import { stripFileExtension } from '@/utils/stripFileExtension';
+import type { VirtualDirectory } from '../types';
 
 export function hasContent(lines: string[] | undefined): lines is string[] {
 	return lines != null && lines.length > 0 && lines.some((l) => l.length > 0);

@@ -1,3 +1,4 @@
+import type { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 import {
 	completePathArgument,
 	formatLsEntry,
@@ -5,7 +6,6 @@ import {
 	listDirectory,
 	normalizePath,
 } from '../../../src/app/components/Terminal/terminal/utils/pathUtils';
-import { VirtualDirectory } from '../../../src/app/components/Terminal/terminal/types';
 
 describe('pathUtils', () => {
 	const mockFs: VirtualDirectory = {
@@ -46,7 +46,10 @@ describe('pathUtils', () => {
 		});
 
 		it('supports long listing and hidden files options', () => {
-			const result = listDirectory('', '/home/gabriel', mockFs, { showAll: true, longListing: true });
+			const result = listDirectory('', '/home/gabriel', mockFs, {
+				showAll: true,
+				longListing: true,
+			});
 			expect(result.lines).toHaveLength(4);
 			expect(result.lines?.[0]).toContain('.');
 			expect(result.lines?.[1]).toContain('..');

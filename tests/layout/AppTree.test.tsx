@@ -1,8 +1,8 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { createElement, SetStateAction } from 'react';
+import { createElement, type SetStateAction } from 'react';
 import AppTree from '../../src/app/layout/AppTree';
-import { Page } from '../../src/domain/page';
+import type { Page } from '../../src/domain/page';
 
 const navigate = jest.fn();
 const createFile = jest.fn();
@@ -47,11 +47,7 @@ jest.mock('@mui/x-tree-view', () => ({
 		onContextMenu?: React.MouseEventHandler<HTMLDivElement>;
 		slots?: { icon?: React.ElementType };
 	}) => (
-		<div
-			data-testid={`tree-item-${itemId}`}
-			onClick={onClick}
-			onContextMenu={onContextMenu}
-		>
+		<div data-testid={`tree-item-${itemId}`} onClick={onClick} onContextMenu={onContextMenu}>
 			{slots?.icon ? createElement(slots.icon) : null}
 			{label}
 			{children}
@@ -107,7 +103,7 @@ function renderTree(options?: {
 	mockEditorContext = {
 		pages,
 		setPages: jest.fn((update: SetStateAction<Page[]>) =>
-			typeof update === 'function' ? update(pages) : undefined
+			typeof update === 'function' ? update(pages) : undefined,
 		),
 		selectedIndex: 0,
 		setSelectedIndex: jest.fn(),
@@ -115,7 +111,7 @@ function renderTree(options?: {
 		setCurrentComponent: jest.fn(),
 		visiblePageIndexes,
 		setVisiblePageIndexes: jest.fn((update: SetStateAction<number[]>) =>
-			typeof update === 'function' ? update(visiblePageIndexes) : undefined
+			typeof update === 'function' ? update(visiblePageIndexes) : undefined,
 		),
 		language: options?.language || ('pt' as const),
 	};
@@ -124,7 +120,7 @@ function renderTree(options?: {
 	const view = render(
 		<ThemeProvider theme={theme}>
 			<AppTree language={mockEditorContext.language} />
-		</ThemeProvider>
+		</ThemeProvider>,
 	);
 	return {
 		...mockEditorContext,
@@ -133,7 +129,7 @@ function renderTree(options?: {
 			view.rerender(
 				<ThemeProvider theme={theme}>
 					<AppTree language={mockEditorContext.language} />
-				</ThemeProvider>
+				</ThemeProvider>,
 			);
 		},
 	};
@@ -196,7 +192,7 @@ describe('AppTree', () => {
 
 		expect(createFile).toHaveBeenCalledWith('new-file.md');
 		expect(saveOrUpdateData).toHaveBeenCalledWith(
-			expect.objectContaining({ route: 'new-file.md' })
+			expect.objectContaining({ route: 'new-file.md' }),
 		);
 		expect(props.setPages).toHaveBeenCalledWith([
 			...defaultPages,
@@ -279,7 +275,7 @@ describe('AppTree', () => {
 		fireEvent.change(input, { target: { value: 'initial' } });
 		fireEvent.blur(input);
 
-		const wrapper = input.parentElement?.parentElement!;
+		const wrapper = input.parentElement?.parentElement as HTMLElement;
 		fireEvent.mouseDown(wrapper);
 		fireEvent.click(wrapper);
 		fireEvent.change(input, { target: { value: 'initial-updated' } });
@@ -308,7 +304,7 @@ describe('AppTree', () => {
 		expect(open).toHaveBeenCalledWith(
 			expect.stringContaining('/src/pages/pt/projects.html'),
 			'_blank',
-			'noopener,noreferrer'
+			'noopener,noreferrer',
 		);
 		open.mockRestore();
 	});

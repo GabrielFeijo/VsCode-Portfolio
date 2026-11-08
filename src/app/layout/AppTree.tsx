@@ -1,24 +1,25 @@
-import React, { useCallback, useEffect } from 'react';
+import { Box, IconButton, InputBase } from '@mui/material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAppPalette } from '../theme/useAppPalette';
+import type React from 'react';
+import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
+	VscCheck,
+	VscClose,
 	VscMarkdown,
 	VscNewFile,
 	VscNewFolder,
 	VscRefresh,
-	VscCheck,
-	VscClose,
 } from 'react-icons/vsc';
-import { convertFileName } from '../../utils/convertFileName';
-import { useTranslation } from 'react-i18next';
-import { Box, IconButton, InputBase } from '@mui/material';
-import { Language, Page } from '../../domain/page';
-import ContextMenu from '../components/ContextMenu/ContextMenu';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getBasePath, getLocalizedPath } from '../../config/seo';
 import { useEditorContext } from '../../contexts/EditorContext';
+import type { Language, Page } from '../../domain/page';
+import { convertFileName } from '../../utils/convertFileName';
+import ContextMenu from '../components/ContextMenu/ContextMenu';
 import { useFileCreation } from '../hooks/useFileCreation';
 import { useTreeContextMenu } from '../hooks/useTreeContextMenu';
+import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
 	language: Language;
@@ -40,9 +41,7 @@ export default function AppTree({ language }: Props) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
 
-	const page: Page | undefined = pages.find(
-		(item) => `/${item.route}` === getBasePath(pathname)
-	);
+	const page: Page | undefined = pages.find((item) => `/${item.route}` === getBasePath(pathname));
 
 	useEffect(() => {
 		if (page) {
@@ -50,13 +49,16 @@ export default function AppTree({ language }: Props) {
 		}
 	}, [page, setSelectedIndex]);
 
-	const openFile = useCallback((filePage: Page) => {
-		if (!visiblePageIndexes.includes(filePage.index)) {
-			setVisiblePageIndexes((prev) => [...prev, filePage.index]);
-		}
-		setSelectedIndex(filePage.index);
-		navigate(getLocalizedPath(`/${filePage.route}`, language));
-	}, [language, navigate, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes]);
+	const openFile = useCallback(
+		(filePage: Page) => {
+			if (!visiblePageIndexes.includes(filePage.index)) {
+				setVisiblePageIndexes((prev) => [...prev, filePage.index]);
+			}
+			setSelectedIndex(filePage.index);
+			navigate(getLocalizedPath(`/${filePage.route}`, language));
+		},
+		[language, navigate, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes],
+	);
 
 	const {
 		isCreatingFile,

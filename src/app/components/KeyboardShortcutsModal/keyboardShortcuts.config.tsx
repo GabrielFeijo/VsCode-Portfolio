@@ -1,11 +1,11 @@
-import { IconType } from 'react-icons';
+import type { IconType } from 'react-icons';
 import {
-	VscTerminal,
 	VscColorMode,
-	VscGlobe,
 	VscEditorLayout,
+	VscGlobe,
 	VscHome,
 	VscSave,
+	VscTerminal,
 } from 'react-icons/vsc';
 
 export type ShortcutAccent = 'green' | 'blue' | 'cyan' | 'yellow' | 'mauve' | 'peach';
@@ -62,4 +62,3 @@ export const KEYBOARD_SHORTCUTS = [
 		labelKey: 'shortcuts.save',
 	},
 ] as const satisfies readonly KeyboardShortcut[];
-

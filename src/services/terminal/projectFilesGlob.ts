@@ -17,4 +17,3 @@ export const PROJECT_FILES: Record<string, string> = import.meta.glob(
 	],
 	{ query: '?raw', eager: true, import: 'default' },
 );
-

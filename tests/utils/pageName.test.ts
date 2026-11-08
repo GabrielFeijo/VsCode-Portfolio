@@ -2,7 +2,11 @@ import { getPageNameAliases, isSamePageName } from '../../src/utils/pageName';
 
 describe('pageName', () => {
 	it('returns the original name plus md and html variants', () => {
-		expect(getPageNameAliases('about-me.html')).toEqual(['about-me.html', 'about-me.md', 'about-me.html']);
+		expect(getPageNameAliases('about-me.html')).toEqual([
+			'about-me.html',
+			'about-me.md',
+			'about-me.html',
+		]);
 		expect(getPageNameAliases('notes')).toEqual(['notes', 'notes.md', 'notes.html']);
 	});
 
