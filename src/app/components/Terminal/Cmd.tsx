@@ -142,7 +142,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 					sx={{
 						display: 'flex',
 						alignItems: 'flex-start',
-						flexWrap: 'nowrap',
+						flexWrap: 'wrap',
 						position: 'relative',
 						minHeight: '1.6em',
 					}}

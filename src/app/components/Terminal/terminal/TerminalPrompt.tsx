@@ -20,7 +20,8 @@ const TerminalPrompt = ({ cwd = '' }: Props) => {
 			sx={{
 				display: 'inline-flex',
 				alignItems: 'center',
-				flexWrap: 'wrap',
+				flexWrap: 'nowrap',
+				flexShrink: 0,
 				fontFamily: fonts.mono,
 				fontSize: '0.85rem',
 				lineHeight: 1.6,

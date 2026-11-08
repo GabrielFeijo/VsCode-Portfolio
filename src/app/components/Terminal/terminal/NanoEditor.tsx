@@ -86,6 +86,24 @@ export function syncPageStorage(fileName: string, content: string): void {
 	notifyStorageChange();
 }
 
+function upsertDirectoryEntry(
+	entries: VirtualDirectory[string] = [],
+	name: string,
+	lines: string[],
+): VirtualDirectory[string] {
+	const nextEntries = [...entries];
+	const existingIndex = nextEntries.findIndex((e) => e.name === name && e.type === 'file');
+	const fileEntry = { name, type: 'file' as const, content: lines };
+
+	if (existingIndex >= 0) {
+		nextEntries[existingIndex] = fileEntry;
+		return nextEntries;
+	}
+
+	nextEntries.push(fileEntry);
+	return nextEntries;
+}
+
 export default function NanoEditor({
 	fileName,
 	filePath,
@@ -116,28 +134,10 @@ export default function NanoEditor({
 		const name = normalized.substring(normalized.lastIndexOf('/') + 1);
 		const lines = textToSave.split('\n');
 
-		setFs((prevFs) => {
-			const nextFs: VirtualDirectory = { ...prevFs };
-			nextFs[parent] = [...(nextFs[parent] || [])];
-
-			const existingIndex = nextFs[parent].findIndex((e) => e.name === name && e.type === 'file');
-
-			if (existingIndex >= 0) {
-				nextFs[parent][existingIndex] = {
-					name,
-					type: 'file',
-					content: lines,
-				};
-			} else {
-				nextFs[parent].push({
-					name,
-					type: 'file',
-					content: lines,
-				});
-			}
-
-			return nextFs;
-		});
+		setFs((prevFs) => ({
+			...prevFs,
+			[parent]: upsertDirectoryEntry(prevFs[parent], name, lines),
+		}));
 
 		syncPageStorage(name, textToSave);
 		onSave?.(name, textToSave);
@@ -189,9 +189,15 @@ export default function NanoEditor({
 		if (key === 'y' || key === 's') {
 			saveContent();
 			onClose();
-		} else if (key === 'n') {
+			return;
+		}
+
+		if (key === 'n') {
 			onClose();
-		} else if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
+			return;
+		}
+
+		if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
 			setPromptSave(false);
 			setStatus('[ Cancelled ]');
 		}
@@ -258,6 +264,8 @@ export default function NanoEditor({
 					backgroundColor: palette.bgElevated,
 					color: palette.textPrimary,
 					display: 'flex',
+					flexWrap: 'wrap',
+					gap: 1,
 					justifyContent: 'space-between',
 					fontWeight: 600,
 					fontSize: '0.8rem',
@@ -351,7 +359,11 @@ export default function NanoEditor({
 					p: 0.5,
 					backgroundColor: palette.bgTertiary,
 					display: 'grid',
-					gridTemplateColumns: 'repeat(6, 1fr)',
+					gridTemplateColumns: {
+						xs: 'repeat(3, 1fr)',
+						sm: 'repeat(4, 1fr)',
+						md: 'repeat(6, 1fr)',
+					},
 					gap: 0.5,
 					fontSize: '0.72rem',
 					borderTop: `1px solid ${palette.border}`,

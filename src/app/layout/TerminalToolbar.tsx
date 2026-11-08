@@ -14,12 +14,14 @@ import { useAppPalette } from '../theme/useAppPalette';
 interface TerminalIconButtonProps {
 	'aria-label': string;
 	onClick?: () => void;
+	hideOnCompact?: boolean;
 	children: React.ReactNode;
 }
 
 function TerminalIconButton({
 	'aria-label': ariaLabel,
 	onClick,
+	hideOnCompact = false,
 	children,
 }: TerminalIconButtonProps) {
 	const colors = useAppPalette();
@@ -48,7 +50,7 @@ function TerminalIconButton({
 				p: 1,
 				border: 'none',
 				background: 'transparent',
-				display: 'flex',
+				display: hideOnCompact ? { xs: 'none', md: 'flex' } : 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 				gap: 0.5,
@@ -65,26 +67,32 @@ interface TerminalToolbarProps {
 
 export function TerminalToolbar({ onCloseTerminal }: TerminalToolbarProps) {
 	return (
-		<Stack direction='row' spacing={0} role='toolbar' aria-label='Terminal toolbar'>
-			<TerminalIconButton aria-label='Open terminal command'>
+		<Stack
+			direction='row'
+			spacing={0}
+			role='toolbar'
+			aria-label='Terminal toolbar'
+			sx={{ flexShrink: 0 }}
+		>
+			<TerminalIconButton aria-label='Open terminal command' hideOnCompact>
 				<VscTerminalCmd />
 				<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label='Add new terminal'>
+			<TerminalIconButton aria-label='Add new terminal' hideOnCompact>
 				<VscAdd />
 				<VscChevronDown />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label='Split terminal'>
+			<TerminalIconButton aria-label='Split terminal' hideOnCompact>
 				<VscSplitHorizontal />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label='Delete terminal'>
+			<TerminalIconButton aria-label='Delete terminal' hideOnCompact>
 				<VscTrash />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label='More options'>
+			<TerminalIconButton aria-label='More options' hideOnCompact>
 				<VscEllipsis />
 			</TerminalIconButton>
 

@@ -77,8 +77,23 @@ const Terminal = ({ language, setTerminal, setRanking, changeLanguage }: Props) 
 				flexDirection='row'
 				role='tablist'
 				aria-label='Terminal tabs'
+				sx={{ minWidth: 0 }}
 			>
-				<Stack direction='row' sx={{ pl: 1 }} spacing={2} role='tablist'>
+				<Stack
+					direction='row'
+					sx={{
+						pl: 1,
+						flex: 1,
+						minWidth: 0,
+						overflowX: 'auto',
+						overflowY: 'hidden',
+						whiteSpace: 'nowrap',
+						'&::-webkit-scrollbar': { height: '2px' },
+						'&::-webkit-scrollbar-thumb': { backgroundColor: colors.scrollbar },
+					}}
+					spacing={{ xs: 1, md: 2 }}
+					role='tablist'
+				>
 					{terminalTabs.map(({ index, name }) => (
 						<Box
 							key={index}
@@ -101,6 +116,8 @@ const Terminal = ({ language, setTerminal, setRanking, changeLanguage }: Props) 
 								borderColor: renderTerminalBgColor(index),
 								color: renderTerminalColor(index),
 								cursor: 'pointer',
+								flexShrink: 0,
+								whiteSpace: 'nowrap',
 								'&:hover': {
 									color: colors.textPrimary,
 								},
@@ -112,7 +129,9 @@ const Terminal = ({ language, setTerminal, setRanking, changeLanguage }: Props) 
 								alignItems: 'center',
 							}}
 						>
-							<Typography sx={{ fontSize: '.7rem' }}>{name.toUpperCase()}</Typography>
+							<Typography sx={{ fontSize: '.7rem', whiteSpace: 'nowrap' }}>
+								{name.toUpperCase()}
+							</Typography>
 						</Box>
 					))}
 				</Stack>
