@@ -12,12 +12,12 @@
 		"@types/react": "^18.0.12",
 		"@types/react-dom": "^18.0.5",
 		"@vercel/speed-insights": "^1.3.1",
-		"axios": "^1.19.0",
+		"axios": "^1.21.0",
 		"dayjs": "^1.11.13",
 		"framer-motion": "^12.6.3",
 		"i18next": "23.6.0",
 		"i18next-browser-languagedetector": "^8.0.4",
-		"i18next-http-backend": "^4.0.1",
+		"i18next-http-backend": "^4.0.10",
 		"nanoid": "^6.0.1",
 		"prismjs": "^1.30.0",
 		"react": "^18.1.0",
@@ -35,7 +35,7 @@
 		"remark-breaks": "^3.0.2",
 		"remark-gfm": "^3.0.1",
 		"typescript": "^5.0.0",
-		"zod": "^4.2.1"
+		"zod": "^4.6.7"
 	},
 	"scripts": {
 		"dev": "vite",
@@ -70,6 +70,9 @@
 	"overrides": {
 		"cosmiconfig": {
 			"yaml": "1.10.3"
+		},
+		"jest-config": {
+			"deepmerge": "4.1.2"
 		}
 	},
 	"devDependencies": {
@@ -85,6 +88,6 @@
 		"jest": "^29.6.1",
 		"jest-environment-jsdom": "^29.6.1",
 		"ts-jest": "^29.1.0",
-		"vite": "^7.2.7"
+		"vite": "^7.3.7"
 	}
 }
