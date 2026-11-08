@@ -15,6 +15,7 @@ import { getLocalizedPath } from '../config/seo';
 
 import { customAlphabet } from 'nanoid';
 import { stripFileExtension } from '../utils/stripFileExtension';
+import { getPageNameAliases, isSamePageName } from '../utils/pageName';
 
 const generatePageIndex = customAlphabet('123456789', 8);
 
@@ -23,24 +24,19 @@ export function loadPages(language: Language): Page[] {
   const storedPages = StorageService.getData();
 
   const mergedDefaults = defaultPages.map((defPage) => {
-    const baseName = stripFileExtension(defPage.name);
-    const stored = storedPages.find(
-      (s) =>
-        s.name === defPage.name ||
-        s.name === `${baseName}.md` ||
-        s.name === `${baseName}.html`
-    );
+    const stored = storedPages.find((s) => isSamePageName(s.name, defPage.name));
     return stored
       ? { ...defPage, ...stored, index: defPage.index, route: defPage.route }
       : defPage;
   });
 
   const allDefaultNames = new Set(
-    Object.values(pageRoutes).flatMap((langPages) => [
-      ...langPages.map((lp) => lp.name),
-      ...langPages.map((lp) => `${stripFileExtension(lp.name)}.md`),
-      ...langPages.map((lp) => stripFileExtension(lp.name)),
-    ]),
+    Object.values(pageRoutes).flatMap((langPages) =>
+      langPages.flatMap((lp) => [
+        ...getPageNameAliases(lp.name),
+        stripFileExtension(lp.name),
+      ]),
+    ),
   );
 
   const customStored = storedPages.filter((s) => !allDefaultNames.has(s.name));
@@ -203,9 +199,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
       const matched = currentPages.find(
         (p) =>
           p.name === target ||
-          p.name === `${base}.md` ||
-          p.name === `${base}.html` ||
-          p.name === base ||
+          isSamePageName(p.name, base) ||
           p.route === base ||
           p.route === `/${base}`,
       );
@@ -224,13 +218,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
   const updatePageContent = useCallback(
     (fileName: string, content: string) => {
       setPages((prev) => {
-        const baseName = stripFileExtension(fileName);
-        const idx = prev.findIndex(
-          (p) =>
-            p.name === fileName ||
-            p.name === `${baseName}.md` ||
-            p.name === `${baseName}.html`
-        );
+        const idx = prev.findIndex((p) => isSamePageName(p.name, fileName));
         if (idx < 0) return prev;
         const updated = [...prev];
         updated[idx] = { ...updated[idx], content, isSaved: true };

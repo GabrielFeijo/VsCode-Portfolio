@@ -10,6 +10,8 @@ import { Page } from '@/domain/page';
 import { StorageService } from '@/services/storageService';
 import { getStaticPageContent } from '@/services/pageContentService';
 import MarkdownRenderer from './MarkdownRenderer';
+import { stripFileExtension } from '../../utils/stripFileExtension';
+import { isSamePageName } from '../../utils/pageName';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 
@@ -18,8 +20,6 @@ interface Props {
 	page?: Page;
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
-
-import { stripFileExtension } from '../../utils/stripFileExtension';
 
 const DEFAULT_PAGE_NAMES = new Set([
 	'about-me',
@@ -50,11 +50,7 @@ function getStoredPageContent(page?: Page): string | null {
 	if (!page) return null;
 	const baseName = stripFileExtension(page.name);
 	const stored = StorageService.getData().find(
-		(p) =>
-			p.name === page.name ||
-			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html` ||
-			p.name === baseName
+		(p) => isSamePageName(p.name, page.name) || p.name === baseName
 	);
 	if (stored?.content !== undefined) {
 		return stored.content;

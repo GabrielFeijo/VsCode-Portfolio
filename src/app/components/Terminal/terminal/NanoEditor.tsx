@@ -6,6 +6,8 @@ import { fonts } from '@/app/theme/typography';
 import { pageRoutes } from '@/app/pages/pages';
 import { VirtualDirectory } from './types';
 import { normalizePath } from './utils/pathUtils';
+import { stripFileExtension } from '@/utils/stripFileExtension';
+import { getPageNameAliases, isSamePageName } from '@/utils/pageName';
 
 interface NanoEditorProps {
 	fileName: string;
@@ -19,18 +21,15 @@ interface NanoEditorProps {
 	isDark: boolean;
 }
 
-import { stripFileExtension } from '@/utils/stripFileExtension';
-
 function buildPageMap(): Record<string, { index: number; route: string; name: string }> {
 	const map: Record<string, { index: number; route: string; name: string }> = {};
 	for (const pages of Object.values(pageRoutes)) {
 		for (const page of pages) {
 			const base = stripFileExtension(page.name);
 			const entry = { index: page.index, route: page.route, name: page.name };
-			map[page.name] = entry;
-			map[`${base}.html`] = entry;
-			map[`${base}.md`] = entry;
-			map[base] = entry;
+			for (const key of [...getPageNameAliases(page.name), base]) {
+				map[key] = entry;
+			}
 		}
 	}
 	return map;
@@ -41,18 +40,15 @@ const PAGE_MAP = buildPageMap();
 function resolvePageData(fileName: string, content: string): Page {
 	const storedPages = StorageService.getData();
 	const baseName = stripFileExtension(fileName);
-	const targetPage = storedPages.find(
-		(p) =>
-			p.name === fileName ||
-			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html`
-	);
+	const targetPage = storedPages.find((p) => isSamePageName(p.name, fileName));
 
 	if (targetPage) {
 		return { ...targetPage, content, isSaved: true };
 	}
 
-	const meta = PAGE_MAP[fileName] || PAGE_MAP[`${baseName}.html`] || PAGE_MAP[`${baseName}.md`] || PAGE_MAP[baseName];
+	const meta = [...getPageNameAliases(fileName), baseName]
+		.map((key) => PAGE_MAP[key])
+		.find(Boolean);
 	if (meta) {
 		return {
 			index: meta.index,
