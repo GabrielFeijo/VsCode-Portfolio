@@ -22,6 +22,8 @@
 
 .logo {
 	opacity: 0;
+	max-width: 40vw;
+	object-fit: contain;
 	animation:
 		logo-enter 1.2s ease-out 0.5s 1 forwards,
 		logo-pulse 1.6s ease-in-out 1.7s infinite alternate;
