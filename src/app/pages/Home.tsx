@@ -10,8 +10,6 @@ import {
 import React, { useEffect, useMemo } from 'react';
 import logo from '../../static/favicon.png';
 import { useLocation } from 'react-router-dom';
-import Loading from '../components/Loading/Loading';
-import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useTranslation } from 'react-i18next';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { siteConfig } from '../../config/site';
@@ -23,7 +21,6 @@ interface Props {
 export default function Home({ setSelectedIndex }: Props) {
 	const { t } = useTranslation();
 	const { pathname } = useLocation();
-	const { isLoading } = useHomeQuery();
 
 	const contactLinks = useMemo(() => [
 		{
@@ -56,7 +53,6 @@ export default function Home({ setSelectedIndex }: Props) {
 
 	return (
 		<>
-			{isLoading && <Loading />}
 			<Grid
 				container
 				spacing={0}

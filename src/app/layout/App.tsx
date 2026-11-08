@@ -49,6 +49,8 @@ import {
 import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { LAYOUT } from '../../constants/layout';
+import Loading from '../components/Loading/Loading';
+import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 
 export { loadPages, initVisiblePageIndexes } from '../../contexts/EditorContext';
 
@@ -86,6 +88,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	} = useLayoutContext();
 
 	const { toggleTheme } = useTheme();
+	const { isLoading } = useHomeQuery();
 
 	const navigateHome = useCallback(
 		() => navigate(getLocalizedPath('/', language)),
@@ -117,7 +120,8 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	return (
 		<>
 			<MetadataComponent />
-			{ranking && (
+			{isLoading && <Loading />}
+			{!isLoading && ranking && (
 				<Suspense fallback={null}>
 					<BoxRating
 						ranking={ranking}
@@ -125,7 +129,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 					/>
 				</Suspense>
 			)}
-			<KeyboardShortcutsModal visible={true} />
+			<KeyboardShortcutsModal visible={!isLoading} />
 			{language && (
 				<Container
 					sx={{
@@ -314,7 +318,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 			)}
 
 			<AnimatePresence>
-				{terminal && !isMobile && (
+				{!isLoading && terminal && !isMobile && (
 					<Grid
 						sx={{
 							scrollBehavior: 'smooth',

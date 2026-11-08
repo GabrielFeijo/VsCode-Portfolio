@@ -141,7 +141,14 @@ jest.mock('src/app/layout/Terminal', () => ({ setRanking }: any) => (
 	</div>
 ));
 jest.mock('src/app/components/Rating/BoxRating', () => () => <div data-testid="box-rating" />);
-jest.mock('src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal', () => () => <div data-testid="keyboard-shortcuts" />);
+jest.mock('src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal', () => ({ visible }: any) => (
+	<div data-testid="keyboard-shortcuts" data-visible={String(visible)} />
+));
+const mockUseHomeQuery = jest.fn();
+jest.mock('@/hooks/queries/useHomeQuery', () => ({
+	useHomeQuery: () => mockUseHomeQuery(),
+}));
+jest.mock('src/app/components/Loading/Loading', () => () => <div role="status">Loading</div>);
 jest.mock('src/i18n', () => ({
     language: 'en',
     changeLanguage: jest.fn(),
@@ -191,6 +198,7 @@ const mockStorageService = require('src/services/storageService').StorageService
 describe('App', () => {
     beforeEach(() => {
         mockCalled = false;
+        mockUseHomeQuery.mockReturnValue({ isLoading: false });
         mockPathname = '/';
         mockI18n.language = 'pt';
         mockI18n.changeLanguage.mockClear();
@@ -220,6 +228,22 @@ describe('App', () => {
 			expect(screen.getByTestId('box-rating')).toBeInTheDocument();
 		});
         expect(screen.getByTestId('keyboard-shortcuts')).toBeInTheDocument();
+    });
+
+    it('shows only the loading screen while the initial query is loading', () => {
+        mockUseHomeQuery.mockReturnValue({ isLoading: true });
+        render(<App />);
+        expect(screen.getByRole('status')).toBeInTheDocument();
+        expect(screen.queryByTestId('terminal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('box-rating')).not.toBeInTheDocument();
+        expect(screen.getByTestId('keyboard-shortcuts')).toHaveAttribute('data-visible', 'false');
+    });
+
+    it('hides the loading screen and enables overlays once loading finishes', () => {
+        render(<App />);
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        expect(screen.getByTestId('terminal')).toBeInTheDocument();
+        expect(screen.getByTestId('keyboard-shortcuts')).toHaveAttribute('data-visible', 'true');
     });
 
     it('renders the app with dark theme', async () => {

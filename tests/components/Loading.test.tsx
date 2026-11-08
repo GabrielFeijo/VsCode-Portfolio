@@ -17,7 +17,7 @@ describe('Loading', () => {
         expect(box).toHaveStyle({
             width: '100%',
             height: 'var(--app-viewport-height)',
-            position: 'absolute',
+            position: 'fixed',
             top: '0',
             left: '0',
             display: 'flex',
@@ -25,7 +25,7 @@ describe('Loading', () => {
             alignItems: 'center',
             flexDirection: 'column',
             backgroundColor: 'var(--bg-primary)',
-            zIndex: '99'
+            zIndex: '9999'
         });
     });
 });

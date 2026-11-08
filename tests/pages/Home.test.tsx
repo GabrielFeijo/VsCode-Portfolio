@@ -1,12 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Home from '../../src/app/pages/Home';
 
-const useHomeQueryMock = jest.fn();
-
-jest.mock('@/hooks/queries/useHomeQuery', () => ({
-	useHomeQuery: () => useHomeQueryMock(),
-}));
-
 jest.mock('react-router-dom', () => ({
 	useLocation: () => ({ pathname: '/' }),
 }));
@@ -29,18 +23,9 @@ jest.mock('react-i18next', () => ({
 	}),
 }));
 
-jest.mock('src/app/components/Loading/Loading', () => () => (
-	<div role='status'>Loading</div>
-));
-
 describe('Home', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useHomeQueryMock.mockReturnValue({
-			data: { connected: true },
-			isLoading: false,
-			isError: false,
-		});
 	});
 
 	it('renders localized content and sets selected index to -1', () => {
@@ -61,17 +46,5 @@ describe('Home', () => {
 			'mailto:test@example.com',
 		);
 		expect(setSelectedIndex).toHaveBeenCalledWith(-1);
-		expect(screen.queryByRole('status')).not.toBeInTheDocument();
-	});
-
-	it('renders loading state when query is loading', () => {
-		useHomeQueryMock.mockReturnValue({
-			data: null,
-			isLoading: true,
-			isError: false,
-		});
-
-		render(<Home setSelectedIndex={jest.fn()} />);
-		expect(screen.getByRole('status')).toBeInTheDocument();
 	});
 });
