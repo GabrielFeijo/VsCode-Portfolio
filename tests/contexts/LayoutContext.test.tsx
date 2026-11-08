@@ -153,4 +153,31 @@ describe('LayoutContext', () => {
 		fireEvent.click(screen.getByTestId('toggle-explorer'));
 		expect(screen.getByTestId('expanded').textContent).toBe('false');
 	});
+
+	it('collapses explorer when matchMedia matches compact viewport', () => {
+		const originalMatchMedia = window.matchMedia;
+		Object.defineProperty(window, 'matchMedia', {
+			configurable: true,
+			writable: true,
+			value: jest.fn(() => ({
+				matches: true,
+				addEventListener: jest.fn(),
+				removeEventListener: jest.fn(),
+			})),
+		});
+
+		render(
+			<LayoutProvider>
+				<TestConsumer />
+			</LayoutProvider>,
+		);
+
+		expect(screen.getByTestId('expanded').textContent).toBe('false');
+
+		Object.defineProperty(window, 'matchMedia', {
+			configurable: true,
+			writable: true,
+			value: originalMatchMedia,
+		});
+	});
 });
