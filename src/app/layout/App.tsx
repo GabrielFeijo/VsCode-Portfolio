@@ -14,50 +14,291 @@ import {
 	useEffect,
 	useMemo,
 } from 'react';
-import AppTree from './AppTree';
-import Footer from './Footer';
-import Sidebar from './Sidebar';
+import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 import {
-	Routes,
+	Navigate,
 	Route,
+	Routes,
 	useLocation,
 	useNavigate,
-	Navigate,
 } from 'react-router-dom';
-import AppButtons from './AppButtons';
-import Home from '../pages/Home';
-import { motion, AnimatePresence } from 'framer-motion';
-import { isMobile } from 'react-device-detect';
-import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
-import i18n from '../../i18n';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
+import {
+	getLanguageFromPathname,
+	getLocalizedPath,
+} from '../../config/seo';
+import { LAYOUT } from '../../constants/layout';
+import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
+import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useTranslation } from 'react-i18next';
+import { Language, Page } from '../../domain/page';
+import i18n from '../../i18n';
+import { onOpenTabRequest } from '../../utils/appEvents';
 import {
 	sidebarAnimations,
 	sidebarItemAnimations,
 	slideInOut,
 	slideUpDown,
 } from '../../utils/motionVariants';
-import MetadataComponent from './Metadata';
+import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
+import Loading from '../components/Loading/Loading';
+import { useAppKeyboardShortcuts } from '../hooks/useAppKeyboardShortcuts';
+import Home from '../pages/Home';
 import { createAppTheme } from '../theme/createAppTheme';
 import { useAppPalette } from '../theme/useAppPalette';
-import { useAppKeyboardShortcuts } from '../hooks/useAppKeyboardShortcuts';
-import {
-	getLanguageFromPathname,
-	getLocalizedPath,
-} from '../../config/seo';
-import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
-import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
-import { LAYOUT } from '../../constants/layout';
-import { onOpenTabRequest } from '../../utils/appEvents';
-import Loading from '../components/Loading/Loading';
-import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
+import AppButtons from './AppButtons';
+import AppTree from './AppTree';
+import Footer from './Footer';
+import MetadataComponent from './Metadata';
+import Sidebar from './Sidebar';
 
-export { loadPages, initVisiblePageIndexes } from '../../contexts/EditorContext';
+export { initVisiblePageIndexes, loadPages } from '../../contexts/EditorContext';
 
 const BoxRating = lazy(() => import('../components/Rating/BoxRating'));
 const MDContainer = lazy(() => import('../components/MDContainer'));
 const Terminal = lazy(() => import('./Terminal'));
+
+const SPRING_TRANSITION = {
+	type: 'spring' as const,
+	damping: 30,
+	stiffness: 200,
+	bounce: 0.2,
+};
+
+function getTerminalWidth(expanded: boolean): string {
+	return `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`;
+}
+
+interface ExplorerDrawerProps {
+	expanded: boolean;
+	setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+	language: Language;
+	explorerTitle: string;
+	bgExplorer: string;
+	bgOverlay: string;
+}
+
+function ExplorerDrawer({
+	expanded,
+	setExpanded,
+	language,
+	explorerTitle,
+	bgExplorer,
+	bgOverlay,
+}: ExplorerDrawerProps) {
+	return (
+		<>
+			<AnimatePresence mode='wait'>
+				{expanded && (
+					<motion.div
+						variants={sidebarAnimations}
+						initial='initial'
+						animate='animate'
+						exit='exit'
+						layout='position'
+						style={{
+							position: isMobile ? 'fixed' : 'relative',
+							left: isMobile ? LAYOUT.SIDEBAR_WIDTH : 0,
+							top: 0,
+							height: isMobile
+								? `calc(var(--app-viewport-height) - ${LAYOUT.FOOTER_HEIGHT}px)`
+								: '100%',
+							zIndex: isMobile ? 999 : 'auto',
+							boxShadow: isMobile ? '2px 0 8px rgba(0,0,0,0.2)' : 'none',
+						}}
+					>
+						<Grid
+							item
+							sx={{
+								backgroundColor: bgExplorer,
+								height: '100%',
+								minHeight: 0,
+							}}
+						>
+							<Stack>
+								<motion.div variants={sidebarItemAnimations}>
+									<Typography
+										variant='caption'
+										color='text.secondary'
+										sx={{ ml: 4 }}
+									>
+										{explorerTitle}
+									</Typography>
+								</motion.div>
+								<motion.div variants={sidebarItemAnimations}>
+									<AppTree language={language} />
+								</motion.div>
+							</Stack>
+						</Grid>
+					</motion.div>
+				)}
+			</AnimatePresence>
+			{isMobile && expanded && (
+				<Box
+					data-testid='sidebar-overlay'
+					sx={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						backgroundColor: bgOverlay,
+						zIndex: 998,
+					}}
+					onClick={() => setExpanded(false)}
+				/>
+			)}
+		</>
+	);
+}
+
+interface EditorWorkspaceProps {
+	language: Language;
+	pages: Page[];
+	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
+	setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
+	terminalOpen: boolean;
+}
+
+function EditorWorkspace({
+	language,
+	pages,
+	setPages,
+	setSelectedIndex,
+	terminalOpen,
+}: EditorWorkspaceProps) {
+	const terminalOffset = terminalOpen ? `${LAYOUT.TERMINAL_MIN_HEIGHT}px` : '0px';
+
+	return (
+		<Grid
+			item
+			xs
+			zeroMinWidth
+			sx={{
+				width: '100%',
+				maxWidth: '100%',
+				height: '100%',
+				minHeight: 0,
+				overflow: 'hidden',
+			}}
+		>
+			<Grid sx={{ height: `${LAYOUT.TABS_HEIGHT}px` }}>
+				<AppButtons language={language} />
+			</Grid>
+
+			<motion.div
+				initial={false}
+				animate={{
+					height: `calc(100% - ${LAYOUT.TABS_HEIGHT}px - ${terminalOffset})`,
+				}}
+				transition={SPRING_TRANSITION}
+				style={{
+					overflowY: 'auto',
+					scrollBehavior: 'smooth',
+				}}
+				role='main'
+				aria-label='Main content'
+			>
+				<Routes>
+					<Route
+						path={getLocalizedPath('/', language)}
+						element={<Home setSelectedIndex={setSelectedIndex} />}
+					/>
+					{pages.map(({ index, name, route }) => (
+						<Route
+							key={index}
+							path={getLocalizedPath(`/${route}`, language)}
+							element={
+								<Suspense fallback={null}>
+									<MDContainer
+										path={`/pages/${language.toLowerCase()}/${name}`}
+										page={pages.find((p) => p.index === index)}
+										setPages={setPages}
+									/>
+								</Suspense>
+							}
+						/>
+					))}
+					<Route
+						path='*'
+						element={
+							<Navigate
+								to={getLocalizedPath('/', language)}
+								replace
+							/>
+						}
+					/>
+				</Routes>
+			</motion.div>
+		</Grid>
+	);
+}
+
+interface TerminalDockProps {
+	visible: boolean;
+	expanded: boolean;
+	language: Language;
+	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
+	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
+	changeLanguage: () => void;
+}
+
+function TerminalDock({
+	visible,
+	expanded,
+	language,
+	setTerminal,
+	setRanking,
+	changeLanguage,
+}: TerminalDockProps) {
+	const width = getTerminalWidth(expanded);
+
+	return (
+		<AnimatePresence>
+			{visible && (
+				<Grid
+					sx={{
+						scrollBehavior: 'smooth',
+						minHeight: `${LAYOUT.TERMINAL_MIN_HEIGHT}px`,
+						overflow: 'hidden',
+						position: 'absolute',
+						width,
+						bottom: LAYOUT.FOOTER_HEIGHT,
+						right: 0,
+					}}
+				>
+					<motion.div
+						initial={false}
+						animate={{ width }}
+						transition={SPRING_TRANSITION}
+						style={{
+							position: 'fixed',
+							right: 0,
+						}}
+					>
+						<motion.div
+							variants={slideUpDown}
+							initial='initial'
+							animate='animate'
+							exit='exit'
+						>
+							<Suspense fallback={null}>
+								<Terminal
+									language={language}
+									setTerminal={setTerminal}
+									setRanking={setRanking}
+									changeLanguage={changeLanguage}
+								/>
+							</Suspense>
+						</motion.div>
+					</motion.div>
+				</Grid>
+			)}
+		</AnimatePresence>
+	);
+}
 
 interface AppContentProps {
 	changeLanguage: () => void;
@@ -162,135 +403,21 @@ function AppContent({ changeLanguage }: AppContentProps) {
 									/>
 								</motion.div>
 							</Grid>
-							<AnimatePresence mode='wait'>
-								{expanded && (
-									<motion.div
-										variants={sidebarAnimations}
-										initial='initial'
-										animate='animate'
-										exit='exit'
-										layout='position'
-										style={{
-											position: isMobile ? 'fixed' : 'relative',
-											left: isMobile ? LAYOUT.SIDEBAR_WIDTH : 0,
-											top: 0,
-											height: isMobile
-												? `calc(var(--app-viewport-height) - ${LAYOUT.FOOTER_HEIGHT}px)`
-												: '100%',
-											zIndex: isMobile ? 999 : 'auto',
-											boxShadow: isMobile
-												? '2px 0 8px rgba(0,0,0,0.2)'
-												: 'none',
-										}}
-									>
-										<Grid
-											item
-											sx={{
-												backgroundColor: colors.bgExplorer,
-												height: '100%',
-												minHeight: 0,
-											}}
-										>
-											<Stack>
-												<motion.div variants={sidebarItemAnimations}>
-													<Typography
-														variant='caption'
-														color='text.secondary'
-														sx={{ ml: 4 }}
-													>
-														{t('sidebar.explorer')}
-													</Typography>
-												</motion.div>
-												<motion.div variants={sidebarItemAnimations}>
-													<AppTree language={language} />
-												</motion.div>
-											</Stack>
-										</Grid>
-									</motion.div>
-								)}
-							</AnimatePresence>
-							{isMobile && expanded && (
-								<Box
-									data-testid="sidebar-overlay"
-									sx={{
-										position: 'fixed',
-										top: 0,
-										left: 0,
-										right: 0,
-										bottom: 0,
-										backgroundColor: colors.bgOverlay,
-										zIndex: 998,
-									}}
-									onClick={() => setExpanded(false)}
-								/>
-							)}
-							<Grid
-								item
-								xs
-								zeroMinWidth
-								sx={{
-									width: '100%',
-									maxWidth: '100%',
-									height: '100%',
-									minHeight: 0,
-									overflow: 'hidden',
-								}}
-							>
-								<Grid sx={{ height: `${LAYOUT.TABS_HEIGHT}px` }}>
-									<AppButtons language={language} />
-								</Grid>
-
-								<motion.div
-									initial={false}
-									animate={{
-										height: `calc(100% - ${LAYOUT.TABS_HEIGHT}px - ${terminal && !isMobile ? `${LAYOUT.TERMINAL_MIN_HEIGHT}px` : '0px'
-											})`,
-									}}
-									transition={{
-										type: 'spring',
-										damping: 30,
-										stiffness: 200,
-										bounce: 0.2,
-									}}
-									style={{
-										overflowY: 'auto',
-										scrollBehavior: 'smooth',
-									}}
-									role="main"
-									aria-label="Main content"
-								>
-									<Routes>
-										<Route
-											path={getLocalizedPath('/', language)}
-											element={<Home setSelectedIndex={setSelectedIndex} />}
-										/>
-										{pages.map(({ index, name, route }) => (
-											<Route
-												key={index}
-												path={getLocalizedPath(`/${route}`, language)}
-												element={
-													<Suspense fallback={null}>
-														<MDContainer
-															path={`/pages/${language.toLowerCase()}/${name}`}
-															page={pages.find((p) => p.index === index)}
-															setPages={setPages}
-														/>
-													</Suspense>
-												}
-											/>
-										))}
-										<Route
-											path='*'
-											element={
-												<Navigate
-													to={getLocalizedPath('/', language)}
-													replace
-												/>
-											}
-										/>
-									</Routes>
-								</motion.div>
-							</Grid>
+							<ExplorerDrawer
+								expanded={expanded}
+								setExpanded={setExpanded}
+								language={language}
+								explorerTitle={t('sidebar.explorer')}
+								bgExplorer={colors.bgExplorer}
+								bgOverlay={colors.bgOverlay}
+							/>
+							<EditorWorkspace
+								language={language}
+								pages={pages}
+								setPages={setPages}
+								setSelectedIndex={setSelectedIndex}
+								terminalOpen={terminal && !isMobile}
+							/>
 						</Grid>
 
 						<Grid
@@ -307,54 +434,14 @@ function AppContent({ changeLanguage }: AppContentProps) {
 				</Container>
 			)}
 
-			<AnimatePresence>
-				{!isLoading && terminal && !isMobile && (
-					<Grid
-						sx={{
-							scrollBehavior: 'smooth',
-							minHeight: `${LAYOUT.TERMINAL_MIN_HEIGHT}px`,
-							overflow: 'hidden',
-							position: 'absolute',
-							width: `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`,
-							bottom: LAYOUT.FOOTER_HEIGHT,
-							right: 0,
-						}}
-					>
-						<motion.div
-							initial={false}
-							animate={{
-								width: `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`,
-							}}
-							transition={{
-								type: 'spring',
-								damping: 30,
-								stiffness: 200,
-								bounce: 0.2,
-							}}
-							style={{
-								position: 'fixed',
-								right: 0,
-							}}
-						>
-							<motion.div
-								variants={slideUpDown}
-								initial='initial'
-								animate='animate'
-								exit='exit'
-							>
-								<Suspense fallback={null}>
-									<Terminal
-										language={language}
-										setTerminal={setTerminal}
-										setRanking={setRanking}
-										changeLanguage={changeLanguage}
-									/>
-								</Suspense>
-							</motion.div>
-						</motion.div>
-					</Grid>
-				)}
-			</AnimatePresence>
+			<TerminalDock
+				visible={!isLoading && terminal && !isMobile}
+				expanded={expanded}
+				language={language}
+				setTerminal={setTerminal}
+				setRanking={setRanking}
+				changeLanguage={changeLanguage}
+			/>
 		</>
 	);
 }
