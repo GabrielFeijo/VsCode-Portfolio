@@ -1,3 +1,4 @@
+import { TERMINAL_HOME, TERMINAL_USER } from '@/config/terminalIdentity';
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { fonts } from '../../../theme/typography';
@@ -11,7 +12,7 @@ interface Props {
 const TerminalPrompt = ({ cwd = '' }: Props) => {
 	const { theme } = useTheme();
 	const colors = getTerminalColors(theme);
-	const displayPath = (cwd || '').replace(/^\/home\/gabriel/, '~');
+	const displayPath = (cwd || '').replace(new RegExp(`^${TERMINAL_HOME}`), '~');
 
 	return (
 		<Box
@@ -30,7 +31,7 @@ const TerminalPrompt = ({ cwd = '' }: Props) => {
 				component="span"
 				sx={{ color: colors.user, font: 'inherit', fontSize: 'inherit' }}
 			>
-				gabriel
+				{TERMINAL_USER}
 			</Typography>
 			<Typography component="span" sx={{ color: colors.muted, font: 'inherit', fontSize: 'inherit' }}>
 				@

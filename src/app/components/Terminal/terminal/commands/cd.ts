@@ -1,3 +1,4 @@
+import { TERMINAL_HOME } from '@/config/terminalIdentity';
 import { PROJECT_ROOT } from '../terminalConfig';
 import { normalizePath } from '../utils/pathUtils';
 import { ICommandDefinition } from './command.types';
@@ -10,7 +11,7 @@ export const cdCommand: ICommandDefinition = {
 
 		if (!arg) {
 			setPreviousCwd(cwd);
-			setCwd('/home/gabriel');
+			setCwd(TERMINAL_HOME);
 			return true;
 		}
 

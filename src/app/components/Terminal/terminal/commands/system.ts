@@ -1,3 +1,4 @@
+import { TERMINAL_USER } from '@/config/terminalIdentity';
 import { StorageService } from '@/services/storageService';
 import { notifyStorageChange, requestOpenTab } from '@/utils/appEvents';
 import { PROJECT_FS, PROJECT_ROOT } from '../terminalConfig';
@@ -10,7 +11,7 @@ export const systemCommands: ICommandDefinition[] = [
 		name: 'whoami',
 		description: 'Print effective user name',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, ['gabriel']);
+			ctx.addEntry(rawCommand, [TERMINAL_USER]);
 			return true;
 		},
 	},

@@ -4,8 +4,7 @@ import { PROJECT_ROOT } from '@/services/terminal/projectFileSystem';
 
 export { PROJECT_FS, PROJECT_ROOT } from '@/services/terminal/projectFileSystem';
 
-export const TERMINAL_USER = 'gabriel';
-export const TERMINAL_HOST = 'portfolio';
+export { TERMINAL_HOST, TERMINAL_USER } from '@/config/terminalIdentity';
 export const TERMINAL_DEFAULT_PATH = PROJECT_ROOT;
 
 export function getTerminalColors(mode: Theme) {

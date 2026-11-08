@@ -1,3 +1,4 @@
+import { TERMINAL_HOST, TERMINAL_USER } from '@/config/terminalIdentity';
 import dayjs from 'dayjs';
 import { Language } from '@/domain/page';
 import { IRate } from '@/services/api/review/ReviewService';
@@ -31,7 +32,7 @@ export function buildNeofetch({ isDark, language, uptime }: NeofetchOptions): st
 	const themeLabel = isDark ? 'Dracula / Catppuccin' : 'Light';
 	const langLabel = language === 'pt' ? 'Português (BR)' : 'English (US)';
 	return [
-		'\x1b[94m       .--.       \x1b[0m  \x1b[92mgabriel\x1b[0m@\x1b[96mportfolio\x1b[0m',
+		`\x1b[94m       .--.       \x1b[0m  \x1b[92m${TERMINAL_USER}\x1b[0m@\x1b[96m${TERMINAL_HOST}\x1b[0m`,
 		'\x1b[94m      |o_o |      \x1b[0m  ─────────────────────',
 		'\x1b[94m      |:_/ |      \x1b[0m  \x1b[91mOS\x1b[0m: Portfolio Linux x86_64',
 		'\x1b[94m     //   \\ \\     \x1b[0m  \x1b[91mHost\x1b[0m: React 18 + Vite 7',
