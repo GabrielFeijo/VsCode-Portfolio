@@ -55,7 +55,7 @@ module.exports = {
 		'^nanoid$': '<rootDir>/__mocks__/nanoid.js',
 		'^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
 		'^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
-		'^.+\\.(png|jpg|jpeg|svg|gif)$': '<rootDir>/__mocks__/fileMock.js',
+		'^.+\\.(png|jpg|jpeg|webp|svg|gif)$': '<rootDir>/__mocks__/fileMock.js',
 	},
 	collectCoverage: true,
 	collectCoverageFrom: [

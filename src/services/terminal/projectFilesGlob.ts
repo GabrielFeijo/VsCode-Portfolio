@@ -1,7 +1,6 @@
 export const PROJECT_FILES: Record<string, string> = import.meta.glob(
 	[
 		'../../../src/**/*.{ts,tsx,css,json,svg,html,md}',
-		'../../../tests/**/*.{ts,tsx}',
 		'../../../scripts/**/*.{js,mjs}',
 		'../../../*.{json,js,cjs,ts,html,md}',
 		'../../../.gitignore',
