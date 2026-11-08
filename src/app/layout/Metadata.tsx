@@ -31,25 +31,18 @@ export default function MetadataComponent() {
 				name: siteConfig.author,
 				url: siteConfig.url,
 				image: siteImage,
-				jobTitle: 'Desenvolvedor Full Stack',
+				jobTitle: siteConfig.jobTitle,
 				address: {
 					'@type': 'PostalAddress',
-					addressLocality: 'Recife',
-					addressRegion: 'PE',
-					addressCountry: 'BR',
+					addressLocality: siteConfig.address.locality,
+					addressRegion: siteConfig.address.region,
+					addressCountry: siteConfig.address.country,
 				},
 				sameAs: [
 					siteConfig.githubUrl,
 					siteConfig.linkedinUrl,
 				],
-				knowsAbout: [
-					'React',
-					'TypeScript',
-					'Node.js',
-					'NestJS',
-					'Software Engineering',
-					'Full Stack Development',
-				],
+				knowsAbout: siteConfig.knowsAbout,
 			},
 			{
 				'@type': 'WebSite',
@@ -86,7 +79,7 @@ export default function MetadataComponent() {
 			/>
 			<meta
 				name='theme-color'
-				content='#1e1e2e'
+				content={siteConfig.themeColor}
 			/>
 			<meta
 				name='robots'
@@ -151,7 +144,7 @@ export default function MetadataComponent() {
 			/>
 			<meta
 				property='og:image:alt'
-				content='Gabriel Feijó — Desenvolvedor Full Stack'
+				content={siteConfig.imageAlt}
 			/>
 			<meta
 				property='og:locale'
@@ -188,11 +181,11 @@ export default function MetadataComponent() {
 			/>
 			<meta
 				name='twitter:image:alt'
-				content='Gabriel Feijó — Desenvolvedor Full Stack'
+				content={siteConfig.imageAlt}
 			/>
 			<meta
 				name='twitter:creator'
-				content='@gabrielfeijo'
+				content={siteConfig.twitterHandle}
 			/>
 
 			<script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
