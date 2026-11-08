@@ -104,12 +104,13 @@ function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
 	if (props.rel !== 'stylesheet' || !props.href) return null;
 
 	const isRemoteStylesheet = allowedStylesheets.has(props.href);
-	if (!isRemoteStylesheet) {
-		if (!localStylesheetPattern.test(props.href)) return null;
-		const localContent = getStyleContent(props.href);
-		if (localContent) {
-			return <style data-stylesheet={props.href}>{localContent}</style>;
-		}
+	if (!isRemoteStylesheet && !localStylesheetPattern.test(props.href)) {
+		return null;
+	}
+
+	const localContent = isRemoteStylesheet ? null : getStyleContent(props.href);
+	if (localContent) {
+		return <style data-stylesheet={props.href}>{localContent}</style>;
 	}
 
 	return (
@@ -136,7 +137,14 @@ function MarkdownImage(props: ComponentPropsWithoutRef<'img'>) {
 	const src = props.src ? props.src.replace(/^(\.\.\/)+/, '/') : props.src;
 
 	return (
-		<img alt='' {...props} src={src} loading={isProfileImage ? 'eager' : 'lazy'} decoding='async' />
+		<img
+			alt=''
+			{...props}
+			src={src}
+			loading={isProfileImage ? 'eager' : 'lazy'}
+			decoding='async'
+			referrerPolicy='no-referrer'
+		/>
 	);
 }
 
@@ -160,7 +168,7 @@ function MarkdownIframe(props: ComponentPropsWithoutRef<'iframe'>) {
 
 function MarkdownTable({ children }: { children: ReactNode }) {
 	return (
-		<TableContainer component={Paper}>
+		<TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
 			<Table size='small' aria-label='Data table'>
 				{children}
 			</Table>
@@ -200,12 +208,13 @@ function MarkdownHeading({ children, level }: { children: ReactNode; level: 1 | 
 				component={`h${level}`}
 				variant={`h${level}`}
 				sx={{
-					fontSize: level === 1 ? '2em' : '1.5em',
+					fontSize: level === 1 ? 'clamp(1.45rem, 4vw, 2em)' : 'clamp(1.2rem, 3.2vw, 1.5em)',
 					display: 'block',
 					marginBlockStart: level === 1 ? '0.67em' : '0.83em',
 					marginBlockEnd: '0.3em',
 					fontWeight: 'bold',
 					lineHeight: 1.25,
+					wordBreak: 'break-word',
 				}}
 			>
 				{children}

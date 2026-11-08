@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { VscChromeClose, VscCloseAll } from 'react-icons/vsc';
+import { clampMenuPosition } from '../../../utils/clampMenuPosition';
 import styles from './TabContextMenu.module.css';
 
 interface ContextMenuPosition {
@@ -117,10 +118,7 @@ export default function TabContextMenu({
 				<motion.div
 					ref={menuRef}
 					className={styles.contextMenu}
-					style={{
-						top: contextMenu.mouseY,
-						left: contextMenu.mouseX,
-					}}
+					style={clampMenuPosition(contextMenu)}
 					initial={{ scale: 0.95, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					exit={{ scale: 0.95, opacity: 0 }}
@@ -133,10 +131,9 @@ export default function TabContextMenu({
 								key={item.id}
 								className={`${styles.menuItem} ${!item.enabled ? styles.disabled : ''}`}
 								onClick={() => {
-									if (item.enabled) {
-										item.onClick();
-										handleClose();
-									}
+									if (!item.enabled) return;
+									item.onClick();
+									handleClose();
 								}}
 								disabled={!item.enabled}
 								aria-label={item.label}

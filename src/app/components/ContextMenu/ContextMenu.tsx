@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOpenInNew } from 'react-icons/md';
 import { VscGithub, VscTrash } from 'react-icons/vsc';
+import { clampMenuPosition } from '../../../utils/clampMenuPosition';
 import styles from './ContextMenu.module.css';
 
 interface ContextMenuPosition {
@@ -58,10 +59,7 @@ export default function ContextMenu({
 				<motion.div
 					ref={menuRef}
 					className={styles.contextMenu}
-					style={{
-						top: contextMenu.mouseY,
-						left: contextMenu.mouseX,
-					}}
+					style={clampMenuPosition(contextMenu)}
 					initial={{ scale: 0.95, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					exit={{ scale: 0.95, opacity: 0 }}

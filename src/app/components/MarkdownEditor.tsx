@@ -184,6 +184,8 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 			<Box
 				sx={{
 					display: 'flex',
+					flexWrap: 'wrap',
+					gap: 1,
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					px: 1.5,

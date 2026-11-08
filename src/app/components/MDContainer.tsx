@@ -173,8 +173,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 						xs={12}
 						md={6}
 						sx={{
-							height: '100%',
-							borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+							height: { xs: '50%', md: '100%' },
+							borderRight: { xs: 'none', md: '1px solid var(--border)' },
+							borderBottom: { xs: '1px solid var(--border)', md: 'none' },
 						}}
 					>
 						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>
@@ -187,8 +188,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					xs={12}
 					md={editMode ? 6 : 12}
 					sx={{
-						height: '100%',
+						height: { xs: editMode ? '50%' : '100%', md: '100%' },
 						overflowY: 'auto',
+						overflowX: 'hidden',
 						px: { xs: 2, sm: 3, md: 4 },
 						boxSizing: 'border-box',
 					}}

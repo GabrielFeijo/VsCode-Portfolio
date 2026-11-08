@@ -97,14 +97,13 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 	};
 
 	useEffect(() => {
-		if (!ranking) {
-			if (errorTimeoutRef.current) {
-				clearTimeout(errorTimeoutRef.current);
-				errorTimeoutRef.current = null;
-			}
-			reset();
-			setError('');
+		if (ranking) return;
+		if (errorTimeoutRef.current) {
+			clearTimeout(errorTimeoutRef.current);
+			errorTimeoutRef.current = null;
 		}
+		reset();
+		setError('');
 	}, [ranking, reset]);
 
 	useEffect(
