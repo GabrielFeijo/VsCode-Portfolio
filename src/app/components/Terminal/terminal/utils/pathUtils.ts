@@ -1,5 +1,5 @@
 import { TERMINAL_HOME, TERMINAL_USER } from '@/config/terminalIdentity';
-import { VirtualDirectory, VirtualFileEntry } from '../types';
+import type { VirtualDirectory, VirtualFileEntry } from '../types';
 
 export const PATH_COMMANDS = [
 	'cd',
@@ -36,7 +36,7 @@ export function normalizePath(base: string, target: string): string {
 		}
 		parts.push(segment);
 	}
-	return '/' + parts.join('/');
+	return `/${parts.join('/')}`;
 }
 
 export function formatLsEntry(entry: VirtualFileEntry, isLong = false): string {
@@ -60,17 +60,13 @@ export function listDirectory(
 	cwd: string,
 	fs: VirtualDirectory,
 	options: { showAll?: boolean; longListing?: boolean } = {},
-): { lines?: string[]; error?: string } {
+): { lines: string[]; error?: undefined } | { error: string; lines?: undefined } {
 	const target = argPath ? normalizePath(cwd, argPath) : cwd;
 
 	if (fs[target]) {
 		const rawEntries = fs[target];
 		const entries = options.showAll
-			? [
-					{ name: '.', type: 'dir' as const },
-					{ name: '..', type: 'dir' as const },
-					...rawEntries,
-				]
+			? [{ name: '.', type: 'dir' as const }, { name: '..', type: 'dir' as const }, ...rawEntries]
 			: rawEntries;
 
 		return {
@@ -98,7 +94,7 @@ export function generateTree(
 	cwd: string,
 	fs: VirtualDirectory,
 	maxDepth = 3,
-): { lines?: string[]; error?: string } {
+): { lines: string[]; error?: undefined } | { error: string; lines?: undefined } {
 	const target = argPath ? normalizePath(cwd, argPath) : cwd;
 	if (!fs[target]) {
 		return { error: `tree: '${argPath || target}': No such directory` };

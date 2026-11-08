@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
-import { CommandService } from '@/services/api/command/CommandService';
 import { useCommandsQuery } from '@/hooks/queries/useCommandsQuery';
+import { CommandService } from '@/services/api/command/CommandService';
+import { useTerminalCommand } from './hooks/useTerminalCommand';
+import { useTerminalEntries } from './hooks/useTerminalEntries';
+import { useTerminalHistory } from './hooks/useTerminalHistory';
+import { useTerminalKeyboard } from './hooks/useTerminalKeyboard';
 import {
+	getTerminalColors,
 	LOCAL_COMMANDS,
 	PROJECT_FS,
 	TERMINAL_DEFAULT_PATH,
-	getTerminalColors,
 } from './terminalConfig';
-import { UseTerminalOptions, VirtualDirectory } from './types';
+import type { UseTerminalOptions, VirtualDirectory } from './types';
 import { getCompletions as getCompletionsUtil } from './utils/autocomplete';
-import { useTerminalHistory } from './hooks/useTerminalHistory';
-import { useTerminalEntries } from './hooks/useTerminalEntries';
-import { useTerminalCommand } from './hooks/useTerminalCommand';
-import { useTerminalKeyboard } from './hooks/useTerminalKeyboard';
 
 export type { TerminalEntry } from './types';
 
@@ -36,17 +36,14 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 
 	const isDark = theme === 'dark';
 	const { commandMap, allCommandNames } = useCommandsQuery();
-	const allCommands = Array.from(new Set([...LOCAL_COMMANDS, ...allCommandNames]));
+	const allCommands = useMemo(
+		() => Array.from(new Set([...LOCAL_COMMANDS, ...allCommandNames])),
+		[allCommandNames],
+	);
 
 	const { entries, addEntry, clearEntries } = useTerminalEntries(cwd);
 
-	const {
-		history,
-		historyRef,
-		addToHistory,
-		navigateUp,
-		navigateDown,
-	} = useTerminalHistory();
+	const { history, historyRef, addToHistory, navigateUp, navigateDown } = useTerminalHistory();
 
 	const fetchApiCommandResponse = useCallback(
 		async (apiCommand: string): Promise<string[] | Error> => {
@@ -57,36 +54,30 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 		[],
 	);
 
-	const {
-		command,
-		commandRef,
-		setCommand,
-		activeEditor,
-		closeEditor,
-		executeCommand,
-	} = useTerminalCommand({
-		language,
-		cwd,
-		setCwd,
-		previousCwd,
-		setPreviousCwd,
-		addEntry,
-		clearEntries,
-		historyRef,
-		toggleTheme,
-		changeLanguage,
-		setRanking,
-		navigate,
-		terminalColors,
-		t,
-		sessionStart: SESSION_START,
-		isDark,
-		fs,
-		setFs,
-		apiCommandList: allCommandNames,
-		commandMap,
-		fetchApiCommandResponse,
-	});
+	const { command, commandRef, setCommand, activeEditor, closeEditor, executeCommand } =
+		useTerminalCommand({
+			language,
+			cwd,
+			setCwd,
+			previousCwd,
+			setPreviousCwd,
+			addEntry,
+			clearEntries,
+			historyRef,
+			toggleTheme,
+			changeLanguage,
+			setRanking,
+			navigate,
+			terminalColors,
+			t,
+			sessionStart: SESSION_START,
+			isDark,
+			fs,
+			setFs,
+			apiCommandList: allCommandNames,
+			commandMap,
+			fetchApiCommandResponse,
+		});
 
 	const { handleKeyDown } = useTerminalKeyboard({
 		command,
@@ -102,6 +93,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 	});
 
 	useEffect(() => {
+		void entries.length;
 		if (scrollRef.current) {
 			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 		}
@@ -117,7 +109,7 @@ export function useTerminal({ language, setRanking, changeLanguage }: UseTermina
 
 	const getCompletions = useCallback(
 		(input: string): string[] => getCompletionsUtil(input, cwd, allCommands, fs),
-		[cwd, fs, allCommandNames],
+		[cwd, fs, allCommands],
 	);
 
 	return {

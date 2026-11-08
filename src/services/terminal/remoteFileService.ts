@@ -37,9 +37,7 @@ export async function fetchFileContent(
 				contentCache.set(normalized, text);
 				return text;
 			}
-		} catch {
-			continue;
-		}
+		} catch {}
 	}
 
 	return null;

@@ -1,18 +1,12 @@
 import { Box, Container, Grid } from '@mui/material';
-import {
-	lazy,
-	Suspense,
-	useCallback,
-	useEffect,
-	useState,
-} from 'react';
-import { Page } from '@/domain/page';
-import { StorageService } from '@/services/storageService';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import type { Page } from '@/domain/page';
 import { getStaticPageContent } from '@/services/pageContentService';
-import MarkdownRenderer from './MarkdownRenderer';
-import { stripFileExtension } from '../../utils/stripFileExtension';
-import { isSamePageName } from '../../utils/pageName';
+import { StorageService } from '@/services/storageService';
 import { onStorageChange } from '../../utils/appEvents';
+import { isSamePageName } from '../../utils/pageName';
+import { stripFileExtension } from '../../utils/stripFileExtension';
+import MarkdownRenderer from './MarkdownRenderer';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 
@@ -44,14 +38,14 @@ function isDefaultPage(page?: Page): boolean {
 }
 
 function hasEditableContent(page?: Page): page is Page & { content?: string } {
-	return !isDefaultPage(page) && Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+	return !isDefaultPage(page) && Boolean(page && Object.hasOwn(page, 'content'));
 }
 
 function getStoredPageContent(page?: Page): string | null {
 	if (!page) return null;
 	const baseName = stripFileExtension(page.name);
 	const stored = StorageService.getData().find(
-		(p) => isSamePageName(p.name, page.name) || p.name === baseName
+		(p) => isSamePageName(p.name, page.name) || p.name === baseName,
 	);
 	if (stored?.content !== undefined) {
 		return stored.content;
@@ -124,11 +118,11 @@ export default function MDContainer({ path, page, setPages }: Props) {
 				currentPages.map((currentPage) =>
 					currentPage.index === pageIndex
 						? { ...currentPage, content: newContent, isSaved: false }
-						: currentPage
-				)
+						: currentPage,
+				),
 			);
 		},
-		[pageIndex, setPages]
+		[pageIndex, setPages],
 	);
 
 	const handleSave = useCallback(() => {
@@ -144,8 +138,8 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 		setPages((currentPages) =>
 			currentPages.map((currentPage) =>
-				currentPage.index === page.index ? updatedPage : currentPage
-			)
+				currentPage.index === page.index ? updatedPage : currentPage,
+			),
 		);
 	}, [content, page, setPages]);
 
@@ -184,10 +178,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 						}}
 					>
 						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>
-							<MarkdownEditor
-								value={content}
-								onChange={handleChange}
-							/>
+							<MarkdownEditor value={content} onChange={handleChange} />
 						</Suspense>
 					</Grid>
 				)}

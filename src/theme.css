@@ -2,14 +2,12 @@
 	--app-viewport-height: 100vh;
 	--transition-speed: 0.3s;
 	--border-radius: 8px;
-	--font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-	--font-ui: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-	--font-content: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+	--font-ui: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--font-content: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-		0 2px 4px -1px rgba(0, 0, 0, 0.06);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-		0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 @supports (height: 100dvh) {
@@ -189,12 +187,13 @@ body {
 	background-color: var(--bg-primary);
 	color: var(--text-primary);
 	font-family: var(--font-content);
-	transition: background-color var(--transition-speed),
+	transition:
+		background-color var(--transition-speed),
 		color var(--transition-speed);
 }
 
 .code-editor-textarea {
-	outline: none !important;
+	outline: none;
 }
 
 .prism-editor__line-number {
