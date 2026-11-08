@@ -1,6 +1,6 @@
 import { Box, Button, Container } from '@mui/material';
 import type React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { VscChromeClose, VscMarkdown } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
 import { getLocalizedPath } from '../../config/seo';
@@ -36,9 +36,11 @@ function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabPr
 
 	return (
 		<Box
+			data-tab-index={page.index}
 			sx={{
 				display: 'inline-flex',
 				alignItems: 'center',
+				flexShrink: 0,
 				borderRight: 1,
 				borderColor: colors.border,
 			}}
@@ -138,6 +140,15 @@ export default function AppButtons({ language }: Props) {
 		tabIndex: number;
 	} | null>(null);
 
+	useEffect(() => {
+		const activeTab = document.querySelector(`[data-tab-index="${selectedIndex}"]`);
+		activeTab?.scrollIntoView?.({
+			behavior: 'smooth',
+			block: 'nearest',
+			inline: 'center',
+		});
+	}, [selectedIndex]);
+
 	const handleContextMenu = useCallback((event: React.MouseEvent, index: number) => {
 		event.preventDefault();
 		setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, tabIndex: index });
@@ -182,10 +193,12 @@ export default function AppButtons({ language }: Props) {
 				maxWidth={false}
 				disableGutters
 				sx={{
-					display: 'inline-flex',
+					display: 'flex',
+					width: '100%',
 					overflowX: 'auto',
 					overflowY: 'hidden',
 					whiteSpace: 'nowrap',
+					WebkitOverflowScrolling: 'touch',
 					backgroundColor: colors.bgTabs,
 					'&::-webkit-scrollbar': { height: '3px' },
 					'&::-webkit-scrollbar-thumb': { backgroundColor: colors.scrollbar },

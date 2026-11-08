@@ -23,9 +23,10 @@ import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
 	language: Language;
+	onSelectFile?: () => void;
 }
 
-export default function AppTree({ language }: Props) {
+export default function AppTree({ language, onSelectFile }: Props) {
 	const {
 		pages,
 		setPages,
@@ -52,12 +53,13 @@ export default function AppTree({ language }: Props) {
 	const openFile = useCallback(
 		(filePage: Page) => {
 			if (!visiblePageIndexes.includes(filePage.index)) {
-				setVisiblePageIndexes((prev) => [...prev, filePage.index]);
+				setVisiblePageIndexes([...visiblePageIndexes, filePage.index]);
 			}
 			setSelectedIndex(filePage.index);
 			navigate(getLocalizedPath(`/${filePage.route}`, language));
+			onSelectFile?.();
 		},
-		[language, navigate, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes],
+		[language, navigate, onSelectFile, setSelectedIndex, setVisiblePageIndexes, visiblePageIndexes],
 	);
 
 	const {
@@ -201,12 +203,7 @@ export default function AppTree({ language }: Props) {
 							}}
 							slots={{ icon: () => <VscMarkdown color={colors.iconMarkdown} /> }}
 							onClick={() => {
-								if (!visiblePageIndexes.includes(index)) {
-									const newIndexes = [...visiblePageIndexes, index];
-									setVisiblePageIndexes(newIndexes);
-								}
-								navigate(getLocalizedPath(`/${route}`, language));
-								setSelectedIndex(index);
+								openFile({ index, name, route, isSaved });
 								setCurrentComponent('tree');
 							}}
 						/>

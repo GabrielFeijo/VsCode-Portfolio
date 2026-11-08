@@ -5,6 +5,7 @@
 	},
 	"shortcuts": {
 		"title": "Keyboard Shortcuts",
+		"close": "Close keyboard shortcuts modal",
 		"terminal": "Open/Close Terminal",
 		"theme": "Toggle Theme",
 		"language": "Switch Language",
@@ -67,6 +68,7 @@
 	},
 	"rating": {
 		"evaluate": "Evaluate this portfolio",
+		"close": "Close rating modal",
 		"name": "Your name",
 		"namePlaceholder": "Enter your name",
 		"comment": "Your comment",
@@ -114,6 +116,14 @@
 	},
 	"sidebar": {
 		"explorer": "EXPLORER",
+		"openExplorer": "Open explorer",
+		"closeExplorer": "Close explorer",
+		"settings": "Settings",
+		"createFile": "Create new file",
+		"createFolder": "Create new folder",
+		"refresh": "Refresh",
+		"confirm": "Confirm",
+		"cancel": "Cancel",
 		"terminal": {
 			"open": "Open Terminal",
 			"close": "Close Terminal"

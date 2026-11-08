@@ -5,7 +5,7 @@ import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
-import { getLanguageFromPathname, getLocalizedPath } from '../../config/seo';
+import { getBasePath, getLanguageFromPathname, getLocalizedPath } from '../../config/seo';
 import { LAYOUT } from '../../constants/layout';
 import { EditorProvider, useEditorContext } from '../../contexts/EditorContext';
 import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
@@ -44,13 +44,15 @@ const SPRING_TRANSITION = {
 	bounce: 0.2,
 };
 
-function getTerminalWidth(expanded: boolean): string {
-	return `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${expanded ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px'})`;
+function getTerminalWidth(expanded: boolean, isOverlayExplorer: boolean): string {
+	const explorerOffset = expanded && !isOverlayExplorer ? `${LAYOUT.EXPLORER_WIDTH}px` : '0px';
+	return `calc(100% - ${LAYOUT.SIDEBAR_WIDTH}px - ${explorerOffset})`;
 }
 
 interface ExplorerDrawerProps {
 	expanded: boolean;
 	setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+	isOverlay: boolean;
 	language: Language;
 	explorerTitle: string;
 	bgExplorer: string;
@@ -60,11 +62,14 @@ interface ExplorerDrawerProps {
 function ExplorerDrawer({
 	expanded,
 	setExpanded,
+	isOverlay,
 	language,
 	explorerTitle,
 	bgExplorer,
 	bgOverlay,
 }: ExplorerDrawerProps) {
+	const closeDrawer = useCallback(() => setExpanded(false), [setExpanded]);
+
 	return (
 		<>
 			<AnimatePresence mode='wait'>
@@ -76,14 +81,15 @@ function ExplorerDrawer({
 						exit='exit'
 						layout='position'
 						style={{
-							position: isMobile ? 'fixed' : 'relative',
-							left: isMobile ? LAYOUT.SIDEBAR_WIDTH : 0,
+							position: isOverlay ? 'fixed' : 'relative',
+							left: isOverlay ? LAYOUT.SIDEBAR_WIDTH : 0,
 							top: 0,
-							height: isMobile
+							maxWidth: isOverlay ? `calc(100vw - ${LAYOUT.SIDEBAR_WIDTH}px)` : undefined,
+							height: isOverlay
 								? `calc(var(--app-viewport-height) - ${LAYOUT.FOOTER_HEIGHT}px)`
 								: '100%',
-							zIndex: isMobile ? 999 : 'auto',
-							boxShadow: isMobile ? '2px 0 8px rgba(0,0,0,0.2)' : 'none',
+							zIndex: isOverlay ? 999 : 'auto',
+							boxShadow: isOverlay ? '2px 0 8px rgba(0,0,0,0.2)' : 'none',
 						}}
 					>
 						<Grid
@@ -92,6 +98,8 @@ function ExplorerDrawer({
 								backgroundColor: bgExplorer,
 								height: '100%',
 								minHeight: 0,
+								overflowY: 'auto',
+								overflowX: 'hidden',
 							}}
 						>
 							<Stack>
@@ -101,14 +109,14 @@ function ExplorerDrawer({
 									</Typography>
 								</motion.div>
 								<motion.div variants={sidebarItemAnimations}>
-									<AppTree language={language} />
+									<AppTree language={language} onSelectFile={isOverlay ? closeDrawer : undefined} />
 								</motion.div>
 							</Stack>
 						</Grid>
 					</motion.div>
 				)}
 			</AnimatePresence>
-			{isMobile && expanded && (
+			{isOverlay && expanded && (
 				<Box
 					data-testid='sidebar-overlay'
 					sx={{
@@ -120,7 +128,7 @@ function ExplorerDrawer({
 						backgroundColor: bgOverlay,
 						zIndex: 998,
 					}}
-					onClick={() => setExpanded(false)}
+					onClick={closeDrawer}
 				/>
 			)}
 		</>
@@ -169,6 +177,7 @@ function EditorWorkspace({
 				transition={SPRING_TRANSITION}
 				style={{
 					overflowY: 'auto',
+					overflowX: 'hidden',
 					scrollBehavior: 'smooth',
 				}}
 				role='main'
@@ -204,6 +213,7 @@ function EditorWorkspace({
 interface TerminalDockProps {
 	visible: boolean;
 	expanded: boolean;
+	isOverlayExplorer: boolean;
 	language: Language;
 	setTerminal: React.Dispatch<React.SetStateAction<boolean>>;
 	setRanking: React.Dispatch<React.SetStateAction<boolean>>;
@@ -213,12 +223,13 @@ interface TerminalDockProps {
 function TerminalDock({
 	visible,
 	expanded,
+	isOverlayExplorer,
 	language,
 	setTerminal,
 	setRanking,
 	changeLanguage,
 }: TerminalDockProps) {
-	const width = getTerminalWidth(expanded);
+	const width = getTerminalWidth(expanded, isOverlayExplorer);
 
 	return (
 		<AnimatePresence>
@@ -282,10 +293,26 @@ function AppContent({ changeLanguage }: AppContentProps) {
 		setRanking,
 		toggleExplorer,
 		toggleTerminal,
+		isMobile: ctxIsMobile,
+		isCompact: ctxIsCompact,
 	} = useLayoutContext();
+
+	const isMobileViewport = Boolean(isMobile || ctxIsMobile);
+	const isOverlayExplorer = Boolean(isMobileViewport || ctxIsCompact);
 
 	const { toggleTheme } = useTheme();
 	const { isLoading } = useHomeQuery();
+
+	const activeRoutePage = useMemo(
+		() => pages.find((item) => `/${item.route}` === getBasePath(pathname)),
+		[pages, pathname],
+	);
+
+	useEffect(() => {
+		if (activeRoutePage) {
+			setSelectedIndex(activeRoutePage.index);
+		}
+	}, [activeRoutePage, setSelectedIndex]);
 
 	const navigateHome = useCallback(
 		() => navigate(getLocalizedPath('/', language)),
@@ -295,7 +322,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	useAppKeyboardShortcuts({
 		changeLanguage,
 		navigateHome,
-		terminalEnabled: !isMobile,
+		terminalEnabled: !isMobileViewport,
 		toggleExplorer,
 		toggleTerminal,
 		toggleTheme,
@@ -336,7 +363,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 								sx={{
 									width: LAYOUT.SIDEBAR_WIDTH,
 									height: '100%',
-									zIndex: isMobile ? 1000 : 2,
+									zIndex: isOverlayExplorer ? 1000 : 2,
 								}}
 							>
 								<motion.div
@@ -352,6 +379,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 							<ExplorerDrawer
 								expanded={expanded}
 								setExpanded={setExpanded}
+								isOverlay={isOverlayExplorer}
 								language={language}
 								explorerTitle={t('sidebar.explorer')}
 								bgExplorer={colors.bgExplorer}
@@ -362,7 +390,7 @@ function AppContent({ changeLanguage }: AppContentProps) {
 								pages={pages}
 								setPages={setPages}
 								setSelectedIndex={setSelectedIndex}
-								terminalOpen={terminal && !isMobile}
+								terminalOpen={terminal && !isMobileViewport}
 							/>
 						</Grid>
 
@@ -374,8 +402,9 @@ function AppContent({ changeLanguage }: AppContentProps) {
 			)}
 
 			<TerminalDock
-				visible={!isLoading && terminal && !isMobile}
+				visible={!isLoading && terminal && !isMobileViewport}
 				expanded={expanded}
+				isOverlayExplorer={isOverlayExplorer}
 				language={language}
 				setTerminal={setTerminal}
 				setRanking={setRanking}

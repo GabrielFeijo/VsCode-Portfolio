@@ -17,36 +17,34 @@ export default function Footer() {
 				height: `${LAYOUT.FOOTER_HEIGHT}px`,
 				color: colors.textPrimary,
 				bgcolor: colors.bgFooter,
+				overflow: 'hidden',
 			}}
 			display='flex'
 		>
-			<Grid container>
-				<Grid
-					item
-					component='button'
-					role='button'
-					aria-label='Remote connection status'
-					tabIndex={0}
-					sx={{
-						width: `${LAYOUT.REMOTE_BUTTON_WIDTH}px`,
-						backgroundColor: colors.footerAccent,
-						justifyContent: 'center',
-						alignItems: 'center',
-						padding: 0,
-						border: 'none',
-						cursor: 'pointer',
-						'&:hover': { opacity: 0.85 },
-					}}
-					display='flex'
-				>
-					<VscRemote fontSize='0.9rem' style={{ color: colors.textInverse }} />
-				</Grid>
-				<Grid
-					item
-					sx={{ backgroundColor: colors.bgFooter, width: `${LAYOUT.GIT_INFO_WIDTH}px` }}
-					display='flex'
-				>
-					<Stack direction='row' spacing={0.5} sx={{ pl: 1 }}>
+			<Grid container wrap='nowrap' alignItems='center' justifyContent='space-between'>
+				<Grid item display='flex' alignItems='center' sx={{ height: '100%', minWidth: 0 }}>
+					<Box
+						component='button'
+						role='button'
+						aria-label='Remote connection status'
+						tabIndex={0}
+						sx={{
+							width: `${LAYOUT.REMOTE_BUTTON_WIDTH}px`,
+							height: '100%',
+							flexShrink: 0,
+							backgroundColor: colors.footerAccent,
+							justifyContent: 'center',
+							alignItems: 'center',
+							padding: 0,
+							border: 'none',
+							cursor: 'pointer',
+							'&:hover': { opacity: 0.85 },
+						}}
+						display='flex'
+					>
+						<VscRemote fontSize='0.9rem' style={{ color: colors.textInverse }} />
+					</Box>
+					<Stack direction='row' spacing={0.5} sx={{ pl: 1, minWidth: 0 }} alignItems='center'>
 						<Box
 							component={Link}
 							href={siteConfig.githubUrl}
@@ -99,12 +97,12 @@ export default function Footer() {
 					item
 					sx={{
 						backgroundColor: colors.bgFooter,
-						minWidth: `calc(100% - ${LAYOUT.REMOTE_BUTTON_WIDTH + LAYOUT.GIT_INFO_WIDTH}px)`,
+						flexShrink: 0,
 					}}
 					display='flex'
 					justifyContent='flex-end'
 				>
-					<Stack justifyContent='end' direction='row' spacing={0.8} sx={{ pr: 1.5 }}>
+					<Stack justifyContent='end' direction='row' spacing={0.8} sx={{ pr: 1 }}>
 						<Box
 							display='flex'
 							sx={{
@@ -130,7 +128,6 @@ export default function Footer() {
 						<Box
 							display='flex'
 							sx={{
-								width: '50%',
 								justifyContent: 'center',
 								alignItems: 'center',
 								py: 0.3,

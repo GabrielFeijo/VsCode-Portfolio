@@ -4,13 +4,13 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import TerminalIcon from '@mui/icons-material/TerminalOutlined';
 import { Box, Link, Paper, Tooltip } from '@mui/material';
 import Divider from '@mui/material/Divider';
-import { useMemo } from 'react';
+import type React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
-import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
 import { useLayoutContext } from '../../contexts/LayoutContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useContactLinks } from '../hooks/useContactLinks';
 import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
@@ -18,35 +18,27 @@ interface Props {
 	changeLanguage: () => void;
 }
 
+function handleActivationKeyDown(action: () => void) {
+	return (e: React.KeyboardEvent) => {
+		if (e.key !== 'Enter' && e.key !== ' ') return;
+		e.preventDefault();
+		action();
+	};
+}
+
 export default function Sidebar({ changeLanguage }: Props) {
-	const { expanded, setExpanded, terminal, setTerminal } = useLayoutContext();
+	const {
+		expanded,
+		setExpanded,
+		terminal,
+		setTerminal,
+		isMobile: ctxIsMobile,
+	} = useLayoutContext();
 	const { theme, toggleTheme } = useTheme();
 	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();
-
-	const contactLinks = useMemo(
-		() => [
-			{
-				index: 0,
-				icon: <FaGithub />,
-				title: t('contact.github.title'),
-				href: t('contact.github.href'),
-			},
-			{
-				index: 1,
-				icon: <FaLinkedin />,
-				title: t('contact.linkedin.title'),
-				href: t('contact.linkedin.href'),
-			},
-			{
-				index: 2,
-				icon: <FaEnvelope />,
-				title: t('contact.email.title'),
-				href: t('contact.email.href'),
-			},
-		],
-		[t],
-	);
+	const contactLinks = useContactLinks();
+	const isMobileViewport = Boolean(isMobile || ctxIsMobile);
 
 	const iconSx = {
 		flexGrow: 0,
@@ -56,9 +48,18 @@ export default function Sidebar({ changeLanguage }: Props) {
 		'&:hover': { color: colors.iconActive },
 	};
 
+	const toggleExplorer = () => setExpanded(!expanded);
+	const toggleTerminal = () => setTerminal(!terminal);
+	const languageKey = `sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`;
+
 	return (
 		<Box
-			sx={{ height: '100%', backgroundColor: colors.bgSidebar }}
+			sx={{
+				height: '100%',
+				backgroundColor: colors.bgSidebar,
+				overflowY: 'auto',
+				overflowX: 'hidden',
+			}}
 			justifyContent='space-between'
 			display='flex'
 			flexDirection='column'
@@ -76,12 +77,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 					}
 					aria-expanded={expanded}
 					tabIndex={0}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							setExpanded(!expanded);
-						}
-					}}
+					onKeyDown={handleActivationKeyDown(toggleExplorer)}
 					sx={{
 						borderLeft: expanded
 							? `solid 0.12em ${colors.accent}`
@@ -93,7 +89,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 						width: '100%',
 						padding: 0,
 					}}
-					onClick={() => setExpanded(!expanded)}
+					onClick={toggleExplorer}
 				>
 					<Box
 						sx={{
@@ -136,7 +132,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 				justifyContent='center'
 				flexDirection='column'
 			>
-				{!isMobile && (
+				{!isMobileViewport && (
 					<Tooltip
 						title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')}
 						placement='right'
@@ -151,12 +147,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 							}
 							aria-expanded={terminal}
 							tabIndex={0}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter' || e.key === ' ') {
-									e.preventDefault();
-									setTerminal(!terminal);
-								}
-							}}
+							onKeyDown={handleActivationKeyDown(toggleTerminal)}
 							sx={{
 								...iconSx,
 								borderLeft: terminal
@@ -167,7 +158,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 								width: '100%',
 								padding: 0,
 							}}
-							onClick={() => setTerminal(!terminal)}
+							onClick={toggleTerminal}
 							display='flex'
 							justifyContent='center'
 						>
@@ -177,24 +168,12 @@ export default function Sidebar({ changeLanguage }: Props) {
 						</Box>
 					</Tooltip>
 				)}
-				<Tooltip
-					title={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`)}
-					placement='right'
-					arrow
-				>
+				<Tooltip title={t(languageKey)} placement='right' arrow>
 					<Box
 						component='button'
-						aria-label={
-							t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`) ||
-							'Change language'
-						}
+						aria-label={t(languageKey) || 'Change language'}
 						tabIndex={0}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								changeLanguage();
-							}
-						}}
+						onKeyDown={handleActivationKeyDown(changeLanguage)}
 						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'
@@ -216,12 +195,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 								: t('sidebar.theme.dark') || 'Switch to dark theme'
 						}
 						tabIndex={0}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								toggleTheme();
-							}
-						}}
+						onKeyDown={handleActivationKeyDown(toggleTheme)}
 						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'

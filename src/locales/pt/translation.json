@@ -5,6 +5,7 @@
 	},
 	"shortcuts": {
 		"title": "Atalhos de Teclado",
+		"close": "Fechar modal de atalhos de teclado",
 		"terminal": "Abrir/Fechar Terminal",
 		"theme": "Alternar Tema",
 		"language": "Alternar Idioma",
@@ -67,6 +68,7 @@
 	},
 	"rating": {
 		"evaluate": "Avalie este portfólio",
+		"close": "Fechar modal de avaliação",
 		"name": "Seu nome",
 		"namePlaceholder": "Digite seu nome",
 		"comment": "Seu comentário",
@@ -114,6 +116,14 @@
 	},
 	"sidebar": {
 		"explorer": "EXPLORADOR",
+		"openExplorer": "Abrir explorador",
+		"closeExplorer": "Fechar explorador",
+		"settings": "Configurações",
+		"createFile": "Criar novo arquivo",
+		"createFolder": "Criar nova pasta",
+		"refresh": "Atualizar",
+		"confirm": "Confirmar",
+		"cancel": "Cancelar",
 		"terminal": {
 			"open": "Abrir Terminal",
 			"close": "Fechar Terminal"
