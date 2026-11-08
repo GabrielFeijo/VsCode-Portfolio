@@ -1,4 +1,5 @@
 import {
+	type CommandExecutionContext,
 	catCommand,
 	cdCommand,
 	clearCommand,
@@ -14,7 +15,6 @@ import {
 	systemCommands,
 	textUtilsCommands,
 	treeCommand,
-	CommandExecutionContext,
 } from '@/app/components/Terminal/terminal/commands';
 import { getTerminalColors } from '@/app/components/Terminal/terminal/terminalConfig';
 import { ReviewService } from '@/services/api/review/ReviewService';
@@ -62,14 +62,14 @@ describe('Terminal Commands', () => {
 			sessionStart: Date.now() - 60000,
 			isDark: true,
 			fs: {
-				'/': [
-					{ name: 'rootfile.txt', type: 'file', content: ['root content'] },
-				],
-				'/home/gabriel': [
-					{ name: 'portfolio', type: 'dir' },
-				],
+				'/': [{ name: 'rootfile.txt', type: 'file', content: ['root content'] }],
+				'/home/gabriel': [{ name: 'portfolio', type: 'dir' }],
 				'/home/gabriel/portfolio': [
-					{ name: 'README.md', type: 'file', content: ['# Title', 'Hello World', 'Line 3', 'Line 4'] },
+					{
+						name: 'README.md',
+						type: 'file',
+						content: ['# Title', 'Hello World', 'Line 3', 'Line 4'],
+					},
 					{ name: 'src', type: 'dir' },
 				],
 				'/home/gabriel/portfolio/src': [],
@@ -79,7 +79,18 @@ describe('Terminal Commands', () => {
 					ctx.fs = updater(ctx.fs);
 				}
 			}),
-			apiCommandList: ['api-test', 'cmd1', 'cmd2', 'cmd3', 'cmd4', 'cmd5', 'cmd6', 'cmd7', 'cmd8', 'cmd9'],
+			apiCommandList: [
+				'api-test',
+				'cmd1',
+				'cmd2',
+				'cmd3',
+				'cmd4',
+				'cmd5',
+				'cmd6',
+				'cmd7',
+				'cmd8',
+				'cmd9',
+			],
 			openEditor: jest.fn(),
 		};
 	});
@@ -162,10 +173,18 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('cat README.md', expect.any(Array));
 
 		await catCommand.execute('src', ctx, 'cat src');
-		expect(ctx.addEntry).toHaveBeenCalledWith('cat src', [expect.stringContaining('Is a directory')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'cat src',
+			[expect.stringContaining('Is a directory')],
+			ctx.terminalColors.error,
+		);
 
 		await catCommand.execute('missing.txt', ctx, 'cat missing.txt');
-		expect(ctx.addEntry).toHaveBeenCalledWith('cat missing.txt', [expect.stringContaining('No such file')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'cat missing.txt',
+			[expect.stringContaining('No such file')],
+			ctx.terminalColors.error,
+		);
 	});
 
 	it('editorCommands handles nano, vim, and code', async () => {
@@ -176,19 +195,29 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('nano', [expect.stringContaining('Usage: nano')]);
 
 		await nano.execute('src', ctx, 'nano src');
-		expect(ctx.addEntry).toHaveBeenCalledWith('nano src', [expect.stringContaining('Is a directory')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'nano src',
+			[expect.stringContaining('Is a directory')],
+			ctx.terminalColors.error,
+		);
 
 		await nano.execute('README.md', ctx, 'nano README.md');
 		expect(ctx.openEditor).toHaveBeenCalledWith(expect.objectContaining({ fileName: 'README.md' }));
 
 		await nano.execute('/rootfile.txt', ctx, 'nano /rootfile.txt');
-		expect(ctx.openEditor).toHaveBeenCalledWith(expect.objectContaining({ fileName: 'rootfile.txt' }));
+		expect(ctx.openEditor).toHaveBeenCalledWith(
+			expect.objectContaining({ fileName: 'rootfile.txt' }),
+		);
 
 		code.execute('.', ctx, 'code .');
-		expect(ctx.addEntry).toHaveBeenCalledWith('code .', [expect.stringContaining('Opening workspace')]);
+		expect(ctx.addEntry).toHaveBeenCalledWith('code .', [
+			expect.stringContaining('Opening workspace'),
+		]);
 
 		code.execute('README.md', ctx, 'code README.md');
-		expect(ctx.addEntry).toHaveBeenCalledWith('code README.md', [expect.stringContaining('Opening README.md')]);
+		expect(ctx.addEntry).toHaveBeenCalledWith('code README.md', [
+			expect.stringContaining('Opening README.md'),
+		]);
 	});
 
 	it('filesystemCommands handles touch, mkdir, rm with edge cases', () => {
@@ -200,7 +229,11 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('touch', [expect.stringContaining('Usage: touch')]);
 
 		touch.execute('/invalid-parent/file.txt', ctx, 'touch /invalid-parent/file.txt');
-		expect(ctx.addEntry).toHaveBeenCalledWith('touch /invalid-parent/file.txt', [expect.stringContaining('No such file or directory')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'touch /invalid-parent/file.txt',
+			[expect.stringContaining('No such file or directory')],
+			ctx.terminalColors.error,
+		);
 
 		touch.execute('/root_new.txt', ctx, 'touch /root_new.txt');
 		expect(ctx.setFs).toHaveBeenCalled();
@@ -215,7 +248,11 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('mkdir', [expect.stringContaining('Usage: mkdir')]);
 
 		mkdir.execute('/invalid-parent/newdir', ctx, 'mkdir /invalid-parent/newdir');
-		expect(ctx.addEntry).toHaveBeenCalledWith('mkdir /invalid-parent/newdir', [expect.stringContaining('No such file or directory')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'mkdir /invalid-parent/newdir',
+			[expect.stringContaining('No such file or directory')],
+			ctx.terminalColors.error,
+		);
 
 		mkdir.execute('/rootdir_new', ctx, 'mkdir /rootdir_new');
 		expect(ctx.setFs).toHaveBeenCalled();
@@ -230,7 +267,11 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('rm', [expect.stringContaining('Usage: rm')]);
 
 		rm.execute('src', ctx, 'rm src');
-		expect(ctx.addEntry).toHaveBeenCalledWith('rm src', [expect.stringContaining('Is a directory')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'rm src',
+			[expect.stringContaining('Is a directory')],
+			ctx.terminalColors.error,
+		);
 
 		rm.execute('-r src', ctx, 'rm -r src');
 		expect(ctx.setFs).toHaveBeenCalled();
@@ -257,16 +298,30 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('head -n2 README.md', ['# Title', 'Hello World']);
 
 		await head.execute('-n abc README.md', ctx, 'head -n abc README.md');
-		expect(ctx.addEntry).toHaveBeenCalledWith('head -n abc README.md', ['# Title', 'Hello World', 'Line 3', 'Line 4']);
+		expect(ctx.addEntry).toHaveBeenCalledWith('head -n abc README.md', [
+			'# Title',
+			'Hello World',
+			'Line 3',
+			'Line 4',
+		]);
 
 		await head.execute('-nabc README.md', ctx, 'head -nabc README.md');
-		expect(ctx.addEntry).toHaveBeenCalledWith('head -nabc README.md', ['# Title', 'Hello World', 'Line 3', 'Line 4']);
+		expect(ctx.addEntry).toHaveBeenCalledWith('head -nabc README.md', [
+			'# Title',
+			'Hello World',
+			'Line 3',
+			'Line 4',
+		]);
 
 		await head.execute('/rootfile.txt', ctx, 'head /rootfile.txt');
 		expect(ctx.addEntry).toHaveBeenCalledWith('head /rootfile.txt', ['root content']);
 
 		await head.execute('missing.txt', ctx, 'head missing.txt');
-		expect(ctx.addEntry).toHaveBeenCalledWith('head missing.txt', [expect.stringContaining('No such file')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'head missing.txt',
+			[expect.stringContaining('No such file')],
+			ctx.terminalColors.error,
+		);
 
 		await head.execute('-n 2 README.md', ctx, 'tail -n 2 README.md');
 		expect(ctx.addEntry).toHaveBeenCalledWith('tail -n 2 README.md', ['Line 3', 'Line 4']);
@@ -284,13 +339,19 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('grep nonexistent README.md', []);
 
 		await grep.execute('pattern missing.txt', ctx, 'grep pattern missing.txt');
-		expect(ctx.addEntry).toHaveBeenCalledWith('grep pattern missing.txt', [expect.stringContaining('No such file')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'grep pattern missing.txt',
+			[expect.stringContaining('No such file')],
+			ctx.terminalColors.error,
+		);
 
 		await wc.execute('', ctx, 'wc');
 		expect(ctx.addEntry).toHaveBeenCalledWith('wc', [expect.stringContaining('Usage: wc')]);
 
 		await wc.execute('-l README.md', ctx, 'wc -l README.md');
-		expect(ctx.addEntry).toHaveBeenCalledWith('wc -l README.md', [expect.stringContaining('4 README.md')]);
+		expect(ctx.addEntry).toHaveBeenCalledWith('wc -l README.md', [
+			expect.stringContaining('4 README.md'),
+		]);
 
 		await wc.execute('/rootfile.txt', ctx, 'wc /rootfile.txt');
 		expect(ctx.addEntry).toHaveBeenCalledWith('wc /rootfile.txt', expect.any(Array));
@@ -299,7 +360,11 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('wc README.md', expect.any(Array));
 
 		await wc.execute('missing.txt', ctx, 'wc missing.txt');
-		expect(ctx.addEntry).toHaveBeenCalledWith('wc missing.txt', [expect.stringContaining('No such file')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'wc missing.txt',
+			[expect.stringContaining('No such file')],
+			ctx.terminalColors.error,
+		);
 	});
 
 	it('systemCommands executes system commands correctly', () => {
@@ -339,13 +404,20 @@ describe('Terminal Commands', () => {
 		expect(ctx.addEntry).toHaveBeenCalledWith('echo hello', ['hello']);
 
 		calc.execute('', ctx, 'calc');
-		expect(ctx.addEntry).toHaveBeenCalledWith('calc', expect.arrayContaining([expect.stringContaining('Usage: calc')]));
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'calc',
+			expect.arrayContaining([expect.stringContaining('Usage: calc')]),
+		);
 
 		calc.execute('2 + 2', ctx, 'calc 2 + 2');
 		expect(ctx.addEntry).toHaveBeenCalledWith('calc 2 + 2', [expect.stringContaining('4')]);
 
 		calc.execute('invalid ++++', ctx, 'calc invalid ++++');
-		expect(ctx.addEntry).toHaveBeenCalledWith('calc invalid ++++', [expect.stringContaining('invalid expression')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'calc invalid ++++',
+			[expect.stringContaining('invalid expression')],
+			ctx.terminalColors.error,
+		);
 
 		neofetch.execute('', ctx, 'neofetch');
 		expect(ctx.addEntry).toHaveBeenCalledWith('neofetch', expect.any(Array));
@@ -387,7 +459,11 @@ describe('Terminal Commands', () => {
 
 		(ReviewService.findAll as jest.Mock).mockResolvedValueOnce(new Error('api down'));
 		await reviews.execute('', ctx, 'reviews');
-		expect(ctx.addEntry).toHaveBeenCalledWith('reviews', [expect.stringContaining('errorShort')], ctx.terminalColors.error);
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'reviews',
+			[expect.stringContaining('errorShort')],
+			ctx.terminalColors.error,
+		);
 
 		ping.execute('', ctx, 'ping');
 		expect(ctx.addEntry).toHaveBeenCalledWith('ping', expect.any(Array));
@@ -398,10 +474,16 @@ describe('Terminal Commands', () => {
 
 	it('manCommand prints manual information', () => {
 		manCommand.execute('ls', ctx, 'man ls');
-		expect(ctx.addEntry).toHaveBeenCalledWith('man ls', expect.arrayContaining([expect.stringContaining('LS(1)')]));
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'man ls',
+			expect.arrayContaining([expect.stringContaining('LS(1)')]),
+		);
 
 		manCommand.execute('', ctx, 'man');
-		expect(ctx.addEntry).toHaveBeenCalledWith('man', expect.arrayContaining([expect.stringContaining('HELP(1)')]));
+		expect(ctx.addEntry).toHaveBeenCalledWith(
+			'man',
+			expect.arrayContaining([expect.stringContaining('HELP(1)')]),
+		);
 	});
 
 	it('funCommands handles matrix, cowsay, banner', () => {

@@ -8,7 +8,11 @@ function highlightLine(line: string, ext: string): string {
 	}
 
 	if (['ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs'].includes(ext)) {
-		if (line.trim().startsWith('//') || line.trim().startsWith('/*') || line.trim().startsWith('*')) {
+		if (
+			line.trim().startsWith('//') ||
+			line.trim().startsWith('/*') ||
+			line.trim().startsWith('*')
+		) {
 			return `\x1b[90m${line}\x1b[0m`;
 		}
 
@@ -17,10 +21,7 @@ function highlightLine(line: string, ext: string): string {
 			/\b(import|export|from|const|let|var|function|return|if|else|switch|case|break|for|while|do|async|await|try|catch|finally|throw|new|typeof|instanceof|class|interface|type|extends|implements|default)\b/g,
 			'\x1b[35m$1\x1b[0m',
 		);
-		result = result.replace(
-			/\b(true|false|null|undefined|NaN|Infinity)\b/g,
-			'\x1b[33m$1\x1b[0m',
-		);
+		result = result.replace(/\b(true|false|null|undefined|NaN|Infinity)\b/g, '\x1b[33m$1\x1b[0m');
 		result = result.replace(/(["'`])(?:(?=(\\?))\2.)*?\1/g, '\x1b[32m$&\x1b[0m');
 		return result;
 	}
@@ -30,8 +31,8 @@ function highlightLine(line: string, ext: string): string {
 			return `\x1b[90m${line}\x1b[0m`;
 		}
 		return line
-			.replace(/(<\/?)([a-zA-Z0-9\-]+)/g, '$1\x1b[34m$2\x1b[0m')
-			.replace(/([a-zA-Z\-]+)=("[^"]*")/g, '\x1b[36m$1\x1b[0m=\x1b[32m$2\x1b[0m');
+			.replace(/(<\/?)([a-zA-Z0-9-]+)/g, '$1\x1b[34m$2\x1b[0m')
+			.replace(/([a-zA-Z-]+)=("[^"]*")/g, '\x1b[36m$1\x1b[0m=\x1b[32m$2\x1b[0m');
 	}
 
 	if (['css', 'scss', 'sass'].includes(ext)) {
@@ -39,7 +40,7 @@ function highlightLine(line: string, ext: string): string {
 			return `\x1b[90m${line}\x1b[0m`;
 		}
 		return line
-			.replace(/([a-zA-Z\-]+)(\s*:)/g, '\x1b[36m$1\x1b[0m$2')
+			.replace(/([a-zA-Z-]+)(\s*:)/g, '\x1b[36m$1\x1b[0m$2')
 			.replace(/(:\s*)([^;]+)(;?)/g, '$1\x1b[32m$2\x1b[0m$3');
 	}
 
@@ -79,7 +80,8 @@ export function formatFileContent(
 		return contentLines;
 	}
 
-	const ext = fileName.includes('.') ? fileName.split('.').pop()!.toLowerCase() : '';
+	const dotIndex = fileName.lastIndexOf('.');
+	const ext = dotIndex >= 0 ? fileName.slice(dotIndex + 1).toLowerCase() : '';
 	const totalLines = contentLines.length;
 
 	const gutterWidth = Math.max(3, String(totalLines).length);

@@ -1,14 +1,19 @@
-import { renderHook, act } from '@testing-library/react';
-import { useTerminalCommand, CommandExecutionDependencies } from '@/app/components/Terminal/terminal/hooks/useTerminalCommand';
-import { getTerminalColors } from '@/app/components/Terminal/terminal/terminalConfig';
+import { act, renderHook } from '@testing-library/react';
 import { executeLocalCommand } from '@/app/components/Terminal/terminal/commandExecutor';
+import {
+	type CommandExecutionDependencies,
+	useTerminalCommand,
+} from '@/app/components/Terminal/terminal/hooks/useTerminalCommand';
+import { getTerminalColors } from '@/app/components/Terminal/terminal/terminalConfig';
 
 jest.mock('@/app/components/Terminal/terminal/commandExecutor', () => ({
 	executeLocalCommand: jest.fn(),
 }));
 
 describe('useTerminalCommand', () => {
-	const createDeps = (overrides: Partial<CommandExecutionDependencies> = {}): CommandExecutionDependencies => ({
+	const createDeps = (
+		overrides: Partial<CommandExecutionDependencies> = {},
+	): CommandExecutionDependencies => ({
 		language: 'pt',
 		cwd: '/home/gabriel',
 		setCwd: jest.fn(),
@@ -80,10 +85,13 @@ describe('useTerminalCommand', () => {
 			await result.current.executeCommand('help');
 		});
 
-		expect(executeLocalCommand).toHaveBeenCalledWith('help', expect.objectContaining({
-			language: 'pt',
-			cwd: '/home/gabriel',
-		}));
+		expect(executeLocalCommand).toHaveBeenCalledWith(
+			'help',
+			expect.objectContaining({
+				language: 'pt',
+				cwd: '/home/gabriel',
+			}),
+		);
 		expect(deps.fetchApiCommandResponse).not.toHaveBeenCalled();
 	});
 
@@ -165,7 +173,7 @@ describe('useTerminalCommand', () => {
 		expect(deps.addEntry).toHaveBeenCalledWith(
 			'unknown-command',
 			expect.arrayContaining([expect.stringContaining('zsh: command not found: unknown-command')]),
-			deps.terminalColors.error
+			deps.terminalColors.error,
 		);
 	});
 

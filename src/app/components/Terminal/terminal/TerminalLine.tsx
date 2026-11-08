@@ -16,12 +16,12 @@ const TerminalLine = ({ lines, color }: Props) => {
 
 	return (
 		<Box sx={{ mb: 0.5 }}>
-			{lines.map((line, lineIndex) => {
+			{Array.from(lines.entries()).map(([lineId, line]) => {
 				const segments = parseAnsiLine(line, defaultColor, theme);
 				return (
 					<Typography
-						key={lineIndex}
-						component="div"
+						key={lineId}
+						component='div'
 						sx={{
 							fontFamily: fonts.mono,
 							fontSize: '0.85rem',
@@ -31,12 +31,8 @@ const TerminalLine = ({ lines, color }: Props) => {
 							m: 0,
 						}}
 					>
-						{segments.map((seg, segIndex) => (
-							<Box
-								key={segIndex}
-								component="span"
-								sx={{ color: seg.color }}
-							>
+						{Array.from(segments.entries()).map(([segmentId, seg]) => (
+							<Box key={segmentId} component='span' sx={{ color: seg.color }}>
 								{seg.text}
 							</Box>
 						))}

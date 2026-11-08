@@ -1,5 +1,11 @@
-import { CommandRegistry, commandRegistry } from '@/app/components/Terminal/terminal/commandRegistry';
-import { CommandExecutionContext, ICommandDefinition } from '@/app/components/Terminal/terminal/commands/command.types';
+import {
+	CommandRegistry,
+	commandRegistry,
+} from '@/app/components/Terminal/terminal/commandRegistry';
+import type {
+	CommandExecutionContext,
+	ICommandDefinition,
+} from '@/app/components/Terminal/terminal/commands/command.types';
 import { getTerminalColors } from '@/app/components/Terminal/terminal/terminalConfig';
 
 jest.mock('@/services/api/review/ReviewService', () => ({

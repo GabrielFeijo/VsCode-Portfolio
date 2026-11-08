@@ -1,6 +1,6 @@
 import {
-	fetchFileContent,
 	clearFileContentCache,
+	fetchFileContent,
 } from '../../../src/services/terminal/remoteFileService';
 
 describe('remoteFileService', () => {

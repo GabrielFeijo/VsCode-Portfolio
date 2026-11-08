@@ -1,6 +1,7 @@
+import { TERMINAL_HOME } from '@/config/terminalIdentity';
 import { PROJECT_ROOT } from '../terminalConfig';
 import { normalizePath } from '../utils/pathUtils';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const cdCommand: ICommandDefinition = {
 	name: 'cd',
@@ -10,7 +11,7 @@ export const cdCommand: ICommandDefinition = {
 
 		if (!arg) {
 			setPreviousCwd(cwd);
-			setCwd('/home/gabriel');
+			setCwd(TERMINAL_HOME);
 			return true;
 		}
 
@@ -24,7 +25,11 @@ export const cdCommand: ICommandDefinition = {
 
 		const newPath = normalizePath(cwd, arg);
 		if (!fs[newPath]) {
-			addEntry(rawCommand, [`\x1b[91mcd: ${arg}: No such file or directory\x1b[0m`], terminalColors.error);
+			addEntry(
+				rawCommand,
+				[`\x1b[91mcd: ${arg}: No such file or directory\x1b[0m`],
+				terminalColors.error,
+			);
 			return true;
 		}
 

@@ -1,4 +1,4 @@
-import { Language } from '@/domain/page';
+import type { Language } from '@/domain/page';
 
 export interface TerminalEntry {
 	id: string;

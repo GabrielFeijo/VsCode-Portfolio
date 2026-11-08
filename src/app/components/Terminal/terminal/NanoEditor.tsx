@@ -1,10 +1,15 @@
 import { Box, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { Page } from '@/domain/page';
-import { StorageService } from '@/services/storageService';
-import { fonts } from '@/app/theme/typography';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { pageRoutes } from '@/app/pages/pages';
-import { VirtualDirectory } from './types';
+import { getAppPalette } from '@/app/theme/palette';
+import { fonts } from '@/app/theme/typography';
+import type { Page } from '@/domain/page';
+import { StorageService } from '@/services/storageService';
+import { notifyStorageChange } from '@/utils/appEvents';
+import { getPageNameAliases, isSamePageName } from '@/utils/pageName';
+import { stripFileExtension } from '@/utils/stripFileExtension';
+import type { VirtualDirectory } from './types';
 import { normalizePath } from './utils/pathUtils';
 
 interface NanoEditorProps {
@@ -19,18 +24,15 @@ interface NanoEditorProps {
 	isDark: boolean;
 }
 
-import { stripFileExtension } from '@/utils/stripFileExtension';
-
 function buildPageMap(): Record<string, { index: number; route: string; name: string }> {
 	const map: Record<string, { index: number; route: string; name: string }> = {};
 	for (const pages of Object.values(pageRoutes)) {
 		for (const page of pages) {
 			const base = stripFileExtension(page.name);
 			const entry = { index: page.index, route: page.route, name: page.name };
-			map[page.name] = entry;
-			map[`${base}.html`] = entry;
-			map[`${base}.md`] = entry;
-			map[base] = entry;
+			for (const key of [...getPageNameAliases(page.name), base]) {
+				map[key] = entry;
+			}
 		}
 	}
 	return map;
@@ -38,21 +40,33 @@ function buildPageMap(): Record<string, { index: number; route: string; name: st
 
 const PAGE_MAP = buildPageMap();
 
+const NANO_SHORTCUTS = [
+	{ key: '^G', label: 'Get Help' },
+	{ key: '^O', label: 'WriteOut' },
+	{ key: '^W', label: 'Where Is' },
+	{ key: '^K', label: 'Cut Text' },
+	{ key: '^J', label: 'Justify' },
+	{ key: '^C', label: 'Cur Pos' },
+	{ key: '^X', label: 'Exit' },
+	{ key: '^R', label: 'Read File' },
+	{ key: '^\\', label: 'Replace' },
+	{ key: '^U', label: 'Paste Text' },
+	{ key: '^T', label: 'To Spell' },
+	{ key: '^S', label: 'Save' },
+] as const;
+
 function resolvePageData(fileName: string, content: string): Page {
 	const storedPages = StorageService.getData();
 	const baseName = stripFileExtension(fileName);
-	const targetPage = storedPages.find(
-		(p) =>
-			p.name === fileName ||
-			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html`
-	);
+	const targetPage = storedPages.find((p) => isSamePageName(p.name, fileName));
 
 	if (targetPage) {
 		return { ...targetPage, content, isSaved: true };
 	}
 
-	const meta = PAGE_MAP[fileName] || PAGE_MAP[`${baseName}.html`] || PAGE_MAP[`${baseName}.md`] || PAGE_MAP[baseName];
+	const meta = [...getPageNameAliases(fileName), baseName]
+		.map((key) => PAGE_MAP[key])
+		.find(Boolean);
 	if (meta) {
 		return {
 			index: meta.index,
@@ -69,7 +83,25 @@ function resolvePageData(fileName: string, content: string): Page {
 export function syncPageStorage(fileName: string, content: string): void {
 	const pageData = resolvePageData(fileName, content);
 	StorageService.saveOrUpdateData(pageData);
-	window.dispatchEvent(new Event('storage'));
+	notifyStorageChange();
+}
+
+function upsertDirectoryEntry(
+	entries: VirtualDirectory[string] = [],
+	name: string,
+	lines: string[],
+): VirtualDirectory[string] {
+	const nextEntries = [...entries];
+	const existingIndex = nextEntries.findIndex((e) => e.name === name && e.type === 'file');
+	const fileEntry = { name, type: 'file' as const, content: lines };
+
+	if (existingIndex >= 0) {
+		nextEntries[existingIndex] = fileEntry;
+		return nextEntries;
+	}
+
+	nextEntries.push(fileEntry);
+	return nextEntries;
 }
 
 export default function NanoEditor({
@@ -89,6 +121,7 @@ export default function NanoEditor({
 	const [clipboard, setClipboard] = useState('');
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+	const palette = getAppPalette(isDark ? 'dark' : 'light');
 	const lineCount = content.split('\n').length;
 
 	useEffect(() => {
@@ -101,30 +134,10 @@ export default function NanoEditor({
 		const name = normalized.substring(normalized.lastIndexOf('/') + 1);
 		const lines = textToSave.split('\n');
 
-		setFs((prevFs) => {
-			const nextFs: VirtualDirectory = { ...prevFs };
-			nextFs[parent] = [...(nextFs[parent] || [])];
-
-			const existingIndex = nextFs[parent].findIndex(
-				(e) => e.name === name && e.type === 'file',
-			);
-
-			if (existingIndex >= 0) {
-				nextFs[parent][existingIndex] = {
-					name,
-					type: 'file',
-					content: lines,
-				};
-			} else {
-				nextFs[parent].push({
-					name,
-					type: 'file',
-					content: lines,
-				});
-			}
-
-			return nextFs;
-		});
+		setFs((prevFs) => ({
+			...prevFs,
+			[parent]: upsertDirectoryEntry(prevFs[parent], name, lines),
+		}));
 
 		syncPageStorage(name, textToSave);
 		onSave?.(name, textToSave);
@@ -132,85 +145,97 @@ export default function NanoEditor({
 		setStatus(`[ Wrote ${lines.length} lines to ${name} ]`);
 	};
 
+	const cutCurrentLine = (textarea: HTMLTextAreaElement) => {
+		const { value, selectionStart } = textarea;
+		const lineStart = value.substring(0, selectionStart).lastIndexOf('\n') + 1;
+		const nextBreak = value.indexOf('\n', selectionStart);
+		const lineEnd = nextBreak === -1 ? value.length : nextBreak + 1;
+
+		setClipboard(value.substring(lineStart, lineEnd));
+		setContent(value.substring(0, lineStart) + value.substring(lineEnd));
+		setIsModified(true);
+		setStatus('[ Cut line ]');
+	};
+
+	const pasteClipboardLine = (textarea: HTMLTextAreaElement) => {
+		if (!clipboard) return;
+
+		const { selectionStart } = textarea;
+		setContent(
+			content.substring(0, selectionStart) + clipboard + content.substring(selectionStart),
+		);
+		setIsModified(true);
+		setStatus('[ Pasted line ]');
+	};
+
+	const reportCursorPosition = (textarea: HTMLTextAreaElement) => {
+		const currentLine = content.substring(0, textarea.selectionStart).split('\n').length;
+		setStatus(`[ line ${currentLine}/${lineCount} ]`);
+	};
+
+	const requestExit = () => {
+		if (!isModified) {
+			onClose();
+			return;
+		}
+		setPromptSave(true);
+		setStatus('Save modified buffer? (Y/N/Ctrl+C)');
+	};
+
+	const handleSavePromptKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		e.preventDefault();
+		const key = e.key.toLowerCase();
+
+		if (key === 'y' || key === 's') {
+			saveContent();
+			onClose();
+			return;
+		}
+
+		if (key === 'n') {
+			onClose();
+			return;
+		}
+
+		if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
+			setPromptSave(false);
+			setStatus('[ Cancelled ]');
+		}
+	};
+
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		e.stopPropagation();
+
 		if (promptSave) {
-			if (e.key === 'y' || e.key === 'Y' || e.key === 's' || e.key === 'S') {
+			handleSavePromptKey(e);
+			return;
+		}
+
+		if (!e.ctrlKey) return;
+
+		const textarea = e.currentTarget;
+		switch (e.key) {
+			case 'o':
+			case 's':
 				e.preventDefault();
 				saveContent();
-				onClose();
-				return;
-			}
-			if (e.key === 'n' || e.key === 'N') {
+				break;
+			case 'x':
 				e.preventDefault();
-				onClose();
-				return;
-			}
-			if ((e.key === 'c' && e.ctrlKey) || e.key === 'Escape') {
+				requestExit();
+				break;
+			case 'k':
 				e.preventDefault();
-				setPromptSave(false);
-				setStatus('[ Cancelled ]');
-				return;
-			}
-			e.preventDefault();
-			return;
-		}
-
-		if ((e.key === 'o' && e.ctrlKey) || (e.key === 's' && e.ctrlKey)) {
-			e.preventDefault();
-			saveContent();
-			return;
-		}
-
-		if (e.key === 'x' && e.ctrlKey) {
-			e.preventDefault();
-			if (isModified) {
-				setPromptSave(true);
-				setStatus('Save modified buffer? (Y/N/Ctrl+C)');
-			} else {
-				onClose();
-			}
-			return;
-		}
-
-		if (e.key === 'k' && e.ctrlKey) {
-			e.preventDefault();
-			const textarea = e.currentTarget;
-
-			const val = textarea.value;
-			const selStart = textarea.selectionStart;
-			const before = val.substring(0, selStart);
-			const lineStart = before.lastIndexOf('\n') + 1;
-			const after = val.substring(selStart);
-			const lineEndIdx = after.indexOf('\n');
-			const lineEnd = lineEndIdx === -1 ? val.length : selStart + lineEndIdx + 1;
-
-			const cutText = val.substring(lineStart, lineEnd);
-			const remaining = val.substring(0, lineStart) + val.substring(lineEnd);
-
-			setClipboard(cutText);
-			setContent(remaining);
-			setIsModified(true);
-			setStatus(`[ Cut line ]`);
-			return;
-		}
-
-		if (e.key === 'u' && e.ctrlKey) {
-			e.preventDefault();
-			if (!clipboard) return;
-			const textarea = e.currentTarget;
-
-			const selStart = textarea.selectionStart;
-			const nextContent = content.substring(0, selStart) + clipboard + content.substring(selStart);
-			setContent(nextContent);
-			setIsModified(true);
-			setStatus(`[ Pasted line ]`);
-			return;
-		}
-
-		if (e.key === 'c' && e.ctrlKey) {
-			e.preventDefault();
-			setStatus(`[ Line ${lineCount} lines total ]`);
+				cutCurrentLine(textarea);
+				break;
+			case 'u':
+				e.preventDefault();
+				pasteClipboardLine(textarea);
+				break;
+			case 'c':
+				e.preventDefault();
+				reportCursorPosition(textarea);
+				break;
 		}
 	};
 
@@ -225,8 +250,8 @@ export default function NanoEditor({
 				height: '100%',
 				display: 'flex',
 				flexDirection: 'column',
-				backgroundColor: isDark ? '#181824' : '#f5f5f5',
-				color: isDark ? '#e0e0e0' : '#1e1e1e',
+				backgroundColor: palette.bgSecondary,
+				color: palette.textPrimary,
 				fontFamily: fonts.mono,
 				fontSize: '0.85rem',
 				overflow: 'hidden',
@@ -236,25 +261,27 @@ export default function NanoEditor({
 				sx={{
 					px: 1.5,
 					py: 0.25,
-					backgroundColor: isDark ? '#2e3440' : '#d8dee9',
-					color: isDark ? '#eceff4' : '#2e3440',
+					backgroundColor: palette.bgElevated,
+					color: palette.textPrimary,
 					display: 'flex',
+					flexWrap: 'wrap',
+					gap: 1,
 					justifyContent: 'space-between',
 					fontWeight: 600,
 					fontSize: '0.8rem',
 				}}
 			>
-				<Typography variant="caption" sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
+				<Typography variant='caption' sx={{ fontFamily: 'inherit', fontWeight: 'bold' }}>
 					GNU nano 7.2
 				</Typography>
-				<Typography variant="caption" sx={{ fontFamily: 'inherit' }}>
+				<Typography variant='caption' sx={{ fontFamily: 'inherit' }}>
 					File: {fileName}
 				</Typography>
 				<Typography
-					variant="caption"
+					variant='caption'
 					sx={{
 						fontFamily: 'inherit',
-						color: isModified ? '#ebcb8b' : 'inherit',
+						color: isModified ? palette.accentYellow : 'inherit',
 						fontWeight: isModified ? 'bold' : 'normal',
 					}}
 				>
@@ -276,13 +303,13 @@ export default function NanoEditor({
 						px: 1,
 						userSelect: 'none',
 						textAlign: 'right',
-						color: isDark ? '#4c566a' : '#9aa0a6',
-						backgroundColor: isDark ? '#14141e' : '#eceff4',
+						color: palette.textMuted,
+						backgroundColor: palette.bgTertiary,
 						minWidth: '2.5rem',
 					}}
 				>
-					{Array.from({ length: lineCount }, (_, i) => (
-						<div key={i + 1}>{i + 1}</div>
+					{Array.from({ length: lineCount }, (_, i) => i + 1).map((lineNumber) => (
+						<div key={lineNumber}>{lineNumber}</div>
 					))}
 				</Box>
 
@@ -292,9 +319,9 @@ export default function NanoEditor({
 					onChange={handleChange}
 					onKeyDown={handleKeyDown}
 					spellCheck={false}
-					autoCapitalize="off"
-					autoComplete="off"
-					autoCorrect="off"
+					autoCapitalize='off'
+					autoComplete='off'
+					autoCorrect='off'
 					style={{
 						flex: 1,
 						height: '100%',
@@ -318,8 +345,8 @@ export default function NanoEditor({
 				sx={{
 					px: 1.5,
 					py: 0.25,
-					backgroundColor: promptSave ? '#bf616a' : isDark ? '#242933' : '#e5e9f0',
-					color: promptSave ? '#fff' : isDark ? '#88c0d0' : '#2e3440',
+					backgroundColor: promptSave ? palette.error : palette.bgElevated,
+					color: promptSave ? palette.textInverse : palette.accentCyan,
 					fontWeight: 500,
 					fontSize: '0.8rem',
 				}}
@@ -330,27 +357,23 @@ export default function NanoEditor({
 			<Box
 				sx={{
 					p: 0.5,
-					backgroundColor: isDark ? '#1a1b26' : '#d8dee9',
+					backgroundColor: palette.bgTertiary,
 					display: 'grid',
-					gridTemplateColumns: 'repeat(6, 1fr)',
+					gridTemplateColumns: {
+						xs: 'repeat(3, 1fr)',
+						sm: 'repeat(4, 1fr)',
+						md: 'repeat(6, 1fr)',
+					},
 					gap: 0.5,
 					fontSize: '0.72rem',
-					borderTop: `1px solid ${isDark ? '#2e3440' : '#c0c8d0'}`,
+					borderTop: `1px solid ${palette.border}`,
 				}}
 			>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^G</span> Get Help</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^O</span> WriteOut</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^W</span> Where Is</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^K</span> Cut Text</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^J</span> Justify</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^C</span> Cur Pos</div>
-
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^X</span> Exit</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^R</span> Read File</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^\</span> Replace</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^U</span> Paste Text</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^T</span> To Spell</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^S</span> Save</div>
+				{NANO_SHORTCUTS.map(({ key, label }) => (
+					<div key={key}>
+						<span style={{ color: palette.accentCyan, fontWeight: 'bold' }}>{key}</span> {label}
+					</div>
+				))}
 			</Box>
 		</Box>
 	);

@@ -1,6 +1,7 @@
-@keyframes logo {
+@keyframes logo-enter {
 	0% {
 		opacity: 0;
+		transform: scale(1);
 	}
 	100% {
 		opacity: 1;
@@ -8,10 +9,28 @@
 	}
 }
 
+@keyframes logo-pulse {
+	0% {
+		opacity: 1;
+		transform: scale(1.5);
+	}
+	100% {
+		opacity: 0.7;
+		transform: scale(1.56);
+	}
+}
+
 .logo {
 	opacity: 0;
-	animation-name: logo;
-	animation-delay: 0.5s;
-	animation-duration: 2.5s;
-	animation-iteration-count: infinite;
+	max-width: 40vw;
+	object-fit: contain;
+	animation:
+		logo-enter 1.2s ease-out 0.5s 1 forwards,
+		logo-pulse 1.6s ease-in-out 1.7s infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.logo {
+		animation: logo-enter 0.4s linear 0.2s 1 forwards;
+	}
 }

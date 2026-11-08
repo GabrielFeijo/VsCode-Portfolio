@@ -25,7 +25,7 @@
 .inputWrapper {
 	position: relative;
 	flex: 1;
-	min-width: 120px;
+	min-width: 140px;
 }
 
 .input {
@@ -67,4 +67,11 @@
 .ghostText {
 	color: var(--term-muted);
 	opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+	.input,
+	.ghost {
+		font-size: 16px;
+	}
 }

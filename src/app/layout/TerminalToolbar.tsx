@@ -1,5 +1,5 @@
-import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
+import type React from 'react';
 import {
 	VscAdd,
 	VscChevronDown,
@@ -14,12 +14,14 @@ import { useAppPalette } from '../theme/useAppPalette';
 interface TerminalIconButtonProps {
 	'aria-label': string;
 	onClick?: () => void;
+	hideOnCompact?: boolean;
 	children: React.ReactNode;
 }
 
 function TerminalIconButton({
 	'aria-label': ariaLabel,
 	onClick,
+	hideOnCompact = false,
 	children,
 }: TerminalIconButtonProps) {
 	const colors = useAppPalette();
@@ -33,7 +35,7 @@ function TerminalIconButton({
 
 	return (
 		<Box
-			component="button"
+			component='button'
 			aria-label={ariaLabel}
 			tabIndex={0}
 			onClick={onClick}
@@ -48,7 +50,7 @@ function TerminalIconButton({
 				p: 1,
 				border: 'none',
 				background: 'transparent',
-				display: 'flex',
+				display: hideOnCompact ? { xs: 'none', md: 'flex' } : 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 				gap: 0.5,
@@ -66,37 +68,35 @@ interface TerminalToolbarProps {
 export function TerminalToolbar({ onCloseTerminal }: TerminalToolbarProps) {
 	return (
 		<Stack
-			direction="row"
+			direction='row'
 			spacing={0}
-			role="toolbar"
-			aria-label="Terminal toolbar"
+			role='toolbar'
+			aria-label='Terminal toolbar'
+			sx={{ flexShrink: 0 }}
 		>
-			<TerminalIconButton aria-label="Open terminal command">
+			<TerminalIconButton aria-label='Open terminal command' hideOnCompact>
 				<VscTerminalCmd />
 				<Typography sx={{ fontSize: '.8rem' }}>cmd</Typography>
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Add new terminal">
+			<TerminalIconButton aria-label='Add new terminal' hideOnCompact>
 				<VscAdd />
 				<VscChevronDown />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Split terminal">
+			<TerminalIconButton aria-label='Split terminal' hideOnCompact>
 				<VscSplitHorizontal />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="Delete terminal">
+			<TerminalIconButton aria-label='Delete terminal' hideOnCompact>
 				<VscTrash />
 			</TerminalIconButton>
 
-			<TerminalIconButton aria-label="More options">
+			<TerminalIconButton aria-label='More options' hideOnCompact>
 				<VscEllipsis />
 			</TerminalIconButton>
 
-			<TerminalIconButton
-				aria-label="Close terminal"
-				onClick={onCloseTerminal}
-			>
+			<TerminalIconButton aria-label='Close terminal' onClick={onCloseTerminal}>
 				<VscClose />
 			</TerminalIconButton>
 		</Stack>

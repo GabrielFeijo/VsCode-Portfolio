@@ -49,7 +49,7 @@ export function calculate(expression: string): number | null {
 		const value = parseFactor();
 		if (peek() === '^') {
 			next();
-			return Math.pow(value, parsePower());
+			return value ** parsePower();
 		}
 		return value;
 	}

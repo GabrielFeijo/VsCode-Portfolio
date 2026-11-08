@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CommandService, ICommand } from '@/services/api/command/CommandService';
+import { CommandService, type ICommand } from '@/services/api/command/CommandService';
 
 export const COMMANDS_QUERY_KEY = ['commands'] as const;
 

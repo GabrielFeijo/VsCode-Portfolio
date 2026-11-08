@@ -1,4 +1,4 @@
-import { Language, Page } from '../../domain/page';
+import type { Language, Page } from '../../domain/page';
 
 export const pageRoutes: Record<Language, Page[]> = {
 	en: [

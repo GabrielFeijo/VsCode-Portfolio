@@ -7,9 +7,7 @@ export function parseFlagsAndArgs(rawArgs: string): ParsedCommandArgs {
 	const flags = new Set<string>();
 	const args: string[] = [];
 	const regex = /[^\s"']+|"([^"]*)"|'([^']*)'/g;
-	let match: RegExpExecArray | null;
-
-	while ((match = regex.exec(rawArgs)) !== null) {
+	for (const match of rawArgs.matchAll(regex)) {
 		const isQuoted = match[1] !== undefined || match[2] !== undefined;
 		const token = match[1] ?? match[2] ?? match[0];
 

@@ -1,6 +1,7 @@
+import { API_HOST, API_ROOT_URL } from '@/config/terminalIdentity';
 import { ReviewService } from '@/services/api/review/ReviewService';
 import { formatReviews } from '../utils/formatters';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const networkCommands: ICommandDefinition[] = [
 	{
@@ -10,7 +11,11 @@ export const networkCommands: ICommandDefinition[] = [
 		execute: async (_arg, ctx, rawCommand) => {
 			const data = await ReviewService.findAll();
 			if (data instanceof Error) {
-				ctx.addEntry(rawCommand, [`\x1b[91m✗\x1b[0m ${ctx.t('terminal.info.errorShort')}`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91m✗\x1b[0m ${ctx.t('terminal.info.errorShort')}`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 			ctx.addEntry(rawCommand, ['', ...formatReviews(data, ctx.t)]);
@@ -21,7 +26,7 @@ export const networkCommands: ICommandDefinition[] = [
 		name: 'ping',
 		description: 'Send ICMP ECHO_REQUEST to network hosts',
 		execute: (arg, ctx, rawCommand) => {
-			const host = arg || 'api.gabrielfeijo.com.br';
+			const host = arg || API_HOST;
 			ctx.addEntry(rawCommand, [
 				`PING ${host} (127.0.0.1): 56 data bytes`,
 				`\x1b[92m64 bytes from ${host}: icmp_seq=0 ttl=64 time=0.42 ms\x1b[0m`,
@@ -37,7 +42,7 @@ export const networkCommands: ICommandDefinition[] = [
 		name: 'curl',
 		description: 'Transfer data from or to a server',
 		execute: (arg, ctx, rawCommand) => {
-			const url = arg || 'https://api.gabrielfeijo.com.br/v2/';
+			const url = arg || API_ROOT_URL;
 			ctx.addEntry(rawCommand, [
 				`\x1b[90m> GET ${url}\x1b[0m`,
 				`\x1b[92m< HTTP/1.1 200 OK\x1b[0m`,

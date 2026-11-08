@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CreateReviewInput, IRate, ReviewService } from '@/services/api/review/ReviewService';
+import {
+	type CreateReviewInput,
+	type IRate,
+	ReviewService,
+} from '@/services/api/review/ReviewService';
 
 export const REVIEWS_QUERY_KEY = ['reviews'] as const;
 

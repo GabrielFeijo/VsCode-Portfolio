@@ -1,39 +1,44 @@
-import { useMemo } from 'react';
-import { Box, Link, Paper, Tooltip } from '@mui/material';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import TerminalIcon from '@mui/icons-material/TerminalOutlined';
 import LanguageIcon from '@mui/icons-material/Language';
-import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
-import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import TerminalIcon from '@mui/icons-material/TerminalOutlined';
+import { Box, Link, Paper, Tooltip } from '@mui/material';
 import Divider from '@mui/material/Divider';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAppPalette } from '../theme/useAppPalette';
-import { useTranslation } from 'react-i18next';
+import type React from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
+import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
 import { useLayoutContext } from '../../contexts/LayoutContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useContactLinks } from '../hooks/useContactLinks';
+import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
 	language: string;
 	changeLanguage: () => void;
 }
 
-export default function Sidebar({
-	changeLanguage,
-}: Props) {
-	const { expanded, setExpanded, terminal, setTerminal } = useLayoutContext();
+function handleActivationKeyDown(action: () => void) {
+	return (e: React.KeyboardEvent) => {
+		if (e.key !== 'Enter' && e.key !== ' ') return;
+		e.preventDefault();
+		action();
+	};
+}
+
+export default function Sidebar({ changeLanguage }: Props) {
+	const {
+		expanded,
+		setExpanded,
+		terminal,
+		setTerminal,
+		isMobile: ctxIsMobile,
+	} = useLayoutContext();
 	const { theme, toggleTheme } = useTheme();
 	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();
-
-	const contactLinks = useMemo(
-		() => [
-			{ index: 0, icon: <FaGithub />, title: t('contact.github.title'), href: t('contact.github.href') },
-			{ index: 1, icon: <FaLinkedin />, title: t('contact.linkedin.title'), href: t('contact.linkedin.href') },
-			{ index: 2, icon: <FaEnvelope />, title: t('contact.email.title'), href: t('contact.email.href') },
-		],
-		[t],
-	);
+	const contactLinks = useContactLinks();
+	const isMobileViewport = Boolean(isMobile || ctxIsMobile);
 
 	const iconSx = {
 		flexGrow: 0,
@@ -43,9 +48,18 @@ export default function Sidebar({
 		'&:hover': { color: colors.iconActive },
 	};
 
+	const toggleExplorer = () => setExpanded(!expanded);
+	const toggleTerminal = () => setTerminal(!terminal);
+	const languageKey = `sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`;
+
 	return (
 		<Box
-			sx={{ height: '100%', backgroundColor: colors.bgSidebar }}
+			sx={{
+				height: '100%',
+				backgroundColor: colors.bgSidebar,
+				overflowY: 'auto',
+				overflowX: 'hidden',
+			}}
 			justifyContent='space-between'
 			display='flex'
 			flexDirection='column'
@@ -55,18 +69,19 @@ export default function Sidebar({
 		>
 			<Box sx={{ flexGrow: 0 }} display='flex' justifyContent='center' flexDirection='column'>
 				<Box
-					component="button"
-					aria-label={expanded ? (t('sidebar.closeExplorer') || 'Close explorer') : (t('sidebar.openExplorer') || 'Open explorer')}
+					component='button'
+					aria-label={
+						expanded
+							? t('sidebar.closeExplorer') || 'Close explorer'
+							: t('sidebar.openExplorer') || 'Open explorer'
+					}
 					aria-expanded={expanded}
 					tabIndex={0}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							setExpanded(!expanded);
-						}
-					}}
+					onKeyDown={handleActivationKeyDown(toggleExplorer)}
 					sx={{
-						borderLeft: expanded ? `solid 0.12em ${colors.accent}` : `solid 0.12em ${colors.bgSidebar}`,
+						borderLeft: expanded
+							? `solid 0.12em ${colors.accent}`
+							: `solid 0.12em ${colors.bgSidebar}`,
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 						border: 'none',
@@ -74,7 +89,7 @@ export default function Sidebar({
 						width: '100%',
 						padding: 0,
 					}}
-					onClick={() => setExpanded(!expanded)}
+					onClick={toggleExplorer}
 				>
 					<Box
 						sx={{
@@ -110,29 +125,40 @@ export default function Sidebar({
 				))}
 			</Box>
 
-			<Box sx={{ flexGrow: 0, pb: 1 }} display='flex' gap={1} justifyContent='center' flexDirection='column'>
-				{!isMobile && (
-					<Tooltip title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')} placement='right' arrow>
+			<Box
+				sx={{ flexGrow: 0, pb: 1 }}
+				display='flex'
+				gap={1}
+				justifyContent='center'
+				flexDirection='column'
+			>
+				{!isMobileViewport && (
+					<Tooltip
+						title={terminal ? t('sidebar.terminal.close') : t('sidebar.terminal.open')}
+						placement='right'
+						arrow
+					>
 						<Box
-							component="button"
-							aria-label={terminal ? (t('sidebar.terminal.close') || 'Close terminal') : (t('sidebar.terminal.open') || 'Open terminal')}
+							component='button'
+							aria-label={
+								terminal
+									? t('sidebar.terminal.close') || 'Close terminal'
+									: t('sidebar.terminal.open') || 'Open terminal'
+							}
 							aria-expanded={terminal}
 							tabIndex={0}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter' || e.key === ' ') {
-									e.preventDefault();
-									setTerminal(!terminal);
-								}
-							}}
+							onKeyDown={handleActivationKeyDown(toggleTerminal)}
 							sx={{
 								...iconSx,
-								borderLeft: terminal ? `solid 0.12em ${colors.accent}` : `solid 0.12em ${colors.bgSidebar}`,
+								borderLeft: terminal
+									? `solid 0.12em ${colors.accent}`
+									: `solid 0.12em ${colors.bgSidebar}`,
 								border: 'none',
 								background: 'transparent',
 								width: '100%',
 								padding: 0,
 							}}
-							onClick={() => setTerminal(!terminal)}
+							onClick={toggleTerminal}
 							display='flex'
 							justifyContent='center'
 						>
@@ -142,17 +168,12 @@ export default function Sidebar({
 						</Box>
 					</Tooltip>
 				)}
-				<Tooltip title={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`)} placement='right' arrow>
+				<Tooltip title={t(languageKey)} placement='right' arrow>
 					<Box
-						component="button"
-						aria-label={t(`sidebar.language.to${i18n.language === 'pt' ? 'English' : 'Portuguese'}`) || 'Change language'}
+						component='button'
+						aria-label={t(languageKey) || 'Change language'}
 						tabIndex={0}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								changeLanguage();
-							}
-						}}
+						onKeyDown={handleActivationKeyDown(changeLanguage)}
 						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'
@@ -161,17 +182,20 @@ export default function Sidebar({
 						<LanguageIcon />
 					</Box>
 				</Tooltip>
-				<Tooltip title={theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')} placement='right' arrow>
+				<Tooltip
+					title={theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
+					placement='right'
+					arrow
+				>
 					<Box
-						component="button"
-						aria-label={theme === 'dark' ? (t('sidebar.theme.light') || 'Switch to light theme') : (t('sidebar.theme.dark') || 'Switch to dark theme')}
+						component='button'
+						aria-label={
+							theme === 'dark'
+								? t('sidebar.theme.light') || 'Switch to light theme'
+								: t('sidebar.theme.dark') || 'Switch to dark theme'
+						}
 						tabIndex={0}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								toggleTheme();
-							}
-						}}
+						onKeyDown={handleActivationKeyDown(toggleTheme)}
 						sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 						display='flex'
 						justifyContent='center'
@@ -181,14 +205,16 @@ export default function Sidebar({
 					</Box>
 				</Tooltip>
 				<Box
-					component="button"
+					component='button'
 					aria-label={t('sidebar.settings') || 'Settings'}
 					tabIndex={0}
 					sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 					display='flex'
 					justifyContent='center'
 				>
-					<Box mt={0.7}><VscSettingsGear /></Box>
+					<Box mt={0.7}>
+						<VscSettingsGear />
+					</Box>
 				</Box>
 			</Box>
 		</Box>

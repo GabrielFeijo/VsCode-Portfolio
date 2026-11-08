@@ -1,13 +1,11 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useRef } from 'react';
 import { useTerminalKeyboard } from '@/app/components/Terminal/terminal/hooks/useTerminalKeyboard';
-import { VirtualDirectory } from '@/app/components/Terminal/terminal/types';
+import type { VirtualDirectory } from '@/app/components/Terminal/terminal/types';
 
 const fs: VirtualDirectory = {
 	'/home': [{ name: 'portfolio', type: 'dir' }],
-	'/home/portfolio': [
-		{ name: 'README.md', type: 'file', content: ['# Hello'] },
-	],
+	'/home/portfolio': [{ name: 'README.md', type: 'file', content: ['# Hello'] }],
 };
 
 function createKeyboardEvent(

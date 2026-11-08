@@ -1,6 +1,6 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
+import type React from 'react';
 import { useCommandsQuery } from '../../src/hooks/queries/useCommandsQuery';
 import { CommandService } from '../../src/services/api/command/CommandService';
 
@@ -50,8 +50,8 @@ describe('useCommandsQuery', () => {
 		expect(result.current.commandMap.get('skills')).toEqual(['skill 1', 'skill 2']);
 		expect(result.current.commandMap.get('habilidades')).toEqual(['skill 1', 'skill 2']);
 		expect(result.current.allCommandNames).toEqual(['skills', 'habilidades', 'stack', 'help']);
-		expect(result.current.commandsByCategory['portfolio']).toHaveLength(1);
-		expect(result.current.commandsByCategory['general']).toHaveLength(1);
+		expect(result.current.commandsByCategory.portfolio).toHaveLength(1);
+		expect(result.current.commandsByCategory.general).toHaveLength(1);
 	});
 
 	it('handles Error responses by returning empty list', async () => {

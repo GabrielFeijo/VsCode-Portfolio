@@ -1,5 +1,5 @@
-import { CommandExecutionContext } from './commands';
 import { commandRegistry } from './commandRegistry';
+import type { CommandExecutionContext } from './commands';
 
 export type { CommandExecutionContext };
 

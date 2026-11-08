@@ -1,8 +1,8 @@
+import { parseFlagsAndArgs } from '../utils/commandArgs';
 import { formatFileContent } from '../utils/fileFormatter';
 import { getFileLinesAsync } from '../utils/fileLookup';
 import { normalizePath } from '../utils/pathUtils';
-import { parseFlagsAndArgs } from '../utils/commandArgs';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const catCommand: ICommandDefinition = {
 	name: 'cat',
@@ -21,7 +21,11 @@ export const catCommand: ICommandDefinition = {
 		for (const fileArg of args) {
 			const filePath = normalizePath(cwd, fileArg);
 			if (fs[filePath]) {
-				addEntry(rawCommand, [`\x1b[91mcat: ${fileArg}: Is a directory\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91mcat: ${fileArg}: Is a directory\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 
@@ -30,7 +34,11 @@ export const catCommand: ICommandDefinition = {
 			const lines = await getFileLinesAsync(fs, parent, fileName, language);
 
 			if (!lines) {
-				addEntry(rawCommand, [`\x1b[91mcat: ${fileArg}: No such file\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91mcat: ${fileArg}: No such file\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 

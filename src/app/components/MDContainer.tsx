@@ -1,14 +1,11 @@
 import { Box, Container, Grid } from '@mui/material';
-import {
-	lazy,
-	Suspense,
-	useCallback,
-	useEffect,
-	useState,
-} from 'react';
-import { Page } from '@/domain/page';
-import { StorageService } from '@/services/storageService';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import type { Page } from '@/domain/page';
 import { getStaticPageContent } from '@/services/pageContentService';
+import { StorageService } from '@/services/storageService';
+import { onStorageChange } from '../../utils/appEvents';
+import { isSamePageName } from '../../utils/pageName';
+import { stripFileExtension } from '../../utils/stripFileExtension';
 import MarkdownRenderer from './MarkdownRenderer';
 
 const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
@@ -18,8 +15,6 @@ interface Props {
 	page?: Page;
 	setPages: React.Dispatch<React.SetStateAction<Page[]>>;
 }
-
-import { stripFileExtension } from '../../utils/stripFileExtension';
 
 const DEFAULT_PAGE_NAMES = new Set([
 	'about-me',
@@ -43,18 +38,14 @@ function isDefaultPage(page?: Page): boolean {
 }
 
 function hasEditableContent(page?: Page): page is Page & { content?: string } {
-	return !isDefaultPage(page) && Boolean(page && Object.prototype.hasOwnProperty.call(page, 'content'));
+	return !isDefaultPage(page) && Boolean(page && Object.hasOwn(page, 'content'));
 }
 
 function getStoredPageContent(page?: Page): string | null {
 	if (!page) return null;
 	const baseName = stripFileExtension(page.name);
 	const stored = StorageService.getData().find(
-		(p) =>
-			p.name === page.name ||
-			p.name === `${baseName}.md` ||
-			p.name === `${baseName}.html` ||
-			p.name === baseName
+		(p) => isSamePageName(p.name, page.name) || p.name === baseName,
 	);
 	if (stored?.content !== undefined) {
 		return stored.content;
@@ -68,6 +59,7 @@ function getStoredPageContent(page?: Page): string | null {
 export default function MDContainer({ path, page, setPages }: Props) {
 	const [content, setContent] = useState('');
 	const editMode = hasEditableContent(page);
+	const pageIndex = page?.index;
 
 	useEffect(() => {
 		if (editMode) {
@@ -112,10 +104,10 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		};
 
 		load();
-		window.addEventListener('storage', load);
+		const stopListening = onStorageChange(load);
 		return () => {
 			activeController?.abort();
-			window.removeEventListener('storage', load);
+			stopListening();
 		};
 	}, [editMode, page, path]);
 
@@ -124,13 +116,13 @@ export default function MDContainer({ path, page, setPages }: Props) {
 			setContent(newContent);
 			setPages((currentPages) =>
 				currentPages.map((currentPage) =>
-					currentPage.index === page!.index
+					currentPage.index === pageIndex
 						? { ...currentPage, content: newContent, isSaved: false }
-						: currentPage
-				)
+						: currentPage,
+				),
 			);
 		},
-		[page, setPages]
+		[pageIndex, setPages],
 	);
 
 	const handleSave = useCallback(() => {
@@ -146,8 +138,8 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 		setPages((currentPages) =>
 			currentPages.map((currentPage) =>
-				currentPage.index === page.index ? updatedPage : currentPage
-			)
+				currentPage.index === page.index ? updatedPage : currentPage,
+			),
 		);
 	}, [content, page, setPages]);
 
@@ -181,15 +173,13 @@ export default function MDContainer({ path, page, setPages }: Props) {
 						xs={12}
 						md={6}
 						sx={{
-							height: '100%',
-							borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+							height: { xs: '50%', md: '100%' },
+							borderRight: { xs: 'none', md: '1px solid var(--border)' },
+							borderBottom: { xs: '1px solid var(--border)', md: 'none' },
 						}}
 					>
 						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>
-							<MarkdownEditor
-								value={content}
-								onChange={handleChange}
-							/>
+							<MarkdownEditor value={content} onChange={handleChange} />
 						</Suspense>
 					</Grid>
 				)}
@@ -198,8 +188,9 @@ export default function MDContainer({ path, page, setPages }: Props) {
 					xs={12}
 					md={editMode ? 6 : 12}
 					sx={{
-						height: '100%',
+						height: { xs: editMode ? '50%' : '100%', md: '100%' },
 						overflowY: 'auto',
+						overflowX: 'hidden',
 						px: { xs: 2, sm: 3, md: 4 },
 						boxSizing: 'border-box',
 					}}

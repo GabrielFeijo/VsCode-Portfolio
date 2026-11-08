@@ -1,11 +1,9 @@
 import { getAppPalette } from '@/app/theme/palette';
-import { Theme } from '@/contexts/ThemeContext';
+import type { Theme } from '@/contexts/ThemeContext';
 import { PROJECT_ROOT } from '@/services/terminal/projectFileSystem';
 
+export { TERMINAL_HOST, TERMINAL_USER } from '@/config/terminalIdentity';
 export { PROJECT_FS, PROJECT_ROOT } from '@/services/terminal/projectFileSystem';
-
-export const TERMINAL_USER = 'gabriel';
-export const TERMINAL_HOST = 'portfolio';
 export const TERMINAL_DEFAULT_PATH = PROJECT_ROOT;
 
 export function getTerminalColors(mode: Theme) {
@@ -49,16 +47,65 @@ export interface VirtualDirectory {
 }
 
 export const LOCAL_COMMANDS = [
-	'help', 'ajuda', 'ls', 'cd', 'pwd', 'whoami', 'date', 'uptime', 'history',
-	'echo', 'cat', 'head', 'tail', 'tree', 'grep', 'wc', 'touch', 'mkdir', 'rm',
-	'nano', 'vim', 'vi', 'code',
-	'reset', 'reset-data', 'restore',
-	'clear', 'limpar', 'neofetch', 'reviews', 'avaliacoes',
-	'evaluate', 'avaliar', 'changetheme', 'mudartema', 'changelanguage', 'mudaridioma',
-	'route', 'rota', 'theme', 'tema', 'lang', 'idioma', 'matrix', 'cowsay',
-	'banner', 'ping', 'curl', 'man', 'exit', 'calc', 'calcular',
+	'help',
+	'ajuda',
+	'ls',
+	'cd',
+	'pwd',
+	'whoami',
+	'date',
+	'uptime',
+	'history',
+	'echo',
+	'cat',
+	'head',
+	'tail',
+	'tree',
+	'grep',
+	'wc',
+	'touch',
+	'mkdir',
+	'rm',
+	'nano',
+	'vim',
+	'vi',
+	'code',
+	'reset',
+	'reset-data',
+	'restore',
+	'clear',
+	'limpar',
+	'neofetch',
+	'reviews',
+	'avaliacoes',
+	'evaluate',
+	'avaliar',
+	'changetheme',
+	'mudartema',
+	'changelanguage',
+	'mudaridioma',
+	'route',
+	'rota',
+	'theme',
+	'tema',
+	'lang',
+	'idioma',
+	'matrix',
+	'cowsay',
+	'banner',
+	'ping',
+	'curl',
+	'man',
+	'exit',
+	'calc',
+	'calcular',
 ] as const;
 
 export const PAGE_ROUTES = [
-	'about-me', 'skills', 'projects', 'experience', 'accomplishments', 'certificates',
+	'about-me',
+	'skills',
+	'projects',
+	'experience',
+	'accomplishments',
+	'certificates',
 ] as const;

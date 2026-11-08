@@ -55,7 +55,9 @@ describe('fileLookup', () => {
 
 	it('resolves altMd file when query is baseName without extension', async () => {
 		const fs = {
-			'/home/gabriel': [{ name: 'skills.md', type: 'file' as const, content: ['markdown content'] }],
+			'/home/gabriel': [
+				{ name: 'skills.md', type: 'file' as const, content: ['markdown content'] },
+			],
 		};
 
 		const lines = await getFileLinesAsync(fs, '/home/gabriel', 'skills');

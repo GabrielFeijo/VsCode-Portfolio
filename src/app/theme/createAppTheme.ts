@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material';
-import { Theme } from '../../contexts/ThemeContext';
+import type { Theme } from '../../contexts/ThemeContext';
 import { appPalette } from './palette';
 import { fonts } from './typography';
 

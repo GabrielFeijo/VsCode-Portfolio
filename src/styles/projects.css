@@ -8,7 +8,8 @@
 .line {
 	height: 35px;
 	width: 2px;
-	background-color: white;
+	background-color: var(--text-secondary, currentColor);
+	opacity: 0.4;
 }
 
 .svg-icon {
@@ -32,8 +33,13 @@ img {
 	height: auto;
 }
 
+img:not(.svg-icon) {
+	border-radius: 6px;
+	display: block;
+}
+
 @media screen and (max-width: 768px) {
-	img {
+	img:not(.svg-icon) {
 		max-width: 100%;
 		width: 100%;
 		height: auto;

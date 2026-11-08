@@ -10,7 +10,7 @@ function renderMetadata(path = '/') {
 	return render(
 		<MemoryRouter initialEntries={[path]}>
 			<MetadataComponent />
-		</MemoryRouter>
+		</MemoryRouter>,
 	);
 }
 
@@ -19,19 +19,19 @@ describe('MetadataComponent', () => {
 		renderMetadata();
 
 		expect(document.querySelector('title')).toHaveTextContent(
-			'Gabriel Feijó | Desenvolvedor Full Stack'
+			'Gabriel Feijó | Desenvolvedor Full Stack',
 		);
 		expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
 			'content',
-			expect.stringContaining('Portfólio de Gabriel Feijó')
+			expect.stringContaining('Portfólio de Gabriel Feijó'),
 		);
 		expect(document.querySelector('meta[name="author"]')).toHaveAttribute(
 			'content',
-			'Gabriel Feijó'
+			'Gabriel Feijó',
 		);
 		expect(document.querySelector('meta[name="robots"]')).toHaveAttribute(
 			'content',
-			'index, follow, max-image-preview:large'
+			'index, follow, max-image-preview:large',
 		);
 	});
 
@@ -39,15 +39,15 @@ describe('MetadataComponent', () => {
 		renderMetadata('/projects');
 
 		expect(document.querySelector('title')).toHaveTextContent(
-			'Projetos Full Stack | Gabriel Feijó'
+			'Projetos Full Stack | Gabriel Feijó',
 		);
 		expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute(
 			'href',
-			'https://www.gabrielfeijo.com.br/projects'
+			'https://www.gabrielfeijo.com.br/projects',
 		);
 		expect(document.querySelector('meta[property="og:url"]')).toHaveAttribute(
 			'content',
-			'https://www.gabrielfeijo.com.br/projects'
+			'https://www.gabrielfeijo.com.br/projects',
 		);
 	});
 
@@ -55,15 +55,16 @@ describe('MetadataComponent', () => {
 		renderMetadata('/en/experience');
 
 		expect(document.querySelector('title')).toHaveTextContent(
-			'Professional experience | Gabriel Feijó'
+			'Professional experience | Gabriel Feijó',
 		);
 		expect(document.querySelector('meta[property="og:locale"]')).toHaveAttribute(
 			'content',
-			'en_US'
+			'en_US',
 		);
-		expect(
-			document.querySelector('meta[property="og:locale:alternate"]')
-		).toHaveAttribute('content', 'pt_BR');
+		expect(document.querySelector('meta[property="og:locale:alternate"]')).toHaveAttribute(
+			'content',
+			'pt_BR',
+		);
 	});
 
 	it('publishes bidirectional language alternates and x-default', () => {
@@ -71,15 +72,15 @@ describe('MetadataComponent', () => {
 
 		expect(document.querySelector('link[hreflang="pt-BR"]')).toHaveAttribute(
 			'href',
-			'https://www.gabrielfeijo.com.br/projects'
+			'https://www.gabrielfeijo.com.br/projects',
 		);
 		expect(document.querySelector('link[hreflang="en"]')).toHaveAttribute(
 			'href',
-			'https://www.gabrielfeijo.com.br/en/projects'
+			'https://www.gabrielfeijo.com.br/en/projects',
 		);
 		expect(document.querySelector('link[hreflang="x-default"]')).toHaveAttribute(
 			'href',
-			'https://www.gabrielfeijo.com.br/projects'
+			'https://www.gabrielfeijo.com.br/projects',
 		);
 	});
 
@@ -89,22 +90,23 @@ describe('MetadataComponent', () => {
 
 		expect(document.querySelector('meta[property="og:image"]')).toHaveAttribute(
 			'content',
-			imageUrl
+			imageUrl,
 		);
-		expect(
-			document.querySelector('meta[property="og:image:secure_url"]')
-		).toHaveAttribute('content', imageUrl);
+		expect(document.querySelector('meta[property="og:image:secure_url"]')).toHaveAttribute(
+			'content',
+			imageUrl,
+		);
 		expect(document.querySelector('meta[property="og:image:type"]')).toHaveAttribute(
 			'content',
-			'image/png'
+			'image/png',
 		);
 		expect(document.querySelector('meta[name="twitter:card"]')).toHaveAttribute(
 			'content',
-			'summary_large_image'
+			'summary_large_image',
 		);
 		expect(document.querySelector('meta[name="twitter:image"]')).toHaveAttribute(
 			'content',
-			imageUrl
+			imageUrl,
 		);
 	});
 

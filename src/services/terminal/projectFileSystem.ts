@@ -1,5 +1,5 @@
-import { PROJECT_FILES } from './projectFilesGlob';
 import type { VirtualDirectory } from '../../app/components/Terminal/terminal/types';
+import { PROJECT_FILES } from './projectFilesGlob';
 
 export const PROJECT_ROOT = '/home/gabriel/vscode-portfolio';
 
@@ -21,14 +21,18 @@ export function buildFileSystem(files: RawFileMap, root = PROJECT_ROOT): Virtual
 	}
 
 	for (const key of Object.keys(files)) {
-		const parts = key.replace(/^(\.\.\/)+/, '').split('/').filter(Boolean);
+		const parts = key
+			.replace(/^(\.\.\/)+/, '')
+			.split('/')
+			.filter(Boolean);
 		const fileName = parts.pop();
 		if (!fileName) continue;
 
 		let current = root;
 		for (const part of parts) {
 			const next = `${current}/${part}`;
-			const entries = (fs[current] ??= []);
+			fs[current] ??= [];
+			const entries = fs[current];
 			if (!entries.some((entry) => entry.name === part && entry.type === 'dir')) {
 				entries.push({ name: part, type: 'dir' });
 			}
@@ -36,7 +40,8 @@ export function buildFileSystem(files: RawFileMap, root = PROJECT_ROOT): Virtual
 		}
 
 		const content = files[key] ? files[key].split('\n') : undefined;
-		(fs[current] ??= []).push({
+		fs[current] ??= [];
+		fs[current].push({
 			name: fileName,
 			type: 'file',
 			content,

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 import { getPageMetadata } from '../../config/seo';
 import { siteConfig } from '../../config/site';
-import { useLocation } from 'react-router-dom';
 
 const localeByLanguage = {
 	pt: 'pt_BR',
@@ -31,25 +31,15 @@ export default function MetadataComponent() {
 				name: siteConfig.author,
 				url: siteConfig.url,
 				image: siteImage,
-				jobTitle: 'Desenvolvedor Full Stack',
+				jobTitle: siteConfig.jobTitle,
 				address: {
 					'@type': 'PostalAddress',
-					addressLocality: 'Recife',
-					addressRegion: 'PE',
-					addressCountry: 'BR',
+					addressLocality: siteConfig.address.locality,
+					addressRegion: siteConfig.address.region,
+					addressCountry: siteConfig.address.country,
 				},
-				sameAs: [
-					siteConfig.githubUrl,
-					siteConfig.linkedinUrl,
-				],
-				knowsAbout: [
-					'React',
-					'TypeScript',
-					'Node.js',
-					'NestJS',
-					'Software Engineering',
-					'Full Stack Development',
-				],
+				sameAs: [siteConfig.githubUrl, siteConfig.linkedinUrl],
+				knowsAbout: siteConfig.knowsAbout,
 			},
 			{
 				'@type': 'WebSite',
@@ -76,124 +66,37 @@ export default function MetadataComponent() {
 	return (
 		<Helmet htmlAttributes={{ lang: htmlLanguageByLanguage[language] }}>
 			<title>{metadata.title}</title>
-			<meta
-				name='description'
-				content={metadata.description}
-			/>
-			<meta
-				name='author'
-				content={siteConfig.author}
-			/>
-			<meta
-				name='theme-color'
-				content='#1e1e2e'
-			/>
-			<meta
-				name='robots'
-				content='index, follow, max-image-preview:large'
-			/>
+			<meta name='description' content={metadata.description} />
+			<meta name='author' content={siteConfig.author} />
+			<meta name='theme-color' content={siteConfig.themeColor} />
+			<meta name='robots' content='index, follow, max-image-preview:large' />
 
-			<link
-				rel='canonical'
-				href={metadata.canonicalUrl}
-			/>
-			<link
-				rel='alternate'
-				hrefLang='pt-BR'
-				href={metadata.alternateUrls.pt}
-			/>
-			<link
-				rel='alternate'
-				hrefLang='en'
-				href={metadata.alternateUrls.en}
-			/>
-			<link
-				rel='alternate'
-				hrefLang='x-default'
-				href={metadata.alternateUrls.xDefault}
-			/>
+			<link rel='canonical' href={metadata.canonicalUrl} />
+			<link rel='alternate' hrefLang='pt-BR' href={metadata.alternateUrls.pt} />
+			<link rel='alternate' hrefLang='en' href={metadata.alternateUrls.en} />
+			<link rel='alternate' hrefLang='x-default' href={metadata.alternateUrls.xDefault} />
 
-			<meta
-				property='og:type'
-				content='website'
-			/>
-			<meta
-				property='og:url'
-				content={metadata.canonicalUrl}
-			/>
-			<meta
-				property='og:title'
-				content={metadata.title}
-			/>
-			<meta
-				property='og:description'
-				content={metadata.description}
-			/>
-			<meta
-				property='og:image'
-				content={siteImage}
-			/>
-			<meta
-				property='og:image:secure_url'
-				content={siteImage}
-			/>
-			<meta
-				property='og:image:type'
-				content='image/png'
-			/>
-			<meta
-				property='og:image:width'
-				content='1200'
-			/>
-			<meta
-				property='og:image:height'
-				content='630'
-			/>
-			<meta
-				property='og:image:alt'
-				content='Gabriel Feijó — Desenvolvedor Full Stack'
-			/>
-			<meta
-				property='og:locale'
-				content={locale}
-			/>
-			<meta
-				property='og:locale:alternate'
-				content={alternateLocale}
-			/>
-			<meta
-				property='og:site_name'
-				content={siteConfig.name}
-			/>
+			<meta property='og:type' content='website' />
+			<meta property='og:url' content={metadata.canonicalUrl} />
+			<meta property='og:title' content={metadata.title} />
+			<meta property='og:description' content={metadata.description} />
+			<meta property='og:image' content={siteImage} />
+			<meta property='og:image:secure_url' content={siteImage} />
+			<meta property='og:image:type' content='image/png' />
+			<meta property='og:image:width' content='1200' />
+			<meta property='og:image:height' content='630' />
+			<meta property='og:image:alt' content={siteConfig.imageAlt} />
+			<meta property='og:locale' content={locale} />
+			<meta property='og:locale:alternate' content={alternateLocale} />
+			<meta property='og:site_name' content={siteConfig.name} />
 
-			<meta
-				name='twitter:card'
-				content='summary_large_image'
-			/>
-			<meta
-				name='twitter:url'
-				content={metadata.canonicalUrl}
-			/>
-			<meta
-				name='twitter:title'
-				content={metadata.title}
-			/>
-			<meta
-				name='twitter:description'
-				content={metadata.description}
-			/>
-			<meta
-				name='twitter:image'
-				content={siteImage}
-			/>
-			<meta
-				name='twitter:image:alt'
-				content='Gabriel Feijó — Desenvolvedor Full Stack'
-			/>
-			<meta
-				name='twitter:creator'
-				content='@gabrielfeijo'
-			/>
+			<meta name='twitter:card' content='summary_large_image' />
+			<meta name='twitter:url' content={metadata.canonicalUrl} />
+			<meta name='twitter:title' content={metadata.title} />
+			<meta name='twitter:description' content={metadata.description} />
+			<meta name='twitter:image' content={siteImage} />
+			<meta name='twitter:image:alt' content={siteConfig.imageAlt} />
+			<meta name='twitter:creator' content={siteConfig.twitterHandle} />
 
 			<script type='application/ld+json'>{JSON.stringify(structuredData)}</script>
 		</Helmet>

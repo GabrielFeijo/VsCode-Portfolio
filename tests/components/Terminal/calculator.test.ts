@@ -1,4 +1,7 @@
-import { calculate, formatResult } from '../../../src/app/components/Terminal/terminal/utils/calculator';
+import {
+	calculate,
+	formatResult,
+} from '../../../src/app/components/Terminal/terminal/utils/calculator';
 
 describe('calculator', () => {
 	it('calculates simple arithmetic expressions', () => {
@@ -33,6 +36,6 @@ describe('calculator', () => {
 
 	it('formats integer and float results correctly', () => {
 		expect(formatResult(42)).toBe('42');
-		expect(formatResult(3.1415926535)).toBe('3.141593');
+		expect(formatResult(Math.PI)).toBe('3.141593');
 	});
 });

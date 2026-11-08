@@ -1,7 +1,7 @@
 import { parseFlagsAndArgs } from '../utils/commandArgs';
 import { getFileLinesAsync } from '../utils/fileLookup';
 import { normalizePath } from '../utils/pathUtils';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 function parseHeadTailOptions(tokens: string[]): { count: number; fileArg: string } {
 	let count = 10;
@@ -47,7 +47,11 @@ export const textUtilsCommands: ICommandDefinition[] = [
 			const lines = await getFileLinesAsync(ctx.fs, parent, fileName, ctx.language);
 
 			if (!lines) {
-				ctx.addEntry(rawCommand, [`\x1b[91m${cmd}: ${fileArg}: No such file\x1b[0m`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91m${cmd}: ${fileArg}: No such file\x1b[0m`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 
@@ -74,7 +78,11 @@ export const textUtilsCommands: ICommandDefinition[] = [
 			const lines = await getFileLinesAsync(ctx.fs, parent, fileName, ctx.language);
 
 			if (!lines) {
-				ctx.addEntry(rawCommand, [`\x1b[91mgrep: ${fileArg}: No such file\x1b[0m`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91mgrep: ${fileArg}: No such file\x1b[0m`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 
@@ -84,10 +92,7 @@ export const textUtilsCommands: ICommandDefinition[] = [
 
 			lines.forEach((line, idx) => {
 				if (regex.test(line)) {
-					const highlighted = line.replace(
-						regex,
-						(match) => `\x1b[1;31m${match}\x1b[0m`,
-					);
+					const highlighted = line.replace(regex, (match) => `\x1b[1;31m${match}\x1b[0m`);
 					matchedLines.push(`\x1b[90m${idx + 1}:\x1b[0m ${highlighted}`);
 				}
 			});
@@ -113,7 +118,11 @@ export const textUtilsCommands: ICommandDefinition[] = [
 			const lines = await getFileLinesAsync(ctx.fs, parent, fileName, ctx.language);
 
 			if (!lines) {
-				ctx.addEntry(rawCommand, [`\x1b[91mwc: ${fileArg}: No such file\x1b[0m`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91mwc: ${fileArg}: No such file\x1b[0m`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 

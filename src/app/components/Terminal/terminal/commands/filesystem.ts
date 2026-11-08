@@ -1,6 +1,6 @@
 import { parseFlagsAndArgs } from '../utils/commandArgs';
 import { normalizePath } from '../utils/pathUtils';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const filesystemCommands: ICommandDefinition[] = [
 	{
@@ -18,7 +18,11 @@ export const filesystemCommands: ICommandDefinition[] = [
 			const fileName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
 
 			if (!fs[parent]) {
-				addEntry(rawCommand, [`\x1b[91mtouch: cannot touch '${arg}': No such file or directory\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91mtouch: cannot touch '${arg}': No such file or directory\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 
@@ -49,7 +53,11 @@ export const filesystemCommands: ICommandDefinition[] = [
 			const dirName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
 
 			if (!fs[parent]) {
-				addEntry(rawCommand, [`\x1b[91mmkdir: cannot create directory '${arg}': No such file or directory\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91mmkdir: cannot create directory '${arg}': No such file or directory\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 
@@ -83,7 +91,11 @@ export const filesystemCommands: ICommandDefinition[] = [
 			const targetName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
 
 			if (fs[targetPath] && !flags.has('r')) {
-				addEntry(rawCommand, [`\x1b[91mrm: cannot remove '${fileArg}': Is a directory\x1b[0m`], terminalColors.error);
+				addEntry(
+					rawCommand,
+					[`\x1b[91mrm: cannot remove '${fileArg}': Is a directory\x1b[0m`],
+					terminalColors.error,
+				);
 				return true;
 			}
 

@@ -1,154 +1,159 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import KeyboardShortcutsModal from '../../src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 
 jest.mock('framer-motion', () => ({
-    motion: {
-        div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    },
-    AnimatePresence: ({ children }: any) => <>{children}</>,
+	motion: {
+		div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+	},
+	AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 jest.mock('react-device-detect', () => ({
-    isMobile: false,
+	isMobile: false,
 }));
 
 jest.mock('react-icons/vsc', () => ({
-    VscTerminal: () => <div data-testid="terminal-icon" />,
-    VscColorMode: () => <div data-testid="color-mode-icon" />,
-    VscHome: () => <div data-testid="home-icon" />,
-    VscGlobe: () => <div data-testid="globe-icon" />,
-    VscChromeClose: () => <div data-testid="close-icon" />,
-    VscEditorLayout: () => <div data-testid="layout-icon" />,
-    VscSave: () => <div data-testid="save-icon" />,
-    VscRecordKeys: () => <div data-testid="keyboard-icon" />,
+	VscTerminal: () => <div data-testid='terminal-icon' />,
+	VscColorMode: () => <div data-testid='color-mode-icon' />,
+	VscHome: () => <div data-testid='home-icon' />,
+	VscGlobe: () => <div data-testid='globe-icon' />,
+	VscChromeClose: () => <div data-testid='close-icon' />,
+	VscEditorLayout: () => <div data-testid='layout-icon' />,
+	VscSave: () => <div data-testid='save-icon' />,
+	VscRecordKeys: () => <div data-testid='keyboard-icon' />,
 }));
 
 const mockT = jest.fn();
 jest.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: mockT }),
+	useTranslation: () => ({ t: mockT }),
 }));
 
 describe('KeyboardShortcutsModal', () => {
-    beforeEach(() => {
-        jest.useFakeTimers();
-        mockT.mockImplementation((key) => key);
-    });
+	beforeEach(() => {
+		jest.useFakeTimers();
+		mockT.mockImplementation((key) => key);
+	});
 
-    afterEach(() => {
-        act(() => {
-            jest.runOnlyPendingTimers();
-        });
-        jest.useRealTimers();
-    });
+	afterEach(() => {
+		act(() => {
+			jest.runOnlyPendingTimers();
+		});
+		jest.useRealTimers();
+	});
 
-    it('renders nothing when visible is false', () => {
-        const { container } = render(<KeyboardShortcutsModal visible={false} />);
-        expect(container.firstChild).toBeNull();
-    });
+	it('renders nothing when visible is false', () => {
+		const { container } = render(<KeyboardShortcutsModal visible={false} />);
+		expect(container.firstChild).toBeNull();
+	});
 
-    it('renders nothing on mobile', () => {
-        jest.mock('react-device-detect', () => ({
-            isMobile: true,
-        }), { virtual: true });
+	it('renders nothing on mobile', () => {
+		jest.mock(
+			'react-device-detect',
+			() => ({
+				isMobile: true,
+			}),
+			{ virtual: true },
+		);
 
-        const KeyboardShortcutsModalMobile = require('../../src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal').default;
+		const KeyboardShortcutsModalMobile =
+			require('../../src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal').default;
 
-        const { container } = render(<KeyboardShortcutsModalMobile visible={true} />);
-        expect(container.firstChild).toBeNull();
-    });
+		const { container } = render(<KeyboardShortcutsModalMobile visible={true} />);
+		expect(container.firstChild).toBeNull();
+	});
 
-    it('renders modal after timeout when visible is true', async () => {
-        render(<KeyboardShortcutsModal visible={true} />);
+	it('renders modal after timeout when visible is true', async () => {
+		render(<KeyboardShortcutsModal visible={true} />);
 
-        expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
+		expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
 
-        expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
-        expect(screen.getByText('shortcuts.terminal')).toBeInTheDocument();
-        expect(screen.getAllByText('Ctrl').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('J').length).toBeGreaterThanOrEqual(1);
-    });
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+		expect(screen.getByText('shortcuts.terminal')).toBeInTheDocument();
+		expect(screen.getAllByText('Ctrl').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('J').length).toBeGreaterThanOrEqual(1);
+	});
 
-    it('hides modal after 5 seconds', async () => {
-        render(<KeyboardShortcutsModal visible={true} />);
+	it('hides modal after 5 seconds', async () => {
+		render(<KeyboardShortcutsModal visible={true} />);
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
-        expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
 
-        act(() => {
-            jest.advanceTimersByTime(5000);
-        });
-        await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
-    });
+		act(() => {
+			jest.advanceTimersByTime(5000);
+		});
+		await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
+	});
 
-    it('closes modal when close button is clicked', async () => {
-        render(<KeyboardShortcutsModal visible={true} />);
+	it('closes modal when close button is clicked', async () => {
+		render(<KeyboardShortcutsModal visible={true} />);
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
-        expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
 
-        const closeButton = screen.getByRole('button', { name: /shortcuts\.close/ });
-        fireEvent.click(closeButton);
+		const closeButton = screen.getByRole('button', { name: /shortcuts\.close/ });
+		fireEvent.click(closeButton);
 
-        await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
-    });
+		await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
+	});
 
-    it('uses default aria-label when translation is missing', async () => {
-        mockT.mockImplementation((key) => key === 'shortcuts.close' ? undefined : key);
+	it('uses default aria-label when translation is missing', async () => {
+		mockT.mockImplementation((key) => (key === 'shortcuts.close' ? undefined : key));
 
-        render(<KeyboardShortcutsModal visible={true} />);
+		render(<KeyboardShortcutsModal visible={true} />);
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
 
-        const closeButton = screen.getByRole('button', { name: 'Close keyboard shortcuts modal' });
-        expect(closeButton).toBeInTheDocument();
+		const closeButton = screen.getByRole('button', { name: 'Close keyboard shortcuts modal' });
+		expect(closeButton).toBeInTheDocument();
 
-        mockT.mockImplementation((key) => key);
-    });
+		mockT.mockImplementation((key) => key);
+	});
 
-    it('clears the show timeout on unmount', () => {
-        const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
+	it('clears the show timeout on unmount', () => {
+		const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
 
-        expect(jest.getTimerCount()).toBe(1);
+		expect(jest.getTimerCount()).toBe(1);
 
-        unmount();
+		unmount();
 
-        expect(jest.getTimerCount()).toBe(0);
-    });
+		expect(jest.getTimerCount()).toBe(0);
+	});
 
-    it('clears the hide timeout on unmount', () => {
-        const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
+	it('clears the hide timeout on unmount', () => {
+		const { unmount } = render(<KeyboardShortcutsModal visible={true} />);
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
-        expect(jest.getTimerCount()).toBe(1);
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
+		expect(jest.getTimerCount()).toBe(1);
 
-        unmount();
+		unmount();
 
-        expect(jest.getTimerCount()).toBe(0);
-    });
+		expect(jest.getTimerCount()).toBe(0);
+	});
 
-    it('hides immediately when visibility is disabled', () => {
-        const { rerender } = render(<KeyboardShortcutsModal visible={true} />);
+	it('hides immediately when visibility is disabled', () => {
+		const { rerender } = render(<KeyboardShortcutsModal visible={true} />);
 
-        act(() => {
-            jest.advanceTimersByTime(2500);
-        });
-        expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+		act(() => {
+			jest.advanceTimersByTime(2500);
+		});
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
 
-        rerender(<KeyboardShortcutsModal visible={false} />);
+		rerender(<KeyboardShortcutsModal visible={false} />);
 
-        expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
-        expect(jest.getTimerCount()).toBe(0);
-    });
+		expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
+		expect(jest.getTimerCount()).toBe(0);
+	});
 });

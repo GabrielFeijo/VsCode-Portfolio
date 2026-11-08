@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Language } from '@/domain/page';
 import { fonts } from '@/app/theme/typography';
+import { useTheme } from '@/contexts/ThemeContext';
+import type { Language } from '@/domain/page';
 import styles from './Cmd.module.css';
+import NanoEditor from './terminal/NanoEditor';
 import TerminalLine from './terminal/TerminalLine';
 import TerminalPrompt from './terminal/TerminalPrompt';
-import NanoEditor from './terminal/NanoEditor';
-import { useTheme } from '@/contexts/ThemeContext';
 import { getTerminalColors } from './terminal/terminalConfig';
 import { useTerminal } from './terminal/useTerminal';
 
@@ -62,7 +62,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 	if (activeEditor) {
 		return (
 			<Box
-				id="cmd-terminal"
+				id='cmd-terminal'
 				sx={{
 					height: '100%',
 					borderRadius: '4px',
@@ -85,7 +85,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 
 	return (
 		<Box
-			id="cmd-terminal"
+			id='cmd-terminal'
 			className={styles.terminal}
 			onClick={() => inputRef.current?.focus()}
 			sx={{
@@ -121,7 +121,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 						>
 							<TerminalPrompt cwd={entry.cwd} isDark={isDark} />
 							<Box
-								component="span"
+								component='span'
 								sx={{
 									fontFamily: 'inherit',
 									fontSize: '0.85rem',
@@ -142,7 +142,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 					sx={{
 						display: 'flex',
 						alignItems: 'flex-start',
-						flexWrap: 'nowrap',
+						flexWrap: 'wrap',
 						position: 'relative',
 						minHeight: '1.6em',
 					}}
@@ -150,7 +150,7 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 					<TerminalPrompt cwd={cwd} isDark={isDark} />
 					<Box className={styles.inputWrapper}>
 						{ghostText && (
-							<Box className={styles.ghost} aria-hidden="true">
+							<Box className={styles.ghost} aria-hidden='true'>
 								<span className={styles.invisible}>{command}</span>
 								<span className={styles.ghostText}>{ghostText}</span>
 							</Box>
@@ -161,9 +161,9 @@ const Cmd = ({ setRanking, changeLanguage, language }: Props) => {
 							className={styles.input}
 							rows={1}
 							spellCheck={false}
-							autoComplete="off"
-							autoCorrect="off"
-							autoCapitalize="off"
+							autoComplete='off'
+							autoCorrect='off'
+							autoCapitalize='off'
 							aria-label={t('terminal.info.placeholder') || 'Terminal command input'}
 							onChange={handleChange}
 							onKeyDown={handleKeyDown}

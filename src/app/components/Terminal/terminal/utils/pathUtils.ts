@@ -1,4 +1,5 @@
-import { VirtualDirectory, VirtualFileEntry } from '../types';
+import { TERMINAL_HOME, TERMINAL_USER } from '@/config/terminalIdentity';
+import type { VirtualDirectory, VirtualFileEntry } from '../types';
 
 export const PATH_COMMANDS = [
 	'cd',
@@ -20,9 +21,9 @@ export const PATH_COMMANDS = [
 ];
 
 export function normalizePath(base: string, target: string): string {
-	if (target === '~') return '/home/gabriel';
+	if (target === '~') return TERMINAL_HOME;
 	if (target.startsWith('~/')) {
-		return normalizePath('/home/gabriel', target.slice(2));
+		return normalizePath(TERMINAL_HOME, target.slice(2));
 	}
 	if (target.startsWith('/')) return target.replace(/\/+$/, '') || '/';
 
@@ -35,7 +36,7 @@ export function normalizePath(base: string, target: string): string {
 		}
 		parts.push(segment);
 	}
-	return '/' + parts.join('/');
+	return `/${parts.join('/')}`;
 }
 
 export function formatLsEntry(entry: VirtualFileEntry, isLong = false): string {
@@ -51,7 +52,7 @@ export function formatLsEntry(entry: VirtualFileEntry, isLong = false): string {
 	const perms = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
 	const size = isDir ? '4096' : String(entry.content?.join('\n').length ?? 0);
 	const paddedSize = size.padStart(6, ' ');
-	return `${perms}  gabriel  gabriel  ${paddedSize}  ${nameStr}`;
+	return `${perms}  ${TERMINAL_USER}  ${TERMINAL_USER}  ${paddedSize}  ${nameStr}`;
 }
 
 export function listDirectory(
@@ -59,17 +60,13 @@ export function listDirectory(
 	cwd: string,
 	fs: VirtualDirectory,
 	options: { showAll?: boolean; longListing?: boolean } = {},
-): { lines?: string[]; error?: string } {
+): { lines: string[]; error?: undefined } | { error: string; lines?: undefined } {
 	const target = argPath ? normalizePath(cwd, argPath) : cwd;
 
 	if (fs[target]) {
 		const rawEntries = fs[target];
 		const entries = options.showAll
-			? [
-					{ name: '.', type: 'dir' as const },
-					{ name: '..', type: 'dir' as const },
-					...rawEntries,
-				]
+			? [{ name: '.', type: 'dir' as const }, { name: '..', type: 'dir' as const }, ...rawEntries]
 			: rawEntries;
 
 		return {
@@ -97,7 +94,7 @@ export function generateTree(
 	cwd: string,
 	fs: VirtualDirectory,
 	maxDepth = 3,
-): { lines?: string[]; error?: string } {
+): { lines: string[]; error?: undefined } | { error: string; lines?: undefined } {
 	const target = argPath ? normalizePath(cwd, argPath) : cwd;
 	if (!fs[target]) {
 		return { error: `tree: '${argPath || target}': No such directory` };

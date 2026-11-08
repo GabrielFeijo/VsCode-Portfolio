@@ -1,4 +1,4 @@
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const manCommand: ICommandDefinition = {
 	name: 'man',

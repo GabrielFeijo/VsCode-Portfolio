@@ -1,15 +1,17 @@
+import { TERMINAL_USER } from '@/config/terminalIdentity';
 import { StorageService } from '@/services/storageService';
+import { notifyStorageChange, requestOpenTab } from '@/utils/appEvents';
 import { PROJECT_FS, PROJECT_ROOT } from '../terminalConfig';
 import { calculate, formatResult } from '../utils/calculator';
 import { buildNeofetch, formatUptime } from '../utils/formatters';
-import { ICommandDefinition } from './command.types';
+import type { ICommandDefinition } from './command.types';
 
 export const systemCommands: ICommandDefinition[] = [
 	{
 		name: 'whoami',
 		description: 'Print effective user name',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, ['gabriel']);
+			ctx.addEntry(rawCommand, [TERMINAL_USER]);
 			return true;
 		},
 	},
@@ -17,7 +19,9 @@ export const systemCommands: ICommandDefinition[] = [
 		name: 'date',
 		description: 'Print current system date and time',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, [new Date().toLocaleString(ctx.language === 'pt' ? 'pt-BR' : 'en-US')]);
+			ctx.addEntry(rawCommand, [
+				new Date().toLocaleString(ctx.language === 'pt' ? 'pt-BR' : 'en-US'),
+			]);
 			return true;
 		},
 	},
@@ -66,7 +70,11 @@ export const systemCommands: ICommandDefinition[] = [
 			}
 			const result = calculate(arg);
 			if (result === null) {
-				ctx.addEntry(rawCommand, [`\x1b[91mcalc: invalid expression: ${arg}\x1b[0m`], ctx.terminalColors.error);
+				ctx.addEntry(
+					rawCommand,
+					[`\x1b[91mcalc: invalid expression: ${arg}\x1b[0m`],
+					ctx.terminalColors.error,
+				);
 				return true;
 			}
 			ctx.addEntry(rawCommand, [`${arg} = \x1b[92m${formatResult(result)}\x1b[0m`]);
@@ -77,11 +85,14 @@ export const systemCommands: ICommandDefinition[] = [
 		name: 'neofetch',
 		description: 'Display system information summary',
 		execute: (_arg, ctx, rawCommand) => {
-			ctx.addEntry(rawCommand, buildNeofetch({
-				isDark: ctx.isDark,
-				language: ctx.language,
-				uptime: formatUptime(ctx.sessionStart),
-			}));
+			ctx.addEntry(
+				rawCommand,
+				buildNeofetch({
+					isDark: ctx.isDark,
+					language: ctx.language,
+					uptime: formatUptime(ctx.sessionStart),
+				}),
+			);
 			return true;
 		},
 	},
@@ -114,8 +125,8 @@ export const systemCommands: ICommandDefinition[] = [
 			ctx.setFs(PROJECT_FS);
 			ctx.setCwd(PROJECT_ROOT);
 			ctx.setPreviousCwd(PROJECT_ROOT);
-			window.dispatchEvent(new Event('storage'));
-			window.dispatchEvent(new CustomEvent('open-tab', { detail: { target: '.' } }));
+			notifyStorageChange();
+			requestOpenTab('.');
 			ctx.addEntry(rawCommand, [
 				'\x1b[92m✔ Portfolio data and files have been reset to factory defaults.\x1b[0m',
 				'\x1b[90mAll virtual files and local editor data restored.\x1b[0m',

@@ -1,6 +1,6 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
+import type React from 'react';
 import { useHomeQuery } from '../../src/hooks/queries/useHomeQuery';
 import { HomeService } from '../../src/services/api/home/HomeService';
 

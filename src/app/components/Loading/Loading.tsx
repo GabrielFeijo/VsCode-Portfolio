@@ -2,13 +2,15 @@ import { Box } from '@mui/material';
 import Logo from '../../../vscode.svg';
 import './Loading.css';
 
+export const LOADING_Z_INDEX = 9999;
+
 const Loading = () => {
 	return (
 		<Box
-			zIndex={99}
+			zIndex={LOADING_Z_INDEX}
 			width={'100%'}
 			height={'var(--app-viewport-height)'}
-			position={'absolute'}
+			position={'fixed'}
 			top={0}
 			left={0}
 			display={'flex'}

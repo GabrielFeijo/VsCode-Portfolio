@@ -1,5 +1,5 @@
+import { type ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
 import apiFetch from '../axios-config';
-import { ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
 
 export interface ICommand {
 	_id?: string;

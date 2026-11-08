@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAppPalette } from '../../theme/useAppPalette';
 import { fonts } from '../../theme/typography';
+import { useAppPalette } from '../../theme/useAppPalette';
 
 interface Props {
 	language?: string;
@@ -15,8 +15,8 @@ const Output = (_props?: Props) => {
 
 	return (
 		<Box>
-			{messages.map((message: string, index: number) => (
-				<Box key={index} display='flex' alignItems='center' gap={1}>
+			{messages.map((message: string) => (
+				<Box key={message} display='flex' alignItems='center' flexWrap='wrap' gap={1}>
 					<Typography sx={{ fontSize: '.8rem', color: colors.textMuted, fontFamily: fonts.mono }}>
 						{today.replace(/,/g, ' ')}
 					</Typography>

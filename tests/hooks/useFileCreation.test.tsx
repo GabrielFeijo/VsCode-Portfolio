@@ -1,6 +1,6 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useFileCreation } from '@/app/hooks/useFileCreation';
-import { Page } from '@/domain/page';
+import type { Page } from '@/domain/page';
 
 describe('useFileCreation', () => {
 	const initialPages: Page[] = [
@@ -12,7 +12,7 @@ describe('useFileCreation', () => {
 		const openFile = jest.fn();
 
 		const { result } = renderHook(() =>
-			useFileCreation({ pages: initialPages, setPages, openFile })
+			useFileCreation({ pages: initialPages, setPages, openFile }),
 		);
 
 		expect(result.current.isCreatingFile).toBe(false);
@@ -24,7 +24,7 @@ describe('useFileCreation', () => {
 		const openFile = jest.fn();
 
 		const { result } = renderHook(() =>
-			useFileCreation({ pages: initialPages, setPages, openFile })
+			useFileCreation({ pages: initialPages, setPages, openFile }),
 		);
 
 		act(() => {
@@ -52,7 +52,7 @@ describe('useFileCreation', () => {
 		const openFile = jest.fn();
 
 		const { result } = renderHook(() =>
-			useFileCreation({ pages: initialPages, setPages, openFile })
+			useFileCreation({ pages: initialPages, setPages, openFile }),
 		);
 
 		act(() => {
@@ -73,7 +73,7 @@ describe('useFileCreation', () => {
 		const openFile = jest.fn();
 
 		const { result } = renderHook(() =>
-			useFileCreation({ pages: initialPages, setPages, openFile })
+			useFileCreation({ pages: initialPages, setPages, openFile }),
 		);
 
 		act(() => {
@@ -93,7 +93,7 @@ describe('useFileCreation', () => {
 		const openFile = jest.fn();
 
 		const { result } = renderHook(() =>
-			useFileCreation({ pages: initialPages, setPages, openFile })
+			useFileCreation({ pages: initialPages, setPages, openFile }),
 		);
 
 		act(() => {

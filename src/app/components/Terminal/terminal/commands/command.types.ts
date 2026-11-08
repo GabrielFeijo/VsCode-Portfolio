@@ -1,6 +1,6 @@
-import { Language } from '@/domain/page';
-import { TerminalColors } from '../terminalConfig';
-import { ActiveEditorSession, VirtualDirectory } from '../types';
+import type { Language } from '@/domain/page';
+import type { TerminalColors } from '../terminalConfig';
+import type { ActiveEditorSession, VirtualDirectory } from '../types';
 
 export interface CommandExecutionContext {
 	language: Language;
@@ -33,5 +33,5 @@ export interface ICommandDefinition {
 		arg: string,
 		ctx: CommandExecutionContext,
 		rawCommand: string,
-	) => Promise<boolean | void> | boolean | void;
+	) => Promise<boolean | undefined> | boolean | undefined;
 }

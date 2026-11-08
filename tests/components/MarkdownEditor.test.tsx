@@ -2,12 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import MarkdownEditor from '../../src/app/components/MarkdownEditor';
 
 const highlightMock = jest.fn(
-	(code: string, _language: unknown, _name: string) => `highlighted:${code}`
+	(code: string, _language: unknown, _name: string) => `highlighted:${code}`,
 );
 
 jest.mock('prismjs', () => ({
-	highlight: (code: string, language: unknown, name: string) =>
-		highlightMock(code, language, name),
+	highlight: (code: string, language: unknown, name: string) => highlightMock(code, language, name),
 	languages: { markdown: { name: 'markdown' } },
 }));
 
@@ -62,11 +61,7 @@ describe('MarkdownEditor', () => {
 		render(<MarkdownEditor value='# Initial' onChange={onChange} />);
 
 		expect(screen.getByText('highlighted:# Initial')).toHaveClass('code-editor-pre');
-		expect(highlightMock).toHaveBeenCalledWith(
-			'# Initial',
-			expect.anything(),
-			'markdown'
-		);
+		expect(highlightMock).toHaveBeenCalledWith('# Initial', expect.anything(), 'markdown');
 
 		const textarea = screen.getByRole('textbox', { name: 'Markdown editor' });
 		fireEvent.change(textarea, {
@@ -93,14 +88,14 @@ describe('MarkdownEditor', () => {
 	it('handles keyboard shortcuts Tab, Ctrl+B, Ctrl+I and normal keys', () => {
 		const onChangeTab = jest.fn();
 		const { container: containerTab } = render(
-			<MarkdownEditor value='Sample' onChange={onChangeTab} />
+			<MarkdownEditor value='Sample' onChange={onChangeTab} />,
 		);
 		fireEvent.keyDown(containerTab.firstChild as HTMLElement, { key: 'Tab' });
 		expect(onChangeTab).toHaveBeenCalledWith('  Sample');
 
 		const onChangeBold = jest.fn();
 		const { container: containerBold } = render(
-			<MarkdownEditor value='Sample' onChange={onChangeBold} />
+			<MarkdownEditor value='Sample' onChange={onChangeBold} />,
 		);
 		fireEvent.keyDown(containerBold.firstChild as HTMLElement, {
 			key: 'b',
@@ -110,7 +105,7 @@ describe('MarkdownEditor', () => {
 
 		const onChangeItalic = jest.fn();
 		const { container: containerItalic } = render(
-			<MarkdownEditor value='Sample' onChange={onChangeItalic} />
+			<MarkdownEditor value='Sample' onChange={onChangeItalic} />,
 		);
 		fireEvent.keyDown(containerItalic.firstChild as HTMLElement, {
 			key: 'i',
@@ -120,7 +115,7 @@ describe('MarkdownEditor', () => {
 
 		const onChangeOther = jest.fn();
 		const { container: containerOther } = render(
-			<MarkdownEditor value='Sample' onChange={onChangeOther} />
+			<MarkdownEditor value='Sample' onChange={onChangeOther} />,
 		);
 		fireEvent.keyDown(containerOther.firstChild as HTMLElement, { key: 'x' });
 		expect(onChangeOther).not.toHaveBeenCalled();
@@ -128,9 +123,7 @@ describe('MarkdownEditor', () => {
 
 	it('wraps selected text on Ctrl+B and Ctrl+I', () => {
 		const onChange = jest.fn();
-		const { container } = render(
-			<MarkdownEditor value='Hello World' onChange={onChange} />
-		);
+		const { container } = render(<MarkdownEditor value='Hello World' onChange={onChange} />);
 
 		const textarea = screen.getByRole('textbox', {
 			name: 'Markdown editor',
@@ -152,9 +145,7 @@ describe('MarkdownEditor', () => {
 	it('handles keyboard shortcuts and clicks when textarea is missing', () => {
 		mockRenderTextarea = false;
 		const onChange = jest.fn();
-		const { container } = render(
-			<MarkdownEditor value='Fallback' onChange={onChange} />
-		);
+		const { container } = render(<MarkdownEditor value='Fallback' onChange={onChange} />);
 
 		const editorRoot = container.firstChild as HTMLElement;
 		fireEvent.keyDown(editorRoot, { key: 'Tab' });
@@ -172,9 +163,7 @@ describe('MarkdownEditor', () => {
 
 	it('handles missing editor container in querySelector', () => {
 		const onChange = jest.fn();
-		const { container } = render(
-			<MarkdownEditor value='Sample' onChange={onChange} />
-		);
+		const { container } = render(<MarkdownEditor value='Sample' onChange={onChange} />);
 		const editorRoot = container.firstChild as HTMLElement;
 		const editorBox = editorRoot.children[0] as HTMLElement;
 

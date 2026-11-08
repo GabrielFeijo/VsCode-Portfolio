@@ -8,7 +8,24 @@
 		"url": "https://www.gabrielfeijo.com.br",
 		"repoUrl": "https://github.com/GabrielFeijo/vscode-portfolio",
 		"githubUrl": "https://github.com/GabrielFeijo",
-		"linkedinUrl": "https://www.linkedin.com/in/gabriel-feijo/"
+		"linkedinUrl": "https://www.linkedin.com/in/gabriel-feijo/",
+		"jobTitle": "Desenvolvedor Full Stack",
+		"imageAlt": "Gabriel Feijó — Desenvolvedor Full Stack",
+		"twitterHandle": "@gabrielfeijo",
+		"themeColor": "#1e1e2e",
+		"address": {
+			"locality": "Recife",
+			"region": "PE",
+			"country": "BR"
+		},
+		"knowsAbout": [
+			"React",
+			"TypeScript",
+			"Node.js",
+			"NestJS",
+			"Software Engineering",
+			"Full Stack Development"
+		]
 	},
 	"pages": [
 		{

@@ -1,4 +1,4 @@
-import { Theme } from '../../../../contexts/ThemeContext';
+import type { Theme } from '../../../../contexts/ThemeContext';
 import { getTerminalColors } from './terminalConfig';
 
 function buildAnsiMap(mode: Theme): Record<string, string> {

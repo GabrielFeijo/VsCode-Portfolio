@@ -1,4 +1,21 @@
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 6px;
+}
+
 .desc {
 	padding: 0 2em;
 	color: #626fa1;
+}
+
+@media screen and (max-width: 768px) {
+	img {
+		width: 100%;
+	}
+
+	.desc {
+		padding: 0 0.5em;
+	}
 }

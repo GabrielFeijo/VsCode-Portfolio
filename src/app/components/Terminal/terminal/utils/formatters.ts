@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
-import { Language } from '@/domain/page';
-import { IRate } from '@/services/api/review/ReviewService';
+import { TERMINAL_HOST, TERMINAL_USER } from '@/config/terminalIdentity';
+import type { Language } from '@/domain/page';
+import type { IRate } from '@/services/api/review/ReviewService';
 
 export function formatUptime(sessionStart: number): string {
 	const diff = Date.now() - sessionStart;
@@ -31,24 +32,25 @@ export function buildNeofetch({ isDark, language, uptime }: NeofetchOptions): st
 	const themeLabel = isDark ? 'Dracula / Catppuccin' : 'Light';
 	const langLabel = language === 'pt' ? 'Português (BR)' : 'English (US)';
 	return [
-		'\x1b[94m       .--.       \x1b[0m  \x1b[92mgabriel\x1b[0m@\x1b[96mportfolio\x1b[0m',
+		`\x1b[94m       .--.       \x1b[0m  \x1b[92m${TERMINAL_USER}\x1b[0m@\x1b[96m${TERMINAL_HOST}\x1b[0m`,
 		'\x1b[94m      |o_o |      \x1b[0m  ─────────────────────',
 		'\x1b[94m      |:_/ |      \x1b[0m  \x1b[91mOS\x1b[0m: Portfolio Linux x86_64',
 		'\x1b[94m     //   \\ \\     \x1b[0m  \x1b[91mHost\x1b[0m: React 18 + Vite 7',
 		'\x1b[94m    (|     | )    \x1b[0m  \x1b[91mKernel\x1b[0m: TypeScript 5',
-		'\x1b[94m   /\'\\_   _/`\\   \x1b[0m  \x1b[91mShell\x1b[0m: zsh 5.9 (oh-my-zsh)',
-		'\x1b[94m   \\___)=(___/    \x1b[0m  \x1b[91mTheme\x1b[0m: ' + themeLabel,
-		'                      \x1b[91mLang\x1b[0m: ' + langLabel,
-		'                      \x1b[91mUptime\x1b[0m: ' + uptime,
+		"\x1b[94m   /'\\_   _/`\\   \x1b[0m  \x1b[91mShell\x1b[0m: zsh 5.9 (oh-my-zsh)",
+		`\x1b[94m   \\___)=(___/    \x1b[0m  \x1b[91mTheme\x1b[0m: ${themeLabel}`,
+		`                      \x1b[91mLang\x1b[0m: ${langLabel}`,
+		`                      \x1b[91mUptime\x1b[0m: ${uptime}`,
 		'                      \x1b[91mPackages\x1b[0m: 37 (npm)',
 		'                      \x1b[91mAPI\x1b[0m: NestJS + MongoDB',
 	];
 }
 
 export function buildHelp(apiCommandList: string[] = []): string[] {
-	const apiLine = apiCommandList.length > 0
-		? apiCommandList.slice(0, 8).join(', ') + '...'
-		: 'help, projects, skills, contact, calc, quote...';
+	const apiLine =
+		apiCommandList.length > 0
+			? `${apiCommandList.slice(0, 8).join(', ')}...`
+			: 'help, projects, skills, contact, calc, quote...';
 
 	return [
 		'\x1b[1;36m╭─ Portfolio Terminal ──────────────────────────────────╮\x1b[0m',
