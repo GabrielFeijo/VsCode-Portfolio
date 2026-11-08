@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { Page } from '@/domain/page';
 import { StorageService } from '@/services/storageService';
+import { getAppPalette } from '@/app/theme/palette';
 import { fonts } from '@/app/theme/typography';
 import { pageRoutes } from '@/app/pages/pages';
 import { VirtualDirectory } from './types';
@@ -37,6 +38,21 @@ function buildPageMap(): Record<string, { index: number; route: string; name: st
 }
 
 const PAGE_MAP = buildPageMap();
+
+const NANO_SHORTCUTS = [
+	{ key: '^G', label: 'Get Help' },
+	{ key: '^O', label: 'WriteOut' },
+	{ key: '^W', label: 'Where Is' },
+	{ key: '^K', label: 'Cut Text' },
+	{ key: '^J', label: 'Justify' },
+	{ key: '^C', label: 'Cur Pos' },
+	{ key: '^X', label: 'Exit' },
+	{ key: '^R', label: 'Read File' },
+	{ key: '^\\', label: 'Replace' },
+	{ key: '^U', label: 'Paste Text' },
+	{ key: '^T', label: 'To Spell' },
+	{ key: '^S', label: 'Save' },
+] as const;
 
 function resolvePageData(fileName: string, content: string): Page {
 	const storedPages = StorageService.getData();
@@ -86,7 +102,9 @@ export default function NanoEditor({
 	const [clipboard, setClipboard] = useState('');
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+	const palette = getAppPalette(isDark ? 'dark' : 'light');
 	const lineCount = content.split('\n').length;
+
 
 	useEffect(() => {
 		textareaRef.current?.focus();
@@ -226,8 +244,8 @@ export default function NanoEditor({
 				height: '100%',
 				display: 'flex',
 				flexDirection: 'column',
-				backgroundColor: isDark ? '#181824' : '#f5f5f5',
-				color: isDark ? '#e0e0e0' : '#1e1e1e',
+				backgroundColor: palette.bgSecondary,
+				color: palette.textPrimary,
 				fontFamily: fonts.mono,
 				fontSize: '0.85rem',
 				overflow: 'hidden',
@@ -237,8 +255,8 @@ export default function NanoEditor({
 				sx={{
 					px: 1.5,
 					py: 0.25,
-					backgroundColor: isDark ? '#2e3440' : '#d8dee9',
-					color: isDark ? '#eceff4' : '#2e3440',
+					backgroundColor: palette.bgElevated,
+					color: palette.textPrimary,
 					display: 'flex',
 					justifyContent: 'space-between',
 					fontWeight: 600,
@@ -255,7 +273,7 @@ export default function NanoEditor({
 					variant="caption"
 					sx={{
 						fontFamily: 'inherit',
-						color: isModified ? '#ebcb8b' : 'inherit',
+						color: isModified ? palette.accentYellow : 'inherit',
 						fontWeight: isModified ? 'bold' : 'normal',
 					}}
 				>
@@ -277,13 +295,13 @@ export default function NanoEditor({
 						px: 1,
 						userSelect: 'none',
 						textAlign: 'right',
-						color: isDark ? '#4c566a' : '#9aa0a6',
-						backgroundColor: isDark ? '#14141e' : '#eceff4',
+						color: palette.textMuted,
+						backgroundColor: palette.bgTertiary,
 						minWidth: '2.5rem',
 					}}
 				>
 					{Array.from({ length: lineCount }, (_, i) => (
-						<div key={i + 1}>{i + 1}</div>
+						<div key={`line-${i + 1}`}>{i + 1}</div>
 					))}
 				</Box>
 
@@ -319,8 +337,8 @@ export default function NanoEditor({
 				sx={{
 					px: 1.5,
 					py: 0.25,
-					backgroundColor: promptSave ? '#bf616a' : isDark ? '#242933' : '#e5e9f0',
-					color: promptSave ? '#fff' : isDark ? '#88c0d0' : '#2e3440',
+					backgroundColor: promptSave ? palette.error : palette.bgElevated,
+					color: promptSave ? palette.textInverse : palette.accentCyan,
 					fontWeight: 500,
 					fontSize: '0.8rem',
 				}}
@@ -331,27 +349,19 @@ export default function NanoEditor({
 			<Box
 				sx={{
 					p: 0.5,
-					backgroundColor: isDark ? '#1a1b26' : '#d8dee9',
+					backgroundColor: palette.bgTertiary,
 					display: 'grid',
 					gridTemplateColumns: 'repeat(6, 1fr)',
 					gap: 0.5,
 					fontSize: '0.72rem',
-					borderTop: `1px solid ${isDark ? '#2e3440' : '#c0c8d0'}`,
+					borderTop: `1px solid ${palette.border}`,
 				}}
 			>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^G</span> Get Help</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^O</span> WriteOut</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^W</span> Where Is</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^K</span> Cut Text</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^J</span> Justify</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^C</span> Cur Pos</div>
-
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^X</span> Exit</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^R</span> Read File</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^\</span> Replace</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^U</span> Paste Text</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^T</span> To Spell</div>
-				<div><span style={{ color: '#88c0d0', fontWeight: 'bold' }}>^S</span> Save</div>
+				{NANO_SHORTCUTS.map(({ key, label }) => (
+					<div key={key}>
+						<span style={{ color: palette.accentCyan, fontWeight: 'bold' }}>{key}</span> {label}
+					</div>
+				))}
 			</Box>
 		</Box>
 	);
