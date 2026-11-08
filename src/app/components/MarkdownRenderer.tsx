@@ -12,14 +12,14 @@ import {
 	TableRow,
 	Typography,
 } from '@mui/material';
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import ReactMarkdown, { type Options as ReactMarkdownOptions } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { fonts } from '../theme/typography';
 import { getStyleContent } from '@/services/styleContentService';
+import { fonts } from '../theme/typography';
 
 interface MarkdownRendererProps {
 	allowRawHtml?: boolean;
@@ -27,11 +27,12 @@ interface MarkdownRendererProps {
 }
 
 const markdownPlugins = [remarkGfm, remarkBreaks];
+const baseAttributes = defaultSchema.attributes as Record<string, string[]>;
 const rawHtmlSchema = {
 	...defaultSchema,
-	strip: [...(defaultSchema.strip ?? []), 'title'],
+	strip: [...(defaultSchema.strip as string[]), 'title'],
 	tagNames: [
-		...(defaultSchema.tagNames ?? []),
+		...(defaultSchema.tagNames as string[]),
 		'iframe',
 		'link',
 		'style',
@@ -50,7 +51,7 @@ const rawHtmlSchema = {
 	attributes: {
 		...defaultSchema.attributes,
 		'*': [
-			...(defaultSchema.attributes?.['*'] ?? []),
+			...baseAttributes['*'],
 			'className',
 			'class',
 			'id',
@@ -59,39 +60,11 @@ const rawHtmlSchema = {
 			'ariaDescribedBy',
 			'ariaLabelledBy',
 		],
-		iframe: [
-			'src',
-			'title',
-			'width',
-			'height',
-			'frameBorder',
-			'allow',
-			'allowFullScreen',
-		],
+		iframe: ['src', 'title', 'width', 'height', 'frameBorder', 'allow', 'allowFullScreen'],
 		link: ['href', 'rel', 'integrity', 'crossOrigin', 'referrerPolicy'],
-		img: [
-			'src',
-			'alt',
-			'width',
-			'height',
-			'loading',
-			'decoding',
-			'className',
-			'class',
-		],
-		section: [
-			'dataFootnotes',
-			'className',
-			'class',
-			'id',
-		],
-		ul: [
-			'ariaDescribedBy',
-			'ariaLabel',
-			'ariaLabelledBy',
-			'className',
-			'class',
-		],
+		img: ['src', 'alt', 'width', 'height', 'loading', 'decoding', 'className', 'class'],
+		section: ['dataFootnotes', 'className', 'class', 'id'],
+		ul: ['ariaDescribedBy', 'ariaLabel', 'ariaLabelledBy', 'className', 'class'],
 		span: ['className', 'class', 'id'],
 		div: ['className', 'class', 'id'],
 	},
@@ -106,10 +79,8 @@ const allowedEmbedOrigins = new Set([
 	'https://www.youtube-nocookie.com',
 ]);
 
-const deviconStylesheet =
-	'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
-const deviconIntegrity =
-	'sha384-6iv3tXABd3c9DYulXujJl8n22ahn/12f45MomxoPv6jBX4LBE4gNJjfkx5mAKIqR';
+const deviconStylesheet = 'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
+const deviconIntegrity = 'sha384-6iv3tXABd3c9DYulXujJl8n22ahn/12f45MomxoPv6jBX4LBE4gNJjfkx5mAKIqR';
 const allowedStylesheets = new Set([
 	deviconStylesheet,
 	'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0',
@@ -154,12 +125,7 @@ function MarkdownStylesheet(props: ComponentPropsWithoutRef<'link'>) {
 
 function MarkdownLink(props: ComponentPropsWithoutRef<'a'>) {
 	return (
-		<Link
-			href={props.href}
-			target='_blank'
-			rel='noopener noreferrer'
-			underline='hover'
-		>
+		<Link href={props.href} target='_blank' rel='noopener noreferrer' underline='hover'>
 			{props.children}
 		</Link>
 	);
@@ -170,12 +136,7 @@ function MarkdownImage(props: ComponentPropsWithoutRef<'img'>) {
 	const src = props.src ? props.src.replace(/^(\.\.\/)+/, '/') : props.src;
 
 	return (
-		<img
-			{...props}
-			src={src}
-			loading={isProfileImage ? 'eager' : 'lazy'}
-			decoding='async'
-		/>
+		<img alt='' {...props} src={src} loading={isProfileImage ? 'eager' : 'lazy'} decoding='async' />
 	);
 }
 
@@ -200,10 +161,7 @@ function MarkdownIframe(props: ComponentPropsWithoutRef<'iframe'>) {
 function MarkdownTable({ children }: { children: ReactNode }) {
 	return (
 		<TableContainer component={Paper}>
-			<Table
-				size='small'
-				aria-label='Data table'
-			>
+			<Table size='small' aria-label='Data table'>
 				{children}
 			</Table>
 		</TableContainer>
@@ -214,13 +172,7 @@ function MarkdownTableCell({ children }: { children: ReactNode }) {
 	return <TableCell>{children}</TableCell>;
 }
 
-function MarkdownCode({
-	children,
-	className,
-}: {
-	children: ReactNode;
-	className?: string;
-}) {
+function MarkdownCode({ children, className }: { children: ReactNode; className?: string }) {
 	const language = className?.split('-')[1] || 'md';
 
 	return (
@@ -236,20 +188,12 @@ function MarkdownCode({
 				fontSize: 14,
 			}}
 		>
-			<code className={`language-${language}`}>
-				{String(children).replace(/\n$/, '')}
-			</code>
+			<code className={`language-${language}`}>{String(children).replace(/\n$/, '')}</code>
 		</Box>
 	);
 }
 
-function MarkdownHeading({
-	children,
-	level,
-}: {
-	children: ReactNode;
-	level: 1 | 2;
-}) {
+function MarkdownHeading({ children, level }: { children: ReactNode; level: 1 | 2 }) {
 	return (
 		<>
 			<Typography
@@ -271,17 +215,12 @@ function MarkdownHeading({
 	);
 }
 
-export default function MarkdownRenderer({
-	allowRawHtml = false,
-	content,
-}: MarkdownRendererProps) {
+export default function MarkdownRenderer({ allowRawHtml = false, content }: MarkdownRendererProps) {
 	return (
 		<ReactMarkdown
 			components={{
 				code: ({ children, className }) => (
-					<MarkdownCode className={className}>
-						{children}
-					</MarkdownCode>
+					<MarkdownCode className={className}>{children}</MarkdownCode>
 				),
 				a: MarkdownLink,
 				img: MarkdownImage,
@@ -294,12 +233,8 @@ export default function MarkdownRenderer({
 				tr: TableRow,
 				td: MarkdownTableCell,
 				tfoot: TableFooter,
-				h1: ({ children }) => (
-					<MarkdownHeading level={1}>{children}</MarkdownHeading>
-				),
-				h2: ({ children }) => (
-					<MarkdownHeading level={2}>{children}</MarkdownHeading>
-				),
+				h1: ({ children }) => <MarkdownHeading level={1}>{children}</MarkdownHeading>,
+				h2: ({ children }) => <MarkdownHeading level={2}>{children}</MarkdownHeading>,
 			}}
 			remarkPlugins={markdownPlugins}
 			rehypePlugins={allowRawHtml ? rawHtmlPlugins : []}

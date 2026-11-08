@@ -1,9 +1,9 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { VscGithub, VscTrash } from 'react-icons/vsc';
-import { motion, AnimatePresence } from 'framer-motion';
-import styles from './ContextMenu.module.css';
-import { MdOpenInNew } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
+import { MdOpenInNew } from 'react-icons/md';
+import { VscGithub, VscTrash } from 'react-icons/vsc';
+import styles from './ContextMenu.module.css';
 
 interface ContextMenuPosition {
 	mouseX: number;
@@ -67,12 +67,13 @@ export default function ContextMenu({
 					exit={{ scale: 0.95, opacity: 0 }}
 					transition={{ duration: 0.1 }}
 				>
-					<div className={styles.menuItems} role="menu">
+					<div className={styles.menuItems} role='menu'>
 						<button
+							type='button'
 							className={styles.menuItem}
 							onClick={handleOpenFile}
 							aria-label={t('contextMenu.open') || 'Open file'}
-							role="menuitem"
+							role='menuitem'
 						>
 							<div className={styles.iconContainer}>
 								<MdOpenInNew className={styles.icon} />
@@ -80,10 +81,11 @@ export default function ContextMenu({
 							<span className={styles.menuText}>{t('contextMenu.open')}</span>
 						</button>
 						<button
+							type='button'
 							className={styles.menuItem}
 							onClick={handleDelete}
 							aria-label={t('contextMenu.delete') || 'Delete file'}
-							role="menuitem"
+							role='menuitem'
 						>
 							<div className={styles.iconContainer}>
 								<VscTrash className={styles.icon} />
@@ -91,17 +93,16 @@ export default function ContextMenu({
 							<span className={styles.menuText}>{t('contextMenu.delete')}</span>
 						</button>
 						<button
+							type='button'
 							className={styles.menuItem}
 							onClick={handleOpenFileOnGithub}
 							aria-label={t('contextMenu.openOnGithub') || 'Open file on GitHub'}
-							role="menuitem"
+							role='menuitem'
 						>
 							<div className={styles.iconContainer}>
 								<VscGithub className={styles.icon} />
 							</div>
-							<span className={styles.menuText}>
-								{t('contextMenu.openOnGithub')}
-							</span>
+							<span className={styles.menuText}>{t('contextMenu.openOnGithub')}</span>
 						</button>
 					</div>
 				</motion.div>

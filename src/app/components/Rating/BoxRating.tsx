@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Star, StarBorder } from '@mui/icons-material';
+import { Rating } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getReviewSchema } from './schemas/BoxRatingSchema';
-import styles from './BoxRating.module.css';
-import { ApiError } from '@/services/api/review/ReviewService';
 import { useCreateReviewMutation } from '@/hooks/queries/useReviewsQuery';
+import type { ApiError } from '@/services/api/review/ReviewService';
 import { fadeInOut } from '@/utils/motionVariants';
-import { Rating } from '@mui/material';
-import { Star, StarBorder } from '@mui/icons-material';
+import styles from './BoxRating.module.css';
+import { getReviewSchema } from './schemas/BoxRatingSchema';
 
 interface Props {
 	ranking: boolean;
@@ -111,7 +111,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		() => () => {
 			if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
 		},
-		[]
+		[],
 	);
 
 	return (
@@ -138,8 +138,11 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 					>
 						<div className={styles.modalHeader}>
 							<div></div>
-							<h3 id='rating-title' className={styles.title}>{t('rating.evaluate')}</h3>
+							<h3 id='rating-title' className={styles.title}>
+								{t('rating.evaluate')}
+							</h3>
 							<button
+								type='button'
 								className={styles.closeButton}
 								onClick={() => setRanking(false)}
 								aria-label={t('rating.close') || 'Close rating modal'}
@@ -151,10 +154,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 						<div className={styles.modalContent}>
 							<form onSubmit={handleSubmit(onSubmit)}>
 								<div className={styles.formField}>
-									<label
-										htmlFor='username'
-										className={styles.label}
-									>
+									<label htmlFor='username' className={styles.label}>
 										{t('rating.name')}
 									</label>
 									<input
@@ -165,14 +165,13 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 										autoComplete='off'
 										placeholder={t('rating.namePlaceholder')}
 									/>
-									{errors.username && <span className={styles.errorSpan}>{errors.username.message}</span>}
+									{errors.username && (
+										<span className={styles.errorSpan}>{errors.username.message}</span>
+									)}
 								</div>
 
 								<div className={styles.formField}>
-									<label
-										htmlFor='comment'
-										className={styles.label}
-									>
+									<label htmlFor='comment' className={styles.label}>
 										{t('rating.comment')}
 									</label>
 									<textarea
@@ -183,7 +182,9 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 										autoComplete='off'
 										placeholder={t('rating.commentPlaceholder')}
 									/>
-									{errors.comment && <span className={styles.errorSpan}>{errors.comment.message}</span>}
+									{errors.comment && (
+										<span className={styles.errorSpan}>{errors.comment.message}</span>
+									)}
 								</div>
 
 								<div className={styles.ratingContainer}>
@@ -219,8 +220,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 										)}
 									/>
 									<div className={styles.ratingText}>
-										{stars > 0 &&
-											t(`terminal.rating.${String(stars).replace('.', '_')}`)}
+										{stars > 0 && t(`terminal.rating.${String(stars).replace('.', '_')}`)}
 									</div>
 									{errors.stars && <span className={styles.errorSpan}>{errors.stars.message}</span>}
 								</div>

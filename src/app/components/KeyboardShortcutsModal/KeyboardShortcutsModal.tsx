@@ -1,12 +1,12 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose, VscRecordKeys } from 'react-icons/vsc';
-import styles from './KeyboardShortcutsModal.module.css';
-import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInOut } from '../../../utils/motionVariants';
-import { isMobile } from 'react-device-detect';
-import { KEYBOARD_SHORTCUTS } from './keyboardShortcuts.config';
 import Kbd from '../ui/Kbd';
+import styles from './KeyboardShortcutsModal.module.css';
+import { KEYBOARD_SHORTCUTS } from './keyboardShortcuts.config';
 
 interface Props {
 	visible: boolean;
@@ -61,6 +61,7 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 								<h2 className={styles.title}>{t('shortcuts.title')}</h2>
 							</div>
 							<button
+								type='button'
 								className={styles.closeButton}
 								onClick={() => setShow(false)}
 								aria-label={t('shortcuts.close') || 'Close keyboard shortcuts modal'}
@@ -79,15 +80,10 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 									transition={{ delay: index * 0.05 }}
 								>
 									<div className={styles.shortcutInfo}>
-										<div
-											className={styles.iconContainer}
-											data-accent={shortcut.accent}
-										>
+										<div className={styles.iconContainer} data-accent={shortcut.accent}>
 											<shortcut.Icon className={styles.icon} />
 										</div>
-										<span className={styles.shortcutLabel}>
-											{t(shortcut.labelKey)}
-										</span>
+										<span className={styles.shortcutLabel}>{t(shortcut.labelKey)}</span>
 									</div>
 									<Kbd keys={shortcut.keys} />
 								</motion.div>

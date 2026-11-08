@@ -6,12 +6,12 @@ interface Props {
 
 export default function Kbd({ keys }: Props) {
 	return (
-		<div className={styles.kbdGroup} role="group" aria-label={keys.join(' + ')}>
-			{keys.map((key, index) => (
-				<span key={`${key}-${index}`} className={styles.kbd}>
+		<fieldset className={styles.kbdGroup} aria-label={keys.join(' + ')}>
+			{keys.map((key) => (
+				<span key={key} className={styles.kbd}>
 					{key}
 				</span>
 			))}
-		</div>
+		</fieldset>
 	);
 }
