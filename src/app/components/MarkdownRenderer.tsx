@@ -29,9 +29,9 @@ interface MarkdownRendererProps {
 const markdownPlugins = [remarkGfm, remarkBreaks];
 const rawHtmlSchema = {
 	...defaultSchema,
-	strip: [...defaultSchema.strip!, 'title'],
+	strip: [...(defaultSchema.strip ?? []), 'title'],
 	tagNames: [
-		...defaultSchema.tagNames!,
+		...(defaultSchema.tagNames ?? []),
 		'iframe',
 		'link',
 		'style',
@@ -50,7 +50,7 @@ const rawHtmlSchema = {
 	attributes: {
 		...defaultSchema.attributes,
 		'*': [
-			...defaultSchema.attributes!['*']!,
+			...(defaultSchema.attributes?.['*'] ?? []),
 			'className',
 			'class',
 			'id',

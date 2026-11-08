@@ -64,6 +64,7 @@ function getStoredPageContent(page?: Page): string | null {
 export default function MDContainer({ path, page, setPages }: Props) {
 	const [content, setContent] = useState('');
 	const editMode = hasEditableContent(page);
+	const pageIndex = page?.index;
 
 	useEffect(() => {
 		if (editMode) {
@@ -120,13 +121,13 @@ export default function MDContainer({ path, page, setPages }: Props) {
 			setContent(newContent);
 			setPages((currentPages) =>
 				currentPages.map((currentPage) =>
-					currentPage.index === page!.index
+					currentPage.index === pageIndex
 						? { ...currentPage, content: newContent, isSaved: false }
 						: currentPage
 				)
 			);
 		},
-		[page, setPages]
+		[pageIndex, setPages]
 	);
 
 	const handleSave = useCallback(() => {
