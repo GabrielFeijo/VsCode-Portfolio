@@ -6,7 +6,10 @@ import type {
 	CommandExecutionContext,
 	ICommandDefinition,
 } from '@/app/components/Terminal/terminal/commands/command.types';
-import { getTerminalColors } from '@/app/components/Terminal/terminal/terminalConfig';
+import {
+	getTerminalColors,
+	LOCAL_COMMANDS,
+} from '@/app/components/Terminal/terminal/terminalConfig';
 
 jest.mock('@/services/api/review/ReviewService', () => ({
 	ReviewService: {
@@ -93,5 +96,9 @@ describe('CommandRegistry', () => {
 		expect(commandRegistry.has('cat')).toBe(true);
 		expect(commandRegistry.has('clear')).toBe(true);
 		expect(commandRegistry.has('matrix')).toBe(true);
+	});
+
+	it('keeps LOCAL_COMMANDS in sync with commandRegistry.getAllNames()', () => {
+		expect([...LOCAL_COMMANDS].sort()).toEqual([...commandRegistry.getAllNames()].sort());
 	});
 });
