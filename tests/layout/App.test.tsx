@@ -2,7 +2,8 @@ import { act, fireEvent, render as rtlRender, screen, waitFor } from '@testing-l
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import App, { initVisiblePageIndexes, loadPages } from '../../src/app/layout/App';
+import App from '../../src/app/layout/App';
+import { initVisiblePageIndexes, loadPages } from '../../src/contexts/EditorContext';
 
 const createWrapper = () => {
 	const queryClient = new QueryClient({
@@ -210,6 +211,11 @@ const mockStorageService = require('src/services/storageService').StorageService
 
 describe('App', () => {
 	beforeEach(() => {
+		window.localStorage.clear();
+		Object.defineProperty(window.navigator, 'language', {
+			value: 'pt-BR',
+			configurable: true,
+		});
 		mockCalled = false;
 		mockUseHomeQuery.mockReturnValue({ isLoading: false });
 		mockPathname = '/';
@@ -250,6 +256,31 @@ describe('App', () => {
 		expect(screen.queryByTestId('terminal')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('box-rating')).not.toBeInTheDocument();
 		expect(screen.getByTestId('keyboard-shortcuts')).toHaveAttribute('data-visible', 'false');
+	});
+
+	it('hides the splash screen after 1000ms even if useHomeQuery stays loading', () => {
+		jest.useFakeTimers();
+		mockUseHomeQuery.mockReturnValue({ isLoading: true });
+		render(<App />);
+		expect(screen.getByRole('status')).toBeInTheDocument();
+
+		act(() => {
+			jest.advanceTimersByTime(1000);
+		});
+
+		expect(screen.queryByRole('status')).not.toBeInTheDocument();
+		expect(screen.getByTestId('keyboard-shortcuts')).toHaveAttribute('data-visible', 'true');
+		jest.useRealTimers();
+	});
+
+	it('auto-redirects to /en on first visit when browser language is English', () => {
+		Object.defineProperty(window.navigator, 'language', {
+			value: 'en-US',
+			configurable: true,
+		});
+		render(<App />);
+		expect(mockI18n.changeLanguage).toHaveBeenCalledWith('en');
+		expect(navigateMock).toHaveBeenCalledWith('/en', { replace: true });
 	});
 
 	it('hides the loading screen and enables overlays once loading finishes', () => {
@@ -394,6 +425,7 @@ describe('App', () => {
 		const originalIsMobile = require('react-device-detect').isMobile;
 		require('react-device-detect').isMobile = true;
 		render(<App />);
+		fireEvent.click(screen.getByTestId('sidebar'));
 		const overlay = screen.getByTestId('sidebar-overlay');
 		fireEvent.click(overlay);
 		const sidebar = screen.getByTestId('sidebar');

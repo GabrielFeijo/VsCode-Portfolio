@@ -156,4 +156,20 @@ describe('KeyboardShortcutsModal', () => {
 		expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument();
 		expect(jest.getTimerCount()).toBe(0);
 	});
+
+	it('opens immediately on requestOpenShortcuts and closes on Escape', async () => {
+		const { requestOpenShortcuts } = require('../../src/utils/appEvents');
+		render(<KeyboardShortcutsModal visible={true} />);
+
+		act(() => {
+			requestOpenShortcuts();
+		});
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+
+		fireEvent.keyDown(window, { key: 'Enter' });
+		expect(screen.getByText('shortcuts.title')).toBeInTheDocument();
+
+		fireEvent.keyDown(window, { key: 'Escape' });
+		await waitFor(() => expect(screen.queryByText('shortcuts.title')).not.toBeInTheDocument());
+	});
 });

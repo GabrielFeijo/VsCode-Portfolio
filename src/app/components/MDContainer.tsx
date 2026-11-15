@@ -62,8 +62,8 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	const pageIndex = page?.index;
 
 	useEffect(() => {
-		if (editMode) {
-			setContent(page?.content || '');
+		if (hasEditableContent(page)) {
+			setContent(page.content || '');
 			return;
 		}
 
@@ -109,7 +109,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 			activeController?.abort();
 			stopListening();
 		};
-	}, [editMode, page, path]);
+	}, [page, path]);
 
 	const handleChange = useCallback(
 		(newContent: string) => {
@@ -125,35 +125,31 @@ export default function MDContainer({ path, page, setPages }: Props) {
 		[pageIndex, setPages],
 	);
 
-	const handleSave = useCallback(() => {
-		if (!page) return;
-
-		const updatedPage = {
-			...page,
-			content,
-			isSaved: true,
-		};
-
-		StorageService.saveOrUpdateData(updatedPage);
-
-		setPages((currentPages) =>
-			currentPages.map((currentPage) =>
-				currentPage.index === page.index ? updatedPage : currentPage,
-			),
-		);
-	}, [content, page, setPages]);
-
 	useEffect(() => {
+		if (!hasEditableContent(page)) return;
+
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.ctrlKey && event.key === 's') {
+			if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
 				event.preventDefault();
-				handleSave();
+				const updatedPage = {
+					...page,
+					content,
+					isSaved: true,
+				};
+
+				StorageService.saveOrUpdateData(updatedPage);
+
+				setPages((currentPages) =>
+					currentPages.map((currentPage) =>
+						currentPage.index === page.index ? updatedPage : currentPage,
+					),
+				);
 			}
 		};
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [handleSave]);
+	}, [content, page, setPages]);
 
 	return (
 		<Container

@@ -80,12 +80,12 @@ describe('BoxRating component', () => {
 		expect(usernameInput).toHaveValue('Test User');
 	});
 
-	it('updates comment textarea', async () => {
+	it('updates comment textarea', () => {
 		const setRanking = jest.fn();
 		render(<BoxRating ranking={true} setRanking={setRanking} />);
 
 		const commentTextarea = screen.getByLabelText('rating.comment');
-		await userEvent.type(commentTextarea, 'Great portfolio!');
+		fireEvent.change(commentTextarea, { target: { value: 'Great portfolio!' } });
 
 		expect(commentTextarea).toHaveValue('Great portfolio!');
 	});
@@ -138,9 +138,12 @@ describe('BoxRating component', () => {
 		const submit = screen.getByRole('button', { name: /rating.submit/i });
 
 		fireEvent.click(submit);
+		await waitFor(() => {
+			expect(usernameInput).toHaveClass('error');
+		});
 
-		await userEvent.type(usernameInput, 'Test');
-		await userEvent.type(commentTextarea, 'Comment here long enough');
+		fireEvent.change(usernameInput, { target: { value: 'Test' } });
+		fireEvent.change(commentTextarea, { target: { value: 'Comment here long enough' } });
 
 		await waitFor(() => {
 			expect(usernameInput).not.toHaveClass('error');
@@ -148,18 +151,15 @@ describe('BoxRating component', () => {
 		});
 	});
 
-	it('removes error class when inputs are filled', async () => {
+	it('removes error class when inputs are filled', () => {
 		const setRanking = jest.fn();
 		render(<BoxRating ranking={true} setRanking={setRanking} />);
 
 		const usernameInput = screen.getByLabelText('rating.name');
 		const commentTextarea = screen.getByLabelText('rating.comment');
 
-		await userEvent.type(usernameInput, 'Test');
-		await userEvent.type(commentTextarea, 'Comment here long enough');
-
-		await userEvent.type(usernameInput, 'Test');
-		await userEvent.type(commentTextarea, 'Comment here long enough');
+		fireEvent.change(usernameInput, { target: { value: 'Test' } });
+		fireEvent.change(commentTextarea, { target: { value: 'Comment here long enough' } });
 
 		expect(usernameInput).not.toHaveClass('error');
 		expect(commentTextarea).not.toHaveClass('error');
@@ -420,15 +420,15 @@ describe('BoxRating component', () => {
 		});
 	});
 
-	it('resets form when modal is closed', async () => {
+	it('resets form when modal is closed', () => {
 		const setRanking = jest.fn();
 		const { rerender } = render(<BoxRating ranking={true} setRanking={setRanking} />);
 
 		const usernameInput = screen.getByLabelText('rating.name');
 		const commentTextarea = screen.getByLabelText('rating.comment');
 
-		await userEvent.type(usernameInput, 'Test User');
-		await userEvent.type(commentTextarea, 'Great portfolio!');
+		fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+		fireEvent.change(commentTextarea, { target: { value: 'Great portfolio!' } });
 
 		const stars = screen.getAllByRole('radio');
 		if (stars.length > 0) {
@@ -516,8 +516,8 @@ describe('BoxRating component', () => {
 		const commentTextarea = screen.getByLabelText('rating.comment');
 		const submit = screen.getByRole('button', { name: /rating.submit/i });
 
-		await userEvent.type(usernameInput, 'Test User');
-		await userEvent.type(commentTextarea, 'Great portfolio!');
+		fireEvent.change(usernameInput, { target: { value: 'Test User' } });
+		fireEvent.change(commentTextarea, { target: { value: 'Great portfolio!' } });
 
 		const stars = screen.getAllByRole('radio');
 		if (stars.length > 0) {

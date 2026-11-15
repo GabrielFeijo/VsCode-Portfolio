@@ -1,4 +1,5 @@
 const OPEN_TAB_EVENT = 'open-tab';
+const OPEN_SHORTCUTS_EVENT = 'open-shortcuts';
 const STORAGE_EVENT = 'storage';
 
 interface OpenTabDetail {
@@ -16,6 +17,15 @@ export function onOpenTabRequest(listener: (target: string) => void): () => void
 	};
 	window.addEventListener(OPEN_TAB_EVENT, handler);
 	return () => window.removeEventListener(OPEN_TAB_EVENT, handler);
+}
+
+export function requestOpenShortcuts(): void {
+	window.dispatchEvent(new Event(OPEN_SHORTCUTS_EVENT));
+}
+
+export function onOpenShortcutsRequest(listener: () => void): () => void {
+	window.addEventListener(OPEN_SHORTCUTS_EVENT, listener);
+	return () => window.removeEventListener(OPEN_SHORTCUTS_EVENT, listener);
 }
 
 export function notifyStorageChange(): void {

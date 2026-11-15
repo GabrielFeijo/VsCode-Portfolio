@@ -13,7 +13,7 @@ export function useReviewsQuery() {
 		queryFn: async (): Promise<IRate[]> => {
 			const res = await ReviewService.findAll();
 			if (res instanceof Error) {
-				return [];
+				throw res;
 			}
 			return res;
 		},

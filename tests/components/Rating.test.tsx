@@ -26,9 +26,14 @@ jest.mock('@mui/material', () => ({
 	),
 }));
 
-jest.mock('@mui/icons-material', () => ({
-	Star: () => <div data-testid='star' />,
-	StarBorder: () => <div data-testid='star-border' />,
+jest.mock('@mui/icons-material/Star', () => ({
+	__esModule: true,
+	default: () => <div data-testid='star' />,
+}));
+
+jest.mock('@mui/icons-material/StarBorder', () => ({
+	__esModule: true,
+	default: () => <div data-testid='star-border' />,
 }));
 
 jest.mock('../../src/contexts/ThemeContext', () => ({
@@ -344,5 +349,43 @@ describe('BoxRating', () => {
 		const rateNullButton = screen.getByText('Rate null');
 		fireEvent.click(rateNullButton);
 		expect(screen.queryByText(/terminal\.rating/)).not.toBeInTheDocument();
+	});
+
+	it('closes modal when Escape is pressed and ignores other keys', () => {
+		const setRanking = jest.fn();
+		render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+		fireEvent.keyDown(window, { key: 'Enter' });
+		expect(setRanking).not.toHaveBeenCalled();
+
+		fireEvent.keyDown(window, { key: 'Escape' });
+		expect(setRanking).toHaveBeenCalledWith(false);
+	});
+
+	it('focuses the username input on open, traps Tab focus, and restores focus on close', () => {
+		const trigger = document.createElement('button');
+		document.body.appendChild(trigger);
+		trigger.focus();
+
+		const setRanking = jest.fn();
+		const { rerender } = render(<BoxRating ranking={true} setRanking={setRanking} />);
+
+		const usernameInput = screen.getByLabelText('rating.name');
+		const closeButton = screen.getByRole('button', { name: /rating\.close/ });
+		const submitButton = screen.getByRole('button', { name: /rating\.submit/ });
+
+		expect(document.activeElement).toBe(usernameInput);
+
+		submitButton.focus();
+		fireEvent.keyDown(window, { key: 'Tab' });
+		expect(document.activeElement).toBe(closeButton);
+
+		closeButton.focus();
+		fireEvent.keyDown(window, { key: 'Tab', shiftKey: true });
+		expect(document.activeElement).toBe(submitButton);
+
+		rerender(<BoxRating ranking={false} setRanking={setRanking} />);
+		expect(document.activeElement).toBe(trigger);
+		document.body.removeChild(trigger);
 	});
 });

@@ -40,15 +40,15 @@ describe('useReviewsQuery', () => {
 		expect(result.current.data).toHaveLength(1);
 	});
 
-	it('handles Error response from ReviewService.findAll', async () => {
+	it('surfaces Error response from ReviewService.findAll as a query error', async () => {
 		(ReviewService.findAll as jest.Mock).mockResolvedValue(new Error('Failed to fetch'));
 
 		const { result } = renderHook(() => useReviewsQuery(), {
 			wrapper: createWrapper(),
 		});
 
-		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual([]);
+		await waitFor(() => expect(result.current.isError).toBe(true));
+		expect(result.current.data).toBeUndefined();
 	});
 
 	it('creates review with mutation and invalidates cache', async () => {

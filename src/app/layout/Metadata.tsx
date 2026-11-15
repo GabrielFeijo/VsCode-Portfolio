@@ -31,7 +31,7 @@ export default function MetadataComponent() {
 				name: siteConfig.author,
 				url: siteConfig.url,
 				image: siteImage,
-				jobTitle: siteConfig.jobTitle,
+				jobTitle: siteConfig.jobTitle[language],
 				address: {
 					'@type': 'PostalAddress',
 					addressLocality: siteConfig.address.locality,
@@ -85,7 +85,7 @@ export default function MetadataComponent() {
 			<meta property='og:image:type' content='image/png' />
 			<meta property='og:image:width' content='1200' />
 			<meta property='og:image:height' content='630' />
-			<meta property='og:image:alt' content={siteConfig.imageAlt} />
+			<meta property='og:image:alt' content={siteConfig.imageAlt[language]} />
 			<meta property='og:locale' content={locale} />
 			<meta property='og:locale:alternate' content={alternateLocale} />
 			<meta property='og:site_name' content={siteConfig.name} />
@@ -95,7 +95,7 @@ export default function MetadataComponent() {
 			<meta name='twitter:title' content={metadata.title} />
 			<meta name='twitter:description' content={metadata.description} />
 			<meta name='twitter:image' content={siteImage} />
-			<meta name='twitter:image:alt' content={siteConfig.imageAlt} />
+			<meta name='twitter:image:alt' content={siteConfig.imageAlt[language]} />
 			<meta name='twitter:creator' content={siteConfig.twitterHandle} />
 
 			<script type='application/ld+json'>{JSON.stringify(structuredData)}</script>

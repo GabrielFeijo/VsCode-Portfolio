@@ -154,6 +154,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
 	const closeTabsToRight = useCallback((index: number) => {
 		setVisiblePageIndexes((prev) => {
 			const pos = prev.indexOf(index);
+			if (pos === -1) return prev;
 			return prev.slice(0, pos + 1);
 		});
 	}, []);
@@ -161,6 +162,7 @@ export function EditorProvider({ children, language }: EditorProviderProps) {
 	const closeTabsToLeft = useCallback((index: number) => {
 		setVisiblePageIndexes((prev) => {
 			const pos = prev.indexOf(index);
+			if (pos === -1) return prev;
 			return prev.slice(pos);
 		});
 	}, []);

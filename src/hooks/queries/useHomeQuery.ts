@@ -9,7 +9,7 @@ export function useHomeQuery() {
 		queryFn: async () => {
 			const res = await HomeService.getResponse();
 			if (res instanceof Error) {
-				return null;
+				throw res;
 			}
 			return res;
 		},

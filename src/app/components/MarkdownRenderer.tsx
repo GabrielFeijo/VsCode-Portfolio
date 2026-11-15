@@ -180,8 +180,29 @@ function MarkdownTableCell({ children }: { children: ReactNode }) {
 	return <TableCell>{children}</TableCell>;
 }
 
+const languagePattern = /language-([\w-]+)/;
+
+function MarkdownInlineCode({ children }: { children: ReactNode }) {
+	return (
+		<Box
+			component='code'
+			sx={{
+				px: 0.6,
+				py: 0.15,
+				borderRadius: 0.5,
+				backgroundColor: 'var(--bg-tertiary)',
+				color: 'var(--text-primary)',
+				fontFamily: fonts.mono,
+				fontSize: '0.9em',
+			}}
+		>
+			{children}
+		</Box>
+	);
+}
+
 function MarkdownCode({ children, className }: { children: ReactNode; className?: string }) {
-	const language = className?.split('-')[1] || 'md';
+	const language = className?.match(languagePattern)?.[1] || 'md';
 
 	return (
 		<Box
@@ -228,9 +249,13 @@ export default function MarkdownRenderer({ allowRawHtml = false, content }: Mark
 	return (
 		<ReactMarkdown
 			components={{
-				code: ({ children, className }) => (
-					<MarkdownCode className={className}>{children}</MarkdownCode>
-				),
+				pre: ({ children }) => <>{children}</>,
+				code: ({ inline, children, className }) =>
+					inline ? (
+						<MarkdownInlineCode>{children}</MarkdownInlineCode>
+					) : (
+						<MarkdownCode className={className}>{children}</MarkdownCode>
+					),
 				a: MarkdownLink,
 				img: MarkdownImage,
 				iframe: MarkdownIframe,

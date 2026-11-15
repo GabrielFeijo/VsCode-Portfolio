@@ -9,7 +9,7 @@ export function useCommandsQuery() {
 		queryFn: async () => {
 			const res = await CommandService.findAll();
 			if (res instanceof Error) {
-				return [];
+				throw res;
 			}
 			return res;
 		},

@@ -1,15 +1,16 @@
-import { type ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
+import type { z } from 'zod';
+import { type ApiError, toApiError } from '../apiError';
 import apiFetch from '../axios-config';
+import { homeSchema, parseApiData } from '../schemas';
 
 export const HOME_REQUEST_TIMEOUT_MS = 10_000;
 
-const getResponse = async (): Promise<unknown | ApiError> => {
+export type HomeData = z.output<typeof homeSchema>;
+
+const getResponse = async (): Promise<HomeData | ApiError> => {
 	try {
 		const { data } = await apiFetch.get(`/`, { timeout: HOME_REQUEST_TIMEOUT_MS });
-
-		if (data) return data;
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return parseApiData(homeSchema, data);
 	} catch (error) {
 		return toApiError(error);
 	}

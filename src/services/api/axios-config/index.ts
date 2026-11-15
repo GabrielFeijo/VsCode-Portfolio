@@ -1,5 +1,7 @@
+import { parseEnv } from '@/config/env';
 import { createApiClient } from './createApiClient';
 
-const apiFetch = createApiClient(import.meta.env.VITE_URL);
+const { apiUrl } = parseEnv(import.meta.env);
+const apiFetch = createApiClient(apiUrl);
 
 export default apiFetch;

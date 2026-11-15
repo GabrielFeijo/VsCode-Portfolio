@@ -76,7 +76,9 @@ for (const page of seoConfig.pages) {
 		expectLink(html, 'alternate', 'hreflang', 'x-default', portugueseUrl);
 		expectMeta(html, 'name', 'description', metadata.description);
 		expectMeta(html, 'property', 'og:url', canonicalUrl);
+		expectMeta(html, 'property', 'og:image:alt', seoConfig.site.imageAlt[language]);
 		expectMeta(html, 'name', 'twitter:url', canonicalUrl);
+		expectMeta(html, 'name', 'twitter:image:alt', seoConfig.site.imageAlt[language]);
 
 		const structuredDataMatch = html.match(
 			/<script\s+id=["']structured-data["'][^>]*>([\s\S]*?)<\/script>/i,
@@ -86,8 +88,11 @@ for (const page of seoConfig.pages) {
 			`Missing structured data for ${getLocalizedPath(page.path, language)}`,
 		);
 		const structuredData = JSON.parse(structuredDataMatch[1]);
-		const webPage = structuredData['@graph'][2];
+		const [person, , webPage] = structuredData['@graph'];
 		assert.equal(structuredData['@context'], 'https://schema.org');
+		assert.equal(person.jobTitle, seoConfig.site.jobTitle[language]);
+		assert.equal(person.address.addressLocality, seoConfig.site.address.locality);
+		assert.deepEqual(person.knowsAbout, seoConfig.site.knowsAbout);
 		assert.equal(webPage.url, canonicalUrl);
 		assert.equal(webPage.name, metadata.title);
 		assert.equal(webPage.description, metadata.description);
@@ -122,4 +127,6 @@ assert.match(robots, /Sitemap: https:\/\/www\.gabrielfeijo\.com\.br\/sitemap\.xm
 
 const manifest = JSON.parse(await readFile(join(buildDirectory, 'site.webmanifest'), 'utf8'));
 assert.equal(manifest.start_url, '/');
+assert.equal(manifest.theme_color, seoConfig.site.themeColor);
+assert.equal(manifest.background_color, seoConfig.site.themeColor);
 assert.equal(manifest.icons.length, 2);

@@ -47,15 +47,24 @@ function createStructuredData(page, language, canonicalUrl) {
 				name: seoConfig.site.author,
 				url: seoConfig.site.url,
 				image: `${seoConfig.site.url}${seoConfig.site.image}`,
-				jobTitle: language === 'pt' ? 'Desenvolvedor Full Stack' : 'Full Stack Developer',
-				sameAs: ['https://github.com/GabrielFeijo', 'https://www.linkedin.com/in/gabriel-feijo/'],
+				jobTitle: seoConfig.site.jobTitle[language],
+				address: {
+					'@type': 'PostalAddress',
+					addressLocality: seoConfig.site.address.locality,
+					addressRegion: seoConfig.site.address.region,
+					addressCountry: seoConfig.site.address.country,
+				},
+				sameAs: [seoConfig.site.githubUrl, seoConfig.site.linkedinUrl],
+				knowsAbout: seoConfig.site.knowsAbout,
 			},
 			{
 				'@type': 'WebSite',
 				'@id': `${seoConfig.site.url}/#website`,
 				url: seoConfig.site.url,
 				name: seoConfig.site.name,
+				description: seoConfig.site.description,
 				inLanguage: ['pt-BR', 'en'],
+				author: { '@id': `${seoConfig.site.url}/#person` },
 			},
 			{
 				'@type': page.path === '/about-me' ? 'ProfilePage' : 'WebPage',
@@ -98,11 +107,13 @@ function createPageHtml(page, language) {
 	html = replaceMeta(html, 'property', 'og:url', canonicalUrl);
 	html = replaceMeta(html, 'property', 'og:title', page[language].title);
 	html = replaceMeta(html, 'property', 'og:description', page[language].description);
+	html = replaceMeta(html, 'property', 'og:image:alt', seoConfig.site.imageAlt[language]);
 	html = replaceMeta(html, 'property', 'og:locale', locale);
 	html = replaceMeta(html, 'property', 'og:locale:alternate', alternateLocale);
 	html = replaceMeta(html, 'name', 'twitter:url', canonicalUrl);
 	html = replaceMeta(html, 'name', 'twitter:title', page[language].title);
 	html = replaceMeta(html, 'name', 'twitter:description', page[language].description);
+	html = replaceMeta(html, 'name', 'twitter:image:alt', seoConfig.site.imageAlt[language]);
 
 	const structuredData = JSON.stringify(createStructuredData(page, language, canonicalUrl));
 	return html.replace(

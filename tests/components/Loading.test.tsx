@@ -2,9 +2,10 @@ import { render, screen } from '@testing-library/react';
 import Loading from '../../src/app/components/Loading/Loading';
 
 describe('Loading', () => {
-	it('renders loading screen with logo', () => {
+	it('renders loading screen with logo and status role', () => {
 		render(<Loading />);
-		const img = screen.getByAltText('Logo vscode');
+		expect(screen.getByRole('status', { name: 'Loading workspace' })).toBeInTheDocument();
+		const img = screen.getByAltText('Visual Studio Code logo');
 		expect(img).toBeInTheDocument();
 		expect(img).toHaveAttribute('src', 'test-file-stub');
 		expect(img).toHaveStyle({ height: '20%' });

@@ -131,7 +131,6 @@ export default function TabContextMenu({
 								key={item.id}
 								className={`${styles.menuItem} ${!item.enabled ? styles.disabled : ''}`}
 								onClick={() => {
-									if (!item.enabled) return;
 									item.onClick();
 									handleClose();
 								}}

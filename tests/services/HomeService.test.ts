@@ -11,7 +11,7 @@ jest.mock('../../src/services/api/axios-config', () => ({
 describe('HomeService', () => {
 	afterEach(() => jest.resetAllMocks());
 
-	it('returns data when apiFetch.get resolves', async () => {
+	it('returns data when apiFetch.get resolves with a JSON object', async () => {
 		const resp = { data: { hello: 'world' } };
 		(apiFetch.get as jest.Mock).mockResolvedValue(resp);
 		const mod = await import('../../src/services/api/home/HomeService');
@@ -41,5 +41,14 @@ describe('HomeService', () => {
 		const result = await mod.HomeService.getResponse();
 		expect(result).toBeInstanceOf(Error);
 		expect((result as Error).message).toBe('An unexpected error occurred.');
+	});
+
+	it('rejects an HTML fallback page served with status 200', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({
+			data: '<!doctype html><html><body><div id="root"></div></body></html>',
+		});
+		const mod = await import('../../src/services/api/home/HomeService');
+		const result = await mod.HomeService.getResponse();
+		expect(result).toBeInstanceOf(Error);
 	});
 });

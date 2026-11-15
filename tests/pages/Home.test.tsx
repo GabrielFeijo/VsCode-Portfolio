@@ -47,4 +47,17 @@ describe('Home', () => {
 		);
 		expect(setSelectedIndex).toHaveBeenCalledWith(-1);
 	});
+
+	it('leaves the document title to the Metadata component (Helmet)', () => {
+		document.title = 'Title from Helmet';
+		render(<Home setSelectedIndex={jest.fn()} />);
+
+		expect(document.title).toBe('Title from Helmet');
+	});
+
+	it('describes the logo image for assistive technology', () => {
+		render(<Home setSelectedIndex={jest.fn()} />);
+
+		expect(screen.getByRole('img', { name: 'header.logoAlt' })).toBeInTheDocument();
+	});
 });

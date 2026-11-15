@@ -5,12 +5,13 @@ import TerminalIcon from '@mui/icons-material/TerminalOutlined';
 import { Box, Link, Paper, Tooltip } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import type React from 'react';
-import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
 import { useLayoutContext } from '../../contexts/LayoutContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { requestOpenShortcuts } from '../../utils/appEvents';
 import { useContactLinks } from '../hooks/useContactLinks';
+import { useViewport } from '../hooks/useViewport';
 import { useAppPalette } from '../theme/useAppPalette';
 
 interface Props {
@@ -38,7 +39,8 @@ export default function Sidebar({ changeLanguage }: Props) {
 	const colors = useAppPalette();
 	const { t, i18n } = useTranslation();
 	const contactLinks = useContactLinks();
-	const isMobileViewport = Boolean(isMobile || ctxIsMobile);
+	const { isMobile: viewportIsMobile } = useViewport();
+	const isMobileViewport = Boolean(ctxIsMobile || viewportIsMobile);
 
 	const iconSx = {
 		flexGrow: 0,
@@ -70,6 +72,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 			<Box sx={{ flexGrow: 0 }} display='flex' justifyContent='center' flexDirection='column'>
 				<Box
 					component='button'
+					type='button'
 					aria-label={
 						expanded
 							? t('sidebar.closeExplorer') || 'Close explorer'
@@ -140,6 +143,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 					>
 						<Box
 							component='button'
+							type='button'
 							aria-label={
 								terminal
 									? t('sidebar.terminal.close') || 'Close terminal'
@@ -171,6 +175,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 				<Tooltip title={t(languageKey)} placement='right' arrow>
 					<Box
 						component='button'
+						type='button'
 						aria-label={t(languageKey) || 'Change language'}
 						tabIndex={0}
 						onKeyDown={handleActivationKeyDown(changeLanguage)}
@@ -189,6 +194,7 @@ export default function Sidebar({ changeLanguage }: Props) {
 				>
 					<Box
 						component='button'
+						type='button'
 						aria-label={
 							theme === 'dark'
 								? t('sidebar.theme.light') || 'Switch to light theme'
@@ -206,8 +212,11 @@ export default function Sidebar({ changeLanguage }: Props) {
 				</Tooltip>
 				<Box
 					component='button'
+					type='button'
 					aria-label={t('sidebar.settings') || 'Settings'}
 					tabIndex={0}
+					onKeyDown={handleActivationKeyDown(requestOpenShortcuts)}
+					onClick={requestOpenShortcuts}
 					sx={{ ...iconSx, border: 'none', background: 'transparent', width: '100%', padding: 0 }}
 					display='flex'
 					justifyContent='center'
