@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import MarkdownRenderer, { getAllowedEmbedSource } from '../../src/app/components/MarkdownRenderer';
 import { STYLE_FILES } from '../mocks/styleContentGlob';
 
+let mockComponents: Record<string, React.ElementType> = {};
 let mockIframeSource = 'https://www.youtube.com/embed/video-id';
 let mockTheme = 'dark';
 let mockStylesheetHref = 'https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css';
@@ -18,8 +19,9 @@ jest.mock('react-markdown', () => {
 		}: {
 			components: Record<string, React.ElementType>;
 			rehypePlugins: unknown[];
-		}) =>
-			React.createElement(
+		}) => {
+			mockComponents = components;
+			return React.createElement(
 				'div',
 				{
 					'data-testid': 'markdown-root',
@@ -64,7 +66,8 @@ jest.mock('react-markdown', () => {
 						),
 					),
 				),
-			),
+			);
+		},
 	};
 });
 
@@ -113,6 +116,45 @@ describe('MarkdownRenderer', () => {
 
 		expect(container.querySelector('code')).toHaveClass('language-typescript');
 		expect(container.querySelector('code')).toHaveTextContent('const value = 1;');
+	});
+
+	it('renders inline code as an inline element, never as a block <pre>', () => {
+		render(<MarkdownRenderer content='content' />);
+		const Code = mockComponents.code as React.ElementType;
+
+		const { container } = render(
+			<p>
+				text <Code inline>inline-snippet</Code>
+			</p>,
+		);
+
+		const code = container.querySelector('code');
+		expect(code).toHaveTextContent('inline-snippet');
+		expect(container.querySelector('pre')).not.toBeInTheDocument();
+		expect(code).not.toHaveClass(/language-/);
+	});
+
+	it('does not nest a <pre> inside the <pre> emitted by react-markdown for fenced blocks', () => {
+		render(<MarkdownRenderer content='content' />);
+		const Pre = mockComponents.pre as React.ElementType;
+		const Code = mockComponents.code as React.ElementType;
+
+		const { container } = render(
+			<Pre>
+				<Code className='language-ts'>const a = 1;</Code>
+			</Pre>,
+		);
+
+		expect(container.querySelectorAll('pre')).toHaveLength(1);
+	});
+
+	it('keeps the full language name for hyphenated fences', () => {
+		render(<MarkdownRenderer content='content' />);
+		const Code = mockComponents.code as React.ElementType;
+
+		const { container } = render(<Code className='language-c-sharp'>x</Code>);
+
+		expect(container.querySelector('code')).toHaveClass('language-c-sharp');
 	});
 
 	it('uses markdown as the default code language', () => {
