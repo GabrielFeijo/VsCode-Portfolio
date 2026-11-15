@@ -331,4 +331,50 @@ describe('MDContainer', () => {
 		expect(pages[1]).toBe(otherPage);
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
+
+	it('never persists default pages on Ctrl+S and leaves the browser shortcut alone', () => {
+		const savePage = jest.spyOn(StorageService, 'saveOrUpdateData');
+		jest.spyOn(StorageService, 'getData').mockReturnValue([]);
+		global.fetch = jest.fn();
+		const page = {
+			index: 0,
+			name: 'sobre-mim.html',
+			route: 'about-me',
+			content: '<h1>Live content</h1>',
+		};
+
+		render(
+			<MemoryRouter>
+				<MDContainer path='/pages/pt/sobre-mim.html' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
+		);
+
+		const notPrevented = fireEvent.keyDown(window, { key: 's', ctrlKey: true });
+
+		expect(savePage).not.toHaveBeenCalled();
+		expect(notPrevented).toBe(true);
+	});
+
+	it.each([
+		['Cmd+S', { key: 's', metaKey: true }],
+		['Ctrl+Shift+S / caps lock', { key: 'S', ctrlKey: true }],
+	])('saves an editable page with %s', async (_label, keyInit) => {
+		global.fetch = jest.fn();
+		const savePage = jest
+			.spyOn(StorageService, 'saveOrUpdateData')
+			.mockImplementation(() => undefined);
+		const page = { index: 30, name: 'mac.md', route: 'mac.md', content: '# Mac', isSaved: true };
+
+		render(
+			<MemoryRouter>
+				<MDContainer path='/unused' page={page} setPages={jest.fn()} />
+			</MemoryRouter>,
+		);
+		await screen.findByLabelText('Markdown editor');
+
+		const notPrevented = fireEvent.keyDown(window, keyInit);
+
+		expect(savePage).toHaveBeenCalledWith(expect.objectContaining({ index: 30 }));
+		expect(notPrevented).toBe(false);
+	});
 });

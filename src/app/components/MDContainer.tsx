@@ -144,8 +144,10 @@ export default function MDContainer({ path, page, setPages }: Props) {
 	}, [content, page, setPages]);
 
 	useEffect(() => {
+		if (!editMode) return;
+
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.ctrlKey && event.key === 's') {
+			if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
 				event.preventDefault();
 				handleSave();
 			}
@@ -153,7 +155,7 @@ export default function MDContainer({ path, page, setPages }: Props) {
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [handleSave]);
+	}, [editMode, handleSave]);
 
 	return (
 		<Container

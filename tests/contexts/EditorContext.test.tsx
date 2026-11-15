@@ -111,6 +111,8 @@ function TestConsumer() {
 			<button onClick={() => ctx.closeOtherTabs(0)}>Close Others</button>
 			<button onClick={() => ctx.closeTabsToRight(0)}>Close Right</button>
 			<button onClick={() => ctx.closeTabsToLeft(1)}>Close Left</button>
+			<button onClick={() => ctx.closeTabsToRight(99)}>Close Right Missing</button>
+			<button onClick={() => ctx.closeTabsToLeft(99)}>Close Left Missing</button>
 			<button onClick={() => ctx.setCurrentComponent('MyComponent')}>Set Component</button>
 			<button
 				onClick={() =>
@@ -460,6 +462,23 @@ describe('EditorProvider and useEditorContext', () => {
 		fireEvent.click(screen.getByText('Close Left'));
 		expect(screen.getByTestId('visible-indexes')).toHaveTextContent('1,2');
 	});
+
+	test.each([['Close Right Missing'], ['Close Left Missing']])(
+		'%s keeps every tab when the target is not open',
+		(label) => {
+			render(
+				<EditorProvider language='pt'>
+					<TestConsumer />
+				</EditorProvider>,
+			);
+
+			fireEvent.click(screen.getByText('Set Multiple Pages'));
+			fireEvent.click(screen.getByText('Set Visible Multiple'));
+			fireEvent.click(screen.getByText(label));
+
+			expect(screen.getByTestId('visible-indexes')).toHaveTextContent('0,1,2');
+		},
+	);
 
 	test('updates selectedIndex to minIndex when selected tab is removed and selectedIndex is less than min', () => {
 		render(
