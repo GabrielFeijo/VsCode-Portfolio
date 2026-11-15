@@ -12,11 +12,25 @@ describe('CommandService', () => {
 	afterEach(() => jest.resetAllMocks());
 
 	it('getResponse returns data on success', async () => {
-		const resp = { data: { ok: true } };
+		const resp = { data: { command: 'help', response: ['line'] } };
 		(apiFetch.get as jest.Mock).mockResolvedValue(resp);
 		const mod = await import('../../src/services/api/command/CommandService');
-		const result = await mod.CommandService.getResponse('');
+		const result = await mod.CommandService.getResponse('help');
 		expect(result).toEqual(resp.data);
+	});
+
+	it('getResponse rejects an HTML fallback page served with status 200', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({ data: '<!doctype html><html></html>' });
+		const mod = await import('../../src/services/api/command/CommandService');
+		const result = await mod.CommandService.getResponse('help');
+		expect(result).toBeInstanceOf(Error);
+	});
+
+	it('getResponse rejects payloads without a response list', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({ data: { command: 'help' } });
+		const mod = await import('../../src/services/api/command/CommandService');
+		const result = await mod.CommandService.getResponse('help');
+		expect(result).toBeInstanceOf(Error);
 	});
 
 	it('returns Error when axios-like error thrown', async () => {
@@ -59,6 +73,22 @@ describe('CommandService', () => {
 		const mod = await import('../../src/services/api/command/CommandService');
 		const result = await mod.CommandService.findAll();
 		expect(result).toBeInstanceOf(Error);
+	});
+
+	it('findAll rejects an HTML fallback page served with status 200', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({ data: '<!doctype html><html></html>' });
+		const mod = await import('../../src/services/api/command/CommandService');
+		const result = await mod.CommandService.findAll();
+		expect(result).toBeInstanceOf(Error);
+	});
+
+	it('findAll tolerates malformed optional fields', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({
+			data: [{ command: 'help', response: ['x'], category: 42, aliases: 'nope' }],
+		});
+		const mod = await import('../../src/services/api/command/CommandService');
+		const result = await mod.CommandService.findAll();
+		expect(result).toEqual([expect.objectContaining({ command: 'help', response: ['x'] })]);
 	});
 
 	it('findAll returns Error when request fails', async () => {

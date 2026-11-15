@@ -54,14 +54,14 @@ describe('useCommandsQuery', () => {
 		expect(result.current.commandsByCategory.general).toHaveLength(1);
 	});
 
-	it('handles Error responses by returning empty list', async () => {
+	it('exposes a failed request as an error with an empty command list', async () => {
 		(CommandService.findAll as jest.Mock).mockResolvedValue(new Error('Network error'));
 
 		const { result } = renderHook(() => useCommandsQuery(), {
 			wrapper: createWrapper(),
 		});
 
-		await waitFor(() => expect(result.current.isSuccess).toBe(true));
+		await waitFor(() => expect(result.current.isError).toBe(true));
 		expect(result.current.commands).toEqual([]);
 		expect(result.current.allCommandNames).toEqual([]);
 	});

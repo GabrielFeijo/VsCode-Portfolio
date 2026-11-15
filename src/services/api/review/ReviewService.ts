@@ -1,16 +1,9 @@
-import { ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
+import type { z } from 'zod';
+import { type ApiError, toApiError } from '../apiError';
 import apiFetch from '../axios-config';
+import { createdReviewSchema, parseApiData, reviewListSchema, type reviewSchema } from '../schemas';
 
-export interface IRate {
-	_id: string;
-	username: string;
-	comment: string;
-	stars: number;
-	createdAt?: string;
-	updatedAt: string;
-}
-
-export { ApiError, DEFAULT_ERROR_MESSAGE } from '../apiError';
+export type IRate = z.output<typeof reviewSchema>;
 
 export interface CreateReviewInput {
 	username: string;
@@ -18,25 +11,21 @@ export interface CreateReviewInput {
 	stars: number;
 }
 
-const findAll = async (): Promise<IRate[] | Error> => {
+const findAll = async (): Promise<IRate[] | ApiError> => {
 	try {
 		const { data } = await apiFetch.get(`/review`);
-
-		if (data) return data;
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return parseApiData(reviewListSchema, data);
 	} catch (error) {
 		return toApiError(error);
 	}
 };
 
-const create = async (review: CreateReviewInput): Promise<IRate | ApiError> => {
+const create = async (
+	review: CreateReviewInput,
+): Promise<z.output<typeof createdReviewSchema> | ApiError> => {
 	try {
 		const { data } = await apiFetch.post(`/review`, review);
-
-		if (data) return data;
-
-		return new ApiError(DEFAULT_ERROR_MESSAGE);
+		return parseApiData(createdReviewSchema, data);
 	} catch (error) {
 		return toApiError(error, true);
 	}

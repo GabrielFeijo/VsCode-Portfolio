@@ -1,5 +1,5 @@
+import { ApiError, DEFAULT_ERROR_MESSAGE } from '../../src/services/api/apiError';
 import apiFetch from '../../src/services/api/axios-config';
-import { ApiError, DEFAULT_ERROR_MESSAGE } from '../../src/services/api/review/ReviewService';
 
 jest.mock('../../src/services/api/axios-config', () => ({
 	__esModule: true,
@@ -19,20 +19,36 @@ describe('ReviewService', () => {
 	});
 
 	it('findAll returns data on success', async () => {
-		const resp = { data: [{ id: 1 }] };
+		const resp = {
+			data: [{ _id: '1', username: 'ana', comment: 'great portfolio', stars: 5 }],
+		};
 		(apiFetch.get as jest.Mock).mockResolvedValue(resp);
 		const mod = await import('../../src/services/api/review/ReviewService');
 		const result = await mod.ReviewService.findAll();
 		expect(result).toEqual(resp.data);
 	});
 
+	it('findAll rejects an HTML fallback page served with status 200', async () => {
+		(apiFetch.get as jest.Mock).mockResolvedValue({ data: '<!doctype html><html></html>' });
+		const mod = await import('../../src/services/api/review/ReviewService');
+		const result = await mod.ReviewService.findAll();
+		expect(result).toBeInstanceOf(Error);
+	});
+
 	it('create returns created item on success', async () => {
-		const payload = { title: 'x' };
-		const resp = { data: { id: 2, ...payload } };
+		const payload = { username: 'u', comment: 'long enough comment', stars: 5 };
+		const resp = { data: { _id: '2', ...payload } };
 		(apiFetch.post as jest.Mock).mockResolvedValue(resp);
 		const mod = await import('../../src/services/api/review/ReviewService');
-		const result = await mod.ReviewService.create(payload as any);
+		const result = await mod.ReviewService.create(payload);
 		expect(result).toEqual(resp.data);
+	});
+
+	it('create rejects an HTML fallback page served with status 200', async () => {
+		(apiFetch.post as jest.Mock).mockResolvedValue({ data: '<!doctype html><html></html>' });
+		const mod = await import('../../src/services/api/review/ReviewService');
+		const result = await mod.ReviewService.create({ username: 'u', comment: 'c', stars: 5 });
+		expect(result).toBeInstanceOf(Error);
 	});
 
 	it('returns Error for axios-like failures', async () => {

@@ -1,25 +1,14 @@
-import { type ApiError, DEFAULT_ERROR_MESSAGE, toApiError } from '../apiError';
+import type { z } from 'zod';
+import { type ApiError, toApiError } from '../apiError';
 import apiFetch from '../axios-config';
+import { commandListSchema, commandSchema, parseApiData } from '../schemas';
 
-export interface ICommand {
-	_id?: string;
-	command: string;
-	aliases?: string[];
-	category?: string;
-	description?: string;
-	language?: string;
-	response: string[];
-	created_at?: string;
-	updatedAt?: string;
-}
+export type ICommand = z.output<typeof commandSchema>;
 
 const getResponse = async (command: string): Promise<ICommand | ApiError> => {
 	try {
 		const { data } = await apiFetch.get(`/command/${encodeURIComponent(command)}`);
-
-		if (data) return data;
-
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return parseApiData(commandSchema, data);
 	} catch (error) {
 		return toApiError(error);
 	}
@@ -28,8 +17,7 @@ const getResponse = async (command: string): Promise<ICommand | ApiError> => {
 const findAll = async (): Promise<ICommand[] | ApiError> => {
 	try {
 		const { data } = await apiFetch.get('/command');
-		if (data) return data;
-		return new Error(DEFAULT_ERROR_MESSAGE);
+		return parseApiData(commandListSchema, data);
 	} catch (error) {
 		return toApiError(error);
 	}

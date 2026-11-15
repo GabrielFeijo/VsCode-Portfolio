@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-export function createApiClient(baseUrl: string) {
+export function createApiClient(baseUrl = '') {
+	const normalizedBase = baseUrl.trim().replace(/\/+$/, '');
 	return axios.create({
-		baseURL: `${baseUrl}/v2`,
+		baseURL: `${normalizedBase}/v2`,
 		headers: {
 			'Content-Type': 'application/json',
 		},
