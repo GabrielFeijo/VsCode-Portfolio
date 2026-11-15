@@ -31,7 +31,7 @@ export default function MetadataComponent() {
 				name: siteConfig.author,
 				url: siteConfig.url,
 				image: siteImage,
-				jobTitle: siteConfig.jobTitle,
+				jobTitle: siteConfig.jobTitle[language],
 				address: {
 					'@type': 'PostalAddress',
 					addressLocality: siteConfig.address.locality,

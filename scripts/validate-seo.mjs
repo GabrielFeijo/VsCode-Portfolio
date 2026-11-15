@@ -86,8 +86,11 @@ for (const page of seoConfig.pages) {
 			`Missing structured data for ${getLocalizedPath(page.path, language)}`,
 		);
 		const structuredData = JSON.parse(structuredDataMatch[1]);
-		const webPage = structuredData['@graph'][2];
+		const [person, , webPage] = structuredData['@graph'];
 		assert.equal(structuredData['@context'], 'https://schema.org');
+		assert.equal(person.jobTitle, seoConfig.site.jobTitle[language]);
+		assert.equal(person.address.addressLocality, seoConfig.site.address.locality);
+		assert.deepEqual(person.knowsAbout, seoConfig.site.knowsAbout);
 		assert.equal(webPage.url, canonicalUrl);
 		assert.equal(webPage.name, metadata.title);
 		assert.equal(webPage.description, metadata.description);
@@ -122,4 +125,6 @@ assert.match(robots, /Sitemap: https:\/\/www\.gabrielfeijo\.com\.br\/sitemap\.xm
 
 const manifest = JSON.parse(await readFile(join(buildDirectory, 'site.webmanifest'), 'utf8'));
 assert.equal(manifest.start_url, '/');
+assert.equal(manifest.theme_color, seoConfig.site.themeColor);
+assert.equal(manifest.background_color, seoConfig.site.themeColor);
 assert.equal(manifest.icons.length, 2);

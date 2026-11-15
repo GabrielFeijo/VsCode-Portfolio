@@ -9,7 +9,10 @@
 		"repoUrl": "https://github.com/GabrielFeijo/vscode-portfolio",
 		"githubUrl": "https://github.com/GabrielFeijo",
 		"linkedinUrl": "https://www.linkedin.com/in/gabriel-feijo/",
-		"jobTitle": "Desenvolvedor Full Stack",
+		"jobTitle": {
+			"pt": "Desenvolvedor Full Stack",
+			"en": "Full Stack Developer"
+		},
 		"imageAlt": "Gabriel Feijó — Desenvolvedor Full Stack",
 		"twitterHandle": "@gabrielfeijo",
 		"themeColor": "#1e1e2e",
