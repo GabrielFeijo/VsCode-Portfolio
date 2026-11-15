@@ -107,11 +107,13 @@ function createPageHtml(page, language) {
 	html = replaceMeta(html, 'property', 'og:url', canonicalUrl);
 	html = replaceMeta(html, 'property', 'og:title', page[language].title);
 	html = replaceMeta(html, 'property', 'og:description', page[language].description);
+	html = replaceMeta(html, 'property', 'og:image:alt', seoConfig.site.imageAlt[language]);
 	html = replaceMeta(html, 'property', 'og:locale', locale);
 	html = replaceMeta(html, 'property', 'og:locale:alternate', alternateLocale);
 	html = replaceMeta(html, 'name', 'twitter:url', canonicalUrl);
 	html = replaceMeta(html, 'name', 'twitter:title', page[language].title);
 	html = replaceMeta(html, 'name', 'twitter:description', page[language].description);
+	html = replaceMeta(html, 'name', 'twitter:image:alt', seoConfig.site.imageAlt[language]);
 
 	const structuredData = JSON.stringify(createStructuredData(page, language, canonicalUrl));
 	return html.replace(

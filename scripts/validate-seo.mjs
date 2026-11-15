@@ -76,7 +76,9 @@ for (const page of seoConfig.pages) {
 		expectLink(html, 'alternate', 'hreflang', 'x-default', portugueseUrl);
 		expectMeta(html, 'name', 'description', metadata.description);
 		expectMeta(html, 'property', 'og:url', canonicalUrl);
+		expectMeta(html, 'property', 'og:image:alt', seoConfig.site.imageAlt[language]);
 		expectMeta(html, 'name', 'twitter:url', canonicalUrl);
+		expectMeta(html, 'name', 'twitter:image:alt', seoConfig.site.imageAlt[language]);
 
 		const structuredDataMatch = html.match(
 			/<script\s+id=["']structured-data["'][^>]*>([\s\S]*?)<\/script>/i,

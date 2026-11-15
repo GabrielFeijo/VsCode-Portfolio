@@ -13,7 +13,10 @@
 			"pt": "Desenvolvedor Full Stack",
 			"en": "Full Stack Developer"
 		},
-		"imageAlt": "Gabriel Feijó — Desenvolvedor Full Stack",
+		"imageAlt": {
+			"pt": "Gabriel Feijó — Desenvolvedor Full Stack",
+			"en": "Gabriel Feijó — Full Stack Developer"
+		},
 		"twitterHandle": "@gabrielfeijo",
 		"themeColor": "#1e1e2e",
 		"address": {
