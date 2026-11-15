@@ -60,6 +60,8 @@ describe('languagePreference', () => {
 	});
 
 	it('extracts the primary browser language with fallback', () => {
+		expect(typeof isAutomatedVisitor()).toBe('boolean');
+		expect(typeof getPreferredBrowserLanguage()).toBe('string');
 		expect(getPreferredBrowserLanguage(mockNavigator({ languages: [], language: 'en-GB' }))).toBe(
 			'en-gb',
 		);

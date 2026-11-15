@@ -9,6 +9,10 @@ import type {
 import {
 	getTerminalColors,
 	LOCAL_COMMANDS,
+	PROJECT_FS,
+	PROJECT_ROOT,
+	TERMINAL_HOST,
+	TERMINAL_USER,
 } from '@/app/components/Terminal/terminal/terminalConfig';
 
 jest.mock('@/services/api/review/ReviewService', () => ({
@@ -100,5 +104,9 @@ describe('CommandRegistry', () => {
 
 	it('keeps LOCAL_COMMANDS in sync with commandRegistry.getAllNames()', () => {
 		expect([...LOCAL_COMMANDS].sort()).toEqual([...commandRegistry.getAllNames()].sort());
+		expect(TERMINAL_USER).toBeTruthy();
+		expect(TERMINAL_HOST).toBeTruthy();
+		expect(PROJECT_ROOT).toBeTruthy();
+		expect(PROJECT_FS).toBeDefined();
 	});
 });
