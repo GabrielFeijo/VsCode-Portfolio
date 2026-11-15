@@ -2,7 +2,6 @@ import { Box, Grid, IconButton, Link, Stack, Tooltip, Typography } from '@mui/ma
 import type React from 'react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { siteConfig } from '../../config/site';
 import logo from '../../static/favicon.webp';
 import { useContactLinks } from '../hooks/useContactLinks';
 
@@ -16,7 +15,6 @@ export default function Home({ setSelectedIndex }: Props) {
 
 	useEffect(() => {
 		setSelectedIndex(-1);
-		document.title = siteConfig.name;
 	}, [setSelectedIndex]);
 
 	return (
@@ -42,7 +40,7 @@ export default function Home({ setSelectedIndex }: Props) {
 							height={150}
 							decoding='async'
 							style={{ maxWidth: '100%', height: 'auto', width: 150 }}
-							alt='logo'
+							alt={t('header.logoAlt')}
 						/>
 					</Box>
 					<Box sx={{ maxWidth: '100%' }}>

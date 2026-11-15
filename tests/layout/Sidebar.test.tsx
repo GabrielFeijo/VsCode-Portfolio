@@ -236,11 +236,27 @@ describe('Sidebar', () => {
 		require('react-device-detect').isMobile = originalIsMobile;
 	});
 
-	it('calls preventDefault when settings button is pressed with Enter', () => {
-		const preventDefault = jest.fn();
+	it('calls preventDefault and opens shortcuts when settings button is pressed with Enter', () => {
+		const listener = jest.fn();
+		const { onOpenShortcutsRequest } = require('../../src/utils/appEvents');
+		const unsubscribe = onOpenShortcutsRequest(listener);
 		render(<Sidebar {...defaultProps} />);
 		const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
-		fireEvent.keyDown(settingsButton, { key: 'Enter', preventDefault });
+		const notPrevented = fireEvent.keyDown(settingsButton, { key: 'Enter' });
+		expect(notPrevented).toBe(false);
+		expect(listener).toHaveBeenCalledTimes(1);
+		unsubscribe();
+	});
+
+	it('opens shortcuts when settings button is clicked', () => {
+		const listener = jest.fn();
+		const { onOpenShortcutsRequest } = require('../../src/utils/appEvents');
+		const unsubscribe = onOpenShortcutsRequest(listener);
+		render(<Sidebar {...defaultProps} />);
+		const settingsButton = screen.getByRole('button', { name: /sidebar\.settings/i });
+		fireEvent.click(settingsButton);
+		expect(listener).toHaveBeenCalledTimes(1);
+		unsubscribe();
 	});
 
 	it('calls preventDefault when settings button is pressed with Space', () => {

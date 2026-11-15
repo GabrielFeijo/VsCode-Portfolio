@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Star, StarBorder } from '@mui/icons-material';
+import Star from '@mui/icons-material/Star';
+import StarBorder from '@mui/icons-material/StarBorder';
 import { Rating } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose } from 'react-icons/vsc';
 import { useCreateReviewMutation } from '@/hooks/queries/useReviewsQuery';
-import type { ApiError } from '@/services/api/review/ReviewService';
+import type { ApiError } from '@/services/api/apiError';
 import { fadeInOut } from '@/utils/motionVariants';
 import styles from './BoxRating.module.css';
 import { getReviewSchema } from './schemas/BoxRatingSchema';
@@ -37,6 +38,13 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 
 	const [error, setError] = useState('');
 	const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const modalRef = useRef<HTMLDivElement | null>(null);
+	const previousFocusRef = useRef<HTMLElement | null>(null);
+
+	const closeModal = useCallback(() => {
+		setRanking(false);
+		previousFocusRef.current?.focus?.();
+	}, [setRanking]);
 	const {
 		register,
 		handleSubmit,
@@ -89,7 +97,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 				stars: data.stars,
 			});
 			reset();
-			setRanking(false);
+			closeModal();
 		} catch (response) {
 			const errorMessage = getErrorMessage(response as ApiError);
 			showError(errorMessage);
@@ -104,7 +112,48 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 		}
 		reset();
 		setError('');
+		previousFocusRef.current?.focus?.();
 	}, [ranking, reset]);
+
+	useEffect(() => {
+		if (!ranking) return;
+
+		if (
+			document.activeElement instanceof HTMLElement &&
+			!modalRef.current?.contains(document.activeElement)
+		) {
+			previousFocusRef.current = document.activeElement;
+		}
+		const initialInput = modalRef.current?.querySelector<HTMLElement>('#username');
+		initialInput?.focus();
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				closeModal();
+				return;
+			}
+
+			if (event.key !== 'Tab' || !modalRef.current) return;
+			const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+				'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+			);
+			const first = focusables[0];
+			const last = focusables[focusables.length - 1];
+			if (event.shiftKey && document.activeElement === first) {
+				event.preventDefault();
+				last.focus();
+			} else if (!event.shiftKey && document.activeElement === last) {
+				event.preventDefault();
+				first.focus();
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [closeModal, ranking]);
 
 	useEffect(
 		() => () => {
@@ -135,115 +184,119 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 						}}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 					>
-						<div className={styles.modalHeader}>
-							<div></div>
-							<h3 id='rating-title' className={styles.title}>
-								{t('rating.evaluate')}
-							</h3>
-							<button
-								type='button'
-								className={styles.closeButton}
-								onClick={() => setRanking(false)}
-								aria-label={t('rating.close') || 'Close rating modal'}
-							>
-								<VscChromeClose />
-							</button>
-						</div>
-
-						<div className={styles.modalContent}>
-							<form onSubmit={handleSubmit(onSubmit)}>
-								<div className={styles.formField}>
-									<label htmlFor='username' className={styles.label}>
-										{t('rating.name')}
-									</label>
-									<input
-										id='username'
-										type='text'
-										{...register('username')}
-										className={`${styles.input} ${errors.username ? styles.error : ''}`}
-										autoComplete='off'
-										placeholder={t('rating.namePlaceholder')}
-									/>
-									{errors.username && (
-										<span className={styles.errorSpan}>{errors.username.message}</span>
-									)}
-								</div>
-
-								<div className={styles.formField}>
-									<label htmlFor='comment' className={styles.label}>
-										{t('rating.comment')}
-									</label>
-									<textarea
-										id='comment'
-										{...register('comment')}
-										className={`${styles.textarea} ${errors.comment ? styles.error : ''}`}
-										rows={3}
-										autoComplete='off'
-										placeholder={t('rating.commentPlaceholder')}
-									/>
-									{errors.comment && (
-										<span className={styles.errorSpan}>{errors.comment.message}</span>
-									)}
-								</div>
-
-								<div className={styles.ratingContainer}>
-									<Controller
-										name='stars'
-										control={control}
-										render={({ field }) => (
-											<Rating
-												{...field}
-												value={field.value}
-												precision={0.5}
-												onChange={(_, newValue) => {
-													field.onChange(newValue || 0);
-												}}
-												icon={
-													<Star
-														fontSize='inherit'
-														sx={{
-															transition: 'transform 0.2s, filter 0.2s',
-														}}
-													/>
-												}
-												emptyIcon={
-													<StarBorder
-														fontSize='inherit'
-														sx={{
-															color: '#ccc',
-															transition: 'color 0.2s',
-														}}
-													/>
-												}
-											/>
-										)}
-									/>
-									<div className={styles.ratingText}>
-										{stars > 0 && t(`terminal.rating.${String(stars).replace('.', '_')}`)}
-									</div>
-									{errors.stars && <span className={styles.errorSpan}>{errors.stars.message}</span>}
-								</div>
-
+						<div ref={modalRef}>
+							<div className={styles.modalHeader}>
+								<div></div>
+								<h3 id='rating-title' className={styles.title}>
+									{t('rating.evaluate')}
+								</h3>
 								<button
-									type='submit'
-									className={styles.submitButton}
-									aria-label={t('rating.submit') || 'Submit rating'}
-									disabled={isSubmitting}
-									aria-busy={isSubmitting}
+									type='button'
+									className={styles.closeButton}
+									onClick={closeModal}
+									aria-label={t('rating.close') || 'Close rating modal'}
 								>
-									{t('rating.submit')}
+									<VscChromeClose />
 								</button>
+							</div>
 
-								{error.length > 0 && (
-									<motion.div
-										className={styles.errorMessage}
-										initial={{ opacity: 0, y: -10 }}
-										animate={{ opacity: 1, y: 0 }}
+							<div className={styles.modalContent}>
+								<form onSubmit={handleSubmit(onSubmit)}>
+									<div className={styles.formField}>
+										<label htmlFor='username' className={styles.label}>
+											{t('rating.name')}
+										</label>
+										<input
+											id='username'
+											type='text'
+											{...register('username')}
+											className={`${styles.input} ${errors.username ? styles.error : ''}`}
+											autoComplete='off'
+											placeholder={t('rating.namePlaceholder')}
+										/>
+										{errors.username && (
+											<span className={styles.errorSpan}>{errors.username.message}</span>
+										)}
+									</div>
+
+									<div className={styles.formField}>
+										<label htmlFor='comment' className={styles.label}>
+											{t('rating.comment')}
+										</label>
+										<textarea
+											id='comment'
+											{...register('comment')}
+											className={`${styles.textarea} ${errors.comment ? styles.error : ''}`}
+											rows={3}
+											autoComplete='off'
+											placeholder={t('rating.commentPlaceholder')}
+										/>
+										{errors.comment && (
+											<span className={styles.errorSpan}>{errors.comment.message}</span>
+										)}
+									</div>
+
+									<div className={styles.ratingContainer}>
+										<Controller
+											name='stars'
+											control={control}
+											render={({ field }) => (
+												<Rating
+													{...field}
+													value={field.value}
+													precision={0.5}
+													onChange={(_, newValue) => {
+														field.onChange(newValue || 0);
+													}}
+													icon={
+														<Star
+															fontSize='inherit'
+															sx={{
+																transition: 'transform 0.2s, filter 0.2s',
+															}}
+														/>
+													}
+													emptyIcon={
+														<StarBorder
+															fontSize='inherit'
+															sx={{
+																color: '#ccc',
+																transition: 'color 0.2s',
+															}}
+														/>
+													}
+												/>
+											)}
+										/>
+										<div className={styles.ratingText}>
+											{stars > 0 && t(`terminal.rating.${String(stars).replace('.', '_')}`)}
+										</div>
+										{errors.stars && (
+											<span className={styles.errorSpan}>{errors.stars.message}</span>
+										)}
+									</div>
+
+									<button
+										type='submit'
+										className={styles.submitButton}
+										aria-label={t('rating.submit') || 'Submit rating'}
+										disabled={isSubmitting}
+										aria-busy={isSubmitting}
 									>
-										{error}
-									</motion.div>
-								)}
-							</form>
+										{t('rating.submit')}
+									</button>
+
+									{error.length > 0 && (
+										<motion.div
+											className={styles.errorMessage}
+											initial={{ opacity: 0, y: -10 }}
+											animate={{ opacity: 1, y: 0 }}
+										>
+											{error}
+										</motion.div>
+									)}
+								</form>
+							</div>
 						</div>
 					</motion.div>
 				</motion.div>

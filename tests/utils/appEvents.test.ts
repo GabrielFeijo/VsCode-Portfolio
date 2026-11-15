@@ -1,7 +1,9 @@
 import {
 	notifyStorageChange,
+	onOpenShortcutsRequest,
 	onOpenTabRequest,
 	onStorageChange,
+	requestOpenShortcuts,
 	requestOpenTab,
 } from '../../src/utils/appEvents';
 
@@ -38,6 +40,18 @@ describe('appEvents', () => {
 
 		unsubscribe();
 		notifyStorageChange();
+		expect(listener).toHaveBeenCalledTimes(1);
+	});
+
+	it('delivers keyboard shortcuts modal requests until unsubscribed', () => {
+		const listener = jest.fn();
+		const unsubscribe = onOpenShortcutsRequest(listener);
+
+		requestOpenShortcuts();
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		unsubscribe();
+		requestOpenShortcuts();
 		expect(listener).toHaveBeenCalledTimes(1);
 	});
 });

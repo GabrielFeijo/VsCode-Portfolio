@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { VscChromeClose, VscRecordKeys } from 'react-icons/vsc';
+import { onOpenShortcutsRequest } from '../../../utils/appEvents';
 import { fadeInOut } from '../../../utils/motionVariants';
+import { useViewport } from '../../hooks/useViewport';
 import Kbd from '../ui/Kbd';
 import styles from './KeyboardShortcutsModal.module.css';
 import { KEYBOARD_SHORTCUTS } from './keyboardShortcuts.config';
@@ -14,6 +15,7 @@ interface Props {
 
 export default function KeyboardShortcutsModal({ visible }: Props) {
 	const [show, setShow] = useState(false);
+	const { isMobile } = useViewport();
 	const { t } = useTranslation();
 
 	useEffect(() => {
@@ -33,6 +35,19 @@ export default function KeyboardShortcutsModal({ visible }: Props) {
 			if (hideTimeout) clearTimeout(hideTimeout);
 		};
 	}, [visible]);
+
+	useEffect(() => onOpenShortcutsRequest(() => setShow(true)), []);
+
+	useEffect(() => {
+		if (!show) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setShow(false);
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [show]);
 
 	if (!show || isMobile) return null;
 

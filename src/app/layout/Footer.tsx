@@ -1,4 +1,5 @@
 import { Box, Grid, Link, Paper, Stack, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { IoIosGitBranch } from 'react-icons/io';
 import { VscBell, VscCheck, VscError, VscFeedback, VscRemote, VscWarning } from 'react-icons/vsc';
 import { siteConfig } from '../../config/site';
@@ -7,6 +8,7 @@ import { useAppPalette } from '../theme/useAppPalette';
 
 export default function Footer() {
 	const colors = useAppPalette();
+	const { t } = useTranslation();
 
 	return (
 		<Box
@@ -25,8 +27,8 @@ export default function Footer() {
 				<Grid item display='flex' alignItems='center' sx={{ height: '100%', minWidth: 0 }}>
 					<Box
 						component='button'
-						role='button'
-						aria-label='Remote connection status'
+						type='button'
+						aria-label={t('footer.remote')}
 						tabIndex={0}
 						sx={{
 							width: `${LAYOUT.REMOTE_BUTTON_WIDTH}px`,
@@ -47,12 +49,12 @@ export default function Footer() {
 					<Stack direction='row' spacing={0.5} sx={{ pl: 1, minWidth: 0 }} alignItems='center'>
 						<Box
 							component={Link}
-							href={siteConfig.githubUrl}
+							href={siteConfig.repoUrl}
 							underline='none'
 							color='inherit'
 							target='_blank'
 							rel='noopener noreferrer'
-							aria-label='View source code on GitHub - main branch'
+							aria-label={t('footer.viewSource')}
 							display='flex'
 							sx={{
 								px: 0.5,
@@ -69,7 +71,7 @@ export default function Footer() {
 							direction='row'
 							spacing={0.5}
 							role='status'
-							aria-label='Errors and warnings count'
+							aria-label={t('footer.problems')}
 							sx={{
 								px: 0.5,
 							}}
@@ -78,7 +80,7 @@ export default function Footer() {
 								<VscError fontSize='0.9rem' aria-hidden='true' />
 							</Box>
 							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
-								<Typography sx={{ fontSize: '0.6rem' }} aria-label='Errors count'>
+								<Typography sx={{ fontSize: '0.6rem' }} aria-label={t('footer.errors')}>
 									0
 								</Typography>
 							</Box>
@@ -86,7 +88,7 @@ export default function Footer() {
 								<VscWarning fontSize='0.9rem' aria-hidden='true' />
 							</Box>
 							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
-								<Typography sx={{ fontSize: '0.6rem' }} aria-label='Warnings count'>
+								<Typography sx={{ fontSize: '0.6rem' }} aria-label={t('footer.warnings')}>
 									0
 								</Typography>
 							</Box>
@@ -112,7 +114,7 @@ export default function Footer() {
 							}}
 						>
 							<VscCheck fontSize='0.9rem' />
-							<Typography sx={{ ml: 0.5, mt: 0.1, fontSize: '0.6rem' }}>Prettier</Typography>
+							<Typography sx={{ ml: 0.5, mt: 0.1, fontSize: '0.6rem' }}>Biome</Typography>
 						</Box>
 						<Box
 							display='flex'

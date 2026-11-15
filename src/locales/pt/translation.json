@@ -1,6 +1,7 @@
 {
 	"header": {
 		"title": "Gabriel Feijó",
+		"logoAlt": "Logo de Gabriel Feijó",
 		"subtitle": "Desenvolvendo soluções tecnológicas para mudar o mundo de forma positiva."
 	},
 	"shortcuts": {
@@ -102,7 +103,7 @@
 	},
 	"contact": {
 		"github": {
-			"title": "Código deste projeto",
+			"title": "Meu perfil no GitHub",
 			"href": "https://github.com/GabrielFeijo"
 		},
 		"linkedin": {
@@ -113,6 +114,13 @@
 			"title": "Contate-me por e-mail",
 			"href": "mailto:feijo6622@gmail.com"
 		}
+	},
+	"footer": {
+		"remote": "Status da conexão remota",
+		"viewSource": "Ver código-fonte no GitHub - branch main",
+		"problems": "Contagem de erros e avisos",
+		"errors": "Quantidade de erros",
+		"warnings": "Quantidade de avisos"
 	},
 	"sidebar": {
 		"explorer": "EXPLORADOR",
