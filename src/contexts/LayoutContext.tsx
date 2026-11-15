@@ -1,6 +1,5 @@
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { isBrowser } from 'react-device-detect';
 import { matchesMediaQuery, useViewport } from '../app/hooks/useViewport';
 import { BREAKPOINTS } from '../constants/layout';
 
@@ -35,8 +34,8 @@ interface LayoutProviderProps {
 export function LayoutProvider({ children }: LayoutProviderProps) {
 	const { isMobile, isTablet, isCompact } = useViewport();
 	const isCompactMedia = matchesMediaQuery(`(max-width: ${BREAKPOINTS.TABLET_MAX}px)`);
-	const [expanded, setExpanded] = useState(() => isBrowser && !isCompactMedia);
-	const [terminal, setTerminal] = useState(() => isBrowser && !isMobile);
+	const [expanded, setExpanded] = useState(() => !isMobile && !isCompactMedia);
+	const [terminal, setTerminal] = useState(() => !isMobile);
 	const [ranking, setRanking] = useState(false);
 
 	useEffect(() => {

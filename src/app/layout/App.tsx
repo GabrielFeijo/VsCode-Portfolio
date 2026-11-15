@@ -1,7 +1,6 @@
 import { Box, Container, CssBaseline, Grid, Stack, ThemeProvider, Typography } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react';
-import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
@@ -12,6 +11,10 @@ import { LayoutProvider, useLayoutContext } from '../../contexts/LayoutContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import type { Language, Page } from '../../domain/page';
 import i18n from '../../i18n';
+import {
+	setStoredLanguagePreference,
+	shouldAutoRedirectToEnglish,
+} from '../../i18n/languagePreference';
 import { onOpenTabRequest } from '../../utils/appEvents';
 import {
 	sidebarAnimations,
@@ -22,6 +25,7 @@ import {
 import KeyboardShortcutsModal from '../components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 import Loading from '../components/Loading/Loading';
 import { useAppKeyboardShortcuts } from '../hooks/useAppKeyboardShortcuts';
+import { useSplashVisible } from '../hooks/useSplash';
 import Home from '../pages/Home';
 import { createAppTheme } from '../theme/createAppTheme';
 import { useAppPalette } from '../theme/useAppPalette';
@@ -30,8 +34,6 @@ import AppTree from './AppTree';
 import Footer from './Footer';
 import MetadataComponent from './Metadata';
 import Sidebar from './Sidebar';
-
-export { initVisiblePageIndexes, loadPages } from '../../contexts/EditorContext';
 
 const BoxRating = lazy(() => import('../components/Rating/BoxRating'));
 const MDContainer = lazy(() => import('../components/MDContainer'));
@@ -297,11 +299,12 @@ function AppContent({ changeLanguage }: AppContentProps) {
 		isCompact: ctxIsCompact,
 	} = useLayoutContext();
 
-	const isMobileViewport = Boolean(isMobile || ctxIsMobile);
+	const isMobileViewport = Boolean(ctxIsMobile);
 	const isOverlayExplorer = Boolean(isMobileViewport || ctxIsCompact);
 
 	const { toggleTheme } = useTheme();
 	const { isLoading } = useHomeQuery();
+	const showSplash = useSplashVisible(!isLoading);
 
 	const activeRoutePage = useMemo(
 		() => pages.find((item) => `/${item.route}` === getBasePath(pathname)),
@@ -333,76 +336,74 @@ function AppContent({ changeLanguage }: AppContentProps) {
 	return (
 		<>
 			<MetadataComponent />
-			{isLoading && <Loading />}
-			{!isLoading && ranking && (
+			{showSplash && <Loading />}
+			{!showSplash && ranking && (
 				<Suspense fallback={null}>
 					<BoxRating ranking={ranking} setRanking={setRanking} />
 				</Suspense>
 			)}
-			<KeyboardShortcutsModal visible={!isLoading} />
-			{language && (
-				<Container
-					sx={{
-						m: 0,
-						p: 0,
-						width: '100%',
-						height: 'var(--app-viewport-height)',
-						maxHeight: 'var(--app-viewport-height)',
-						overflow: 'hidden',
-					}}
-					maxWidth={false}
-					disableGutters
-				>
-					<Grid container sx={{ height: '100%', overflow: 'hidden' }}>
+			<KeyboardShortcutsModal visible={!showSplash} />
+			<Container
+				sx={{
+					m: 0,
+					p: 0,
+					width: '100%',
+					height: 'var(--app-viewport-height)',
+					maxHeight: 'var(--app-viewport-height)',
+					overflow: 'hidden',
+				}}
+				maxWidth={false}
+				disableGutters
+			>
+				<Grid container sx={{ height: '100%', overflow: 'hidden' }}>
+					<Grid
+						container
+						sx={{ height: `calc(100% - ${LAYOUT.FOOTER_HEIGHT}px)`, overflow: 'hidden' }}
+					>
 						<Grid
-							container
-							sx={{ height: `calc(100% - ${LAYOUT.FOOTER_HEIGHT}px)`, overflow: 'hidden' }}
+							item
+							sx={{
+								width: LAYOUT.SIDEBAR_WIDTH,
+								height: '100%',
+								zIndex: isOverlayExplorer ? 1000 : 2,
+							}}
 						>
-							<Grid
-								item
-								sx={{
-									width: LAYOUT.SIDEBAR_WIDTH,
-									height: '100%',
-									zIndex: isOverlayExplorer ? 1000 : 2,
-								}}
+							<motion.div
+								variants={slideInOut}
+								initial='initial'
+								animate='animate'
+								exit='exit'
+								style={{ height: '100%' }}
 							>
-								<motion.div
-									variants={slideInOut}
-									initial='initial'
-									animate='animate'
-									exit='exit'
-									style={{ height: '100%' }}
-								>
-									<Sidebar language={language} changeLanguage={changeLanguage} />
-								</motion.div>
-							</Grid>
-							<ExplorerDrawer
-								expanded={expanded}
-								setExpanded={setExpanded}
-								isOverlay={isOverlayExplorer}
-								language={language}
-								explorerTitle={t('sidebar.explorer')}
-								bgExplorer={colors.bgExplorer}
-								bgOverlay={colors.bgOverlay}
-							/>
-							<EditorWorkspace
-								language={language}
-								pages={pages}
-								setPages={setPages}
-								setSelectedIndex={setSelectedIndex}
-								terminalOpen={terminal && !isMobileViewport}
-							/>
+								<Sidebar language={language} changeLanguage={changeLanguage} />
+							</motion.div>
 						</Grid>
-
-						<Grid item lg={12} md={12} sm={12} xs={12} zIndex={2}>
-							<Footer />
-						</Grid>
+						<ExplorerDrawer
+							expanded={expanded}
+							setExpanded={setExpanded}
+							isOverlay={isOverlayExplorer}
+							language={language}
+							explorerTitle={t('sidebar.explorer')}
+							bgExplorer={colors.bgExplorer}
+							bgOverlay={colors.bgOverlay}
+						/>
+						<EditorWorkspace
+							language={language}
+							pages={pages}
+							setPages={setPages}
+							setSelectedIndex={setSelectedIndex}
+							terminalOpen={terminal && !isMobileViewport}
+						/>
 					</Grid>
-				</Container>
-			)}
+
+					<Grid item lg={12} md={12} sm={12} xs={12} zIndex={2}>
+						<Footer />
+					</Grid>
+				</Grid>
+			</Container>
 
 			<TerminalDock
-				visible={!isLoading && terminal && !isMobileViewport}
+				visible={!showSplash && terminal && !isMobileViewport}
 				expanded={expanded}
 				isOverlayExplorer={isOverlayExplorer}
 				language={language}
@@ -422,8 +423,17 @@ export default function App() {
 
 	const muiTheme = useMemo(() => createAppTheme(paletteType), [paletteType]);
 
+	useEffect(() => {
+		if (shouldAutoRedirectToEnglish(pathname)) {
+			setStoredLanguagePreference('en');
+			void i18n.changeLanguage('en');
+			navigate('/en', { replace: true });
+		}
+	}, [navigate, pathname]);
+
 	const changeLanguage = useCallback(() => {
 		const newLanguage = language === 'pt' ? 'en' : 'pt';
+		setStoredLanguagePreference(newLanguage);
 		void i18n.changeLanguage(newLanguage);
 		navigate(getLocalizedPath(pathname, newLanguage));
 	}, [language, navigate, pathname]);

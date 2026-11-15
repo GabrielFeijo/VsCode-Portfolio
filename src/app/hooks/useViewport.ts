@@ -22,7 +22,7 @@ export function getViewportState(): ViewportState {
 		`(min-width: ${BREAKPOINTS.MOBILE_MAX + 1}px) and (max-width: ${BREAKPOINTS.TABLET_MAX}px)`,
 	);
 
-	const isMobile = isDeviceMobile || !isBrowser || mobileQuery;
+	const isMobile = Boolean(isDeviceMobile) || isBrowser === false || mobileQuery;
 	const isTablet = !isMobile && tabletQuery;
 	const isCompact = isMobile || isTablet;
 
