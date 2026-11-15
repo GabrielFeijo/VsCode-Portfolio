@@ -43,8 +43,10 @@ function TerminalIconButton({
 			sx={{
 				cursor: 'pointer',
 				height: 33,
+				color: colors.textSecondary,
 				'&:hover': {
 					backgroundColor: colors.bgHover,
+					color: colors.textPrimary,
 				},
 				WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 				p: 1,

@@ -112,8 +112,8 @@ const Terminal = ({ language, setTerminal, setRanking, changeLanguage }: Props) 
 								setSelectedTerminalIndex(index);
 							}}
 							sx={{
-								borderBottom: '1px solid transparent',
-								borderColor: renderTerminalBgColor(index),
+								border: 'none',
+								borderBottom: `2px solid ${renderTerminalBgColor(index)}`,
 								color: renderTerminalColor(index),
 								cursor: 'pointer',
 								flexShrink: 0,
@@ -123,7 +123,6 @@ const Terminal = ({ language, setTerminal, setRanking, changeLanguage }: Props) 
 								},
 								WebkitTapHighlightColor: 'rgba(0,0,0,0)',
 								p: 0.8,
-								border: 'none',
 								background: 'transparent',
 								display: 'flex',
 								alignItems: 'center',

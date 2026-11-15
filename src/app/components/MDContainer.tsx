@@ -170,8 +170,8 @@ export default function MDContainer({ path, page, setPages }: Props) {
 						md={6}
 						sx={{
 							height: { xs: '50%', md: '100%' },
-							borderRight: { xs: 'none', md: '1px solid var(--border)' },
-							borderBottom: { xs: '1px solid var(--border)', md: 'none' },
+							borderRight: { xs: 'none', md: '1px solid var(--border-color)' },
+							borderBottom: { xs: '1px solid var(--border-color)', md: 'none' },
 						}}
 					>
 						<Suspense fallback={<Box sx={{ p: 2 }}>Loading editor...</Box>}>

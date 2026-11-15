@@ -43,6 +43,11 @@ function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabPr
 				flexShrink: 0,
 				borderRight: 1,
 				borderColor: colors.border,
+				borderTop: `2px solid ${isSelected ? colors.tabIndicator : 'transparent'}`,
+				backgroundColor: isSelected ? colors.bgTabActive : colors.bgTabInactive,
+				'&:hover': {
+					backgroundColor: isSelected ? colors.bgTabActive : colors.bgHover,
+				},
 			}}
 		>
 			<Button
@@ -54,13 +59,13 @@ function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabPr
 				onContextMenu={onContextMenu}
 				sx={{
 					borderRadius: 0,
-					px: 2,
+					px: 1.5,
 					pr: 0.5,
 					textTransform: 'none',
-					backgroundColor: isSelected ? colors.bgTabActive : colors.bgTabInactive,
+					backgroundColor: 'transparent',
 					color: isSelected ? colors.textPrimary : colors.textSecondary,
 					'&.MuiButtonBase-root:hover': {
-						bgcolor: isSelected ? colors.bgTabActive : colors.bgHover,
+						bgcolor: 'transparent',
 					},
 					transition: 'none',
 					pb: 0.2,
@@ -97,7 +102,7 @@ function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabPr
 				}}
 				sx={{
 					mx: 0.5,
-					backgroundColor: isSelected ? colors.bgTabActive : colors.bgTabInactive,
+					backgroundColor: 'transparent',
 					color: isSelected ? colors.textPrimary : colors.textSecondary,
 					'&:hover': {
 						bgcolor: colors.bgHover,
@@ -113,7 +118,7 @@ function PageTab({ page, isSelected, onOpen, onClose, onContextMenu }: PageTabPr
 					display: 'inline-flex',
 					alignItems: 'center',
 					justifyContent: 'center',
-					borderRadius: '2px',
+					borderRadius: '4px',
 				}}
 			>
 				<VscChromeClose aria-hidden='true' />

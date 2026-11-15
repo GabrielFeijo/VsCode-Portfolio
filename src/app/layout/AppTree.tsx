@@ -131,6 +131,7 @@ export default function AppTree({ language, onSelectFile }: Props) {
 									size='small'
 									aria-label={t('sidebar.createFile') || 'Create new file'}
 									onClick={handleCreateFile}
+									sx={{ color: colors.icon, '&:hover': { color: colors.iconActive } }}
 								>
 									<VscNewFile size={16} />
 								</IconButton>
@@ -140,6 +141,7 @@ export default function AppTree({ language, onSelectFile }: Props) {
 									onClick={(e: React.MouseEvent) => {
 										e.stopPropagation();
 									}}
+									sx={{ color: colors.icon, '&:hover': { color: colors.iconActive } }}
 								>
 									<VscNewFolder size={16} />
 								</IconButton>
@@ -149,13 +151,14 @@ export default function AppTree({ language, onSelectFile }: Props) {
 									onClick={(e: React.MouseEvent) => {
 										e.stopPropagation();
 									}}
+									sx={{ color: colors.icon, '&:hover': { color: colors.iconActive } }}
 								>
 									<VscRefresh size={16} />
 								</IconButton>
 							</Box>
 						</Box>
 					}
-					color='#bdc3cf'
+					sx={{ color: colors.textPrimary }}
 				>
 					{pages.map(({ index, name, route, isSaved }) => (
 						<TreeItem
@@ -197,7 +200,10 @@ export default function AppTree({ language, onSelectFile }: Props) {
 							sx={{
 								color: renderTreeItemColor(index),
 								backgroundColor: renderTreeItemBgColor(index),
-								'&& .Mui-selected': {
+								'&& .MuiTreeItem-content:hover': {
+									backgroundColor: colors.bgHover,
+								},
+								'&& .Mui-selected, && .Mui-selected:hover, && .Mui-selected.Mui-focused': {
 									backgroundColor: renderTreeItemBgColor(index),
 								},
 							}}
@@ -241,6 +247,7 @@ export default function AppTree({ language, onSelectFile }: Props) {
 													size='small'
 													aria-label={t('sidebar.confirm') || 'Confirm'}
 													onClick={handleConfirmCreateFile}
+													sx={{ color: colors.icon, '&:hover': { color: colors.iconActive } }}
 												>
 													<VscCheck size={12} />
 												</IconButton>
@@ -248,6 +255,7 @@ export default function AppTree({ language, onSelectFile }: Props) {
 													size='small'
 													aria-label={t('sidebar.cancel') || 'Cancel'}
 													onClick={handleCancelCreateFile}
+													sx={{ color: colors.icon, '&:hover': { color: colors.iconActive } }}
 												>
 													<VscClose size={12} />
 												</IconButton>

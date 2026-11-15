@@ -3,7 +3,6 @@ import { highlight, languages } from 'prismjs';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import Editor from 'react-simple-code-editor';
 import 'prismjs/components/prism-markdown';
-import 'prismjs/themes/prism-tomorrow.css';
 import { fonts } from '../theme/typography';
 import { useAppPalette } from '../theme/useAppPalette';
 
@@ -100,7 +99,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 				flexDirection: 'column',
 				height: '100%',
 				width: '100%',
-				backgroundColor: palette.bgSidebar,
+				backgroundColor: palette.bgPrimary,
 				color: palette.textPrimary,
 				fontFamily: fonts.mono,
 				overflow: 'hidden',
@@ -114,7 +113,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 					flex: 1,
 					overflow: 'auto',
 					position: 'relative',
-					backgroundColor: palette.bgSidebar,
+					backgroundColor: palette.bgPrimary,
 				}}
 				onClick={handleCursorSync}
 				onKeyUp={handleCursorSync}
@@ -127,13 +126,12 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 						minWidth: '2.8rem',
 						textAlign: 'right',
 						userSelect: 'none',
-						color: palette.textSecondary,
-						opacity: 0.5,
+						color: palette.textMuted,
 						fontSize: 13,
 						lineHeight: '1.6',
 						fontFamily: fonts.mono,
 						borderRight: `1px solid ${palette.border}`,
-						backgroundColor: palette.bgSidebar,
+						backgroundColor: palette.bgSecondary,
 					}}
 				>
 					{Array.from({ length: lineCount }, (_, i) => i + 1).map((lineNumber) => (
@@ -192,7 +190,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
 					py: 0.3,
 					fontSize: '11px',
 					color: palette.textSecondary,
-					backgroundColor: palette.bgElevated,
+					backgroundColor: palette.bgSecondary,
 					borderTop: `1px solid ${palette.border}`,
 					userSelect: 'none',
 				}}

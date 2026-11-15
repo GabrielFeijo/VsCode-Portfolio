@@ -82,12 +82,12 @@ export default function Sidebar({ changeLanguage }: Props) {
 					tabIndex={0}
 					onKeyDown={handleActivationKeyDown(toggleExplorer)}
 					sx={{
+						border: 'none',
 						borderLeft: expanded
 							? `solid 0.12em ${colors.accent}`
 							: `solid 0.12em ${colors.bgSidebar}`,
 						cursor: 'pointer',
 						WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-						border: 'none',
 						background: 'transparent',
 						width: '100%',
 						padding: 0,
@@ -154,10 +154,10 @@ export default function Sidebar({ changeLanguage }: Props) {
 							onKeyDown={handleActivationKeyDown(toggleTerminal)}
 							sx={{
 								...iconSx,
+								border: 'none',
 								borderLeft: terminal
 									? `solid 0.12em ${colors.accent}`
 									: `solid 0.12em ${colors.bgSidebar}`,
-								border: 'none',
 								background: 'transparent',
 								width: '100%',
 								padding: 0,

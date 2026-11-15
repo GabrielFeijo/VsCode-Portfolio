@@ -252,6 +252,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 														<Star
 															fontSize='inherit'
 															sx={{
+																color: 'var(--accent-yellow)',
 																transition: 'transform 0.2s, filter 0.2s',
 															}}
 														/>
@@ -260,7 +261,7 @@ export default function BoxRating({ ranking, setRanking }: Props) {
 														<StarBorder
 															fontSize='inherit'
 															sx={{
-																color: '#ccc',
+																color: 'var(--text-muted)',
 																transition: 'color 0.2s',
 															}}
 														/>
