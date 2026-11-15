@@ -88,7 +88,7 @@ body {
 	--icon-markdown: var(--ctp-blue);
 
 	--footer-accent: var(--ctp-mauve);
-	--footer-hover: var(--ctp-blue);
+	--footer-hover: var(--ctp-surface0);
 	--tab-indicator: var(--ctp-pink);
 
 	--success-color: var(--ctp-green);
@@ -164,7 +164,7 @@ body {
 	--icon-markdown: var(--ctp-blue);
 
 	--footer-accent: var(--ctp-mauve);
-	--footer-hover: var(--ctp-blue);
+	--footer-hover: var(--ctp-surface0);
 	--tab-indicator: var(--ctp-pink);
 
 	--success-color: var(--ctp-green);

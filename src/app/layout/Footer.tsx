@@ -23,8 +23,14 @@ export default function Footer() {
 			}}
 			display='flex'
 		>
-			<Grid container wrap='nowrap' alignItems='center' justifyContent='space-between'>
-				<Grid item display='flex' alignItems='center' sx={{ height: '100%', minWidth: 0 }}>
+			<Grid
+				container
+				wrap='nowrap'
+				alignItems='stretch'
+				justifyContent='space-between'
+				sx={{ height: '100%' }}
+			>
+				<Grid item display='flex' alignItems='stretch' sx={{ height: '100%', minWidth: 0 }}>
 					<Box
 						component='button'
 						type='button'
@@ -46,7 +52,12 @@ export default function Footer() {
 					>
 						<VscRemote fontSize='0.9rem' style={{ color: colors.textInverse }} />
 					</Box>
-					<Stack direction='row' spacing={0.5} sx={{ pl: 1, minWidth: 0 }} alignItems='center'>
+					<Stack
+						direction='row'
+						spacing={0}
+						sx={{ height: '100%', minWidth: 0 }}
+						alignItems='stretch'
+					>
 						<Box
 							component={Link}
 							href={siteConfig.repoUrl}
@@ -57,14 +68,20 @@ export default function Footer() {
 							aria-label={t('footer.viewSource')}
 							display='flex'
 							sx={{
-								px: 0.5,
+								height: '100%',
+								px: 1.25,
 								justifyContent: 'center',
 								alignItems: 'center',
-								'&:hover': { background: colors.footerHover },
+								color: colors.textPrimary,
+								transition: 'background-color 0.15s ease',
+								'&:hover': {
+									backgroundColor: colors.footerHover,
+									color: colors.textPrimary,
+								},
 							}}
 						>
 							<IoIosGitBranch fontSize='0.9rem' />
-							<Typography sx={{ ml: 0.5, mt: 0.1, fontSize: '0.6rem' }}>main</Typography>
+							<Typography sx={{ ml: 0.5, fontSize: '0.6rem', lineHeight: 1 }}>main</Typography>
 						</Box>
 
 						<Stack
@@ -72,23 +89,31 @@ export default function Footer() {
 							spacing={0.5}
 							role='status'
 							aria-label={t('footer.problems')}
+							alignItems='center'
 							sx={{
-								px: 0.5,
+								height: '100%',
+								px: 1,
 							}}
 						>
-							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', py: 0.3 }}>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center' }}>
 								<VscError fontSize='0.9rem' aria-hidden='true' />
 							</Box>
-							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
-								<Typography sx={{ fontSize: '0.6rem' }} aria-label={t('footer.errors')}>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center' }}>
+								<Typography
+									sx={{ fontSize: '0.6rem', lineHeight: 1 }}
+									aria-label={t('footer.errors')}
+								>
 									0
 								</Typography>
 							</Box>
-							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', py: 0.3 }}>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center' }}>
 								<VscWarning fontSize='0.9rem' aria-hidden='true' />
 							</Box>
-							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center', pt: 0.3 }}>
-								<Typography sx={{ fontSize: '0.6rem' }} aria-label={t('footer.warnings')}>
+							<Box display='flex' sx={{ justifyContent: 'center', alignItems: 'center' }}>
+								<Typography
+									sx={{ fontSize: '0.6rem', lineHeight: 1 }}
+									aria-label={t('footer.warnings')}
+								>
 									0
 								</Typography>
 							</Box>
@@ -98,13 +123,21 @@ export default function Footer() {
 				<Grid
 					item
 					sx={{
+						height: '100%',
 						backgroundColor: colors.bgFooter,
 						flexShrink: 0,
 					}}
 					display='flex'
+					alignItems='stretch'
 					justifyContent='flex-end'
 				>
-					<Stack justifyContent='end' direction='row' spacing={0.8} sx={{ pr: 1 }}>
+					<Stack
+						justifyContent='end'
+						alignItems='center'
+						direction='row'
+						spacing={0.8}
+						sx={{ height: '100%', pr: 1 }}
+					>
 						<Box
 							display='flex'
 							sx={{

@@ -62,7 +62,7 @@ export const appPalette = {
 		iconMarkdown: '#89b4fa',
 
 		footerAccent: '#cba6f7',
-		footerHover: '#89b4fa',
+		footerHover: '#313244',
 		tabIndicator: '#f38ba8',
 
 		success: '#a6e3a1',
@@ -145,7 +145,7 @@ export const appPalette = {
 		iconMarkdown: '#1e66f5',
 
 		footerAccent: '#8839ef',
-		footerHover: '#1e66f5',
+		footerHover: '#ccd0da',
 		tabIndicator: '#d20f39',
 
 		success: '#40a02b',
