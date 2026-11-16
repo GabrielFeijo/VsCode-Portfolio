@@ -105,25 +105,25 @@ VsCode-Portfolio/
 │   └── validate-seo.mjs           # Pós-build: valida canonicals, hreflang, títulos únicos, JSON-LD e sitemap
 ├── src/
 │   ├── app/
-│   │   ├── components/            # Componentes de UI (Terminal, MDContainer, MarkdownRenderer, Rating, Loading...)
-│   │   ├── hooks/                 # Hooks de aplicação (useViewport, useSplash, useAppKeyboardShortcuts, useMarkdownPage)
-│   │   ├── layout/                # Shell do VS Code (App, Sidebar, AppTree, AppButtons, Footer, Metadata, Terminal)
-│   │   ├── pages/                 # Página Home e mapeamento de rotas localizadas (pages.ts)
+│   │   ├── components/            # Componentes de UI em kebab-case (terminal, md-container, markdown-renderer, rating...)
+│   │   ├── hooks/                 # Hooks de aplicação (use-viewport, use-splash, use-app-keyboard-shortcuts...)
+│   │   ├── layout/                # Shell do VS Code (app, sidebar, app-tree, app-buttons, footer, metadata, terminal)
+│   │   ├── pages/                 # Página home.tsx e mapeamento de rotas localizadas (pages.ts)
 │   │   └── theme/                 # Paletas Catppuccin (Mocha/Latte) e configuração do tema Material UI
-│   ├── config/                    # Fonte única de verdade de SEO (seo.json, seo.ts), siteConfig e validação de env (Zod)
+│   ├── config/                    # Fonte única de verdade de SEO (seo.json, seo.ts), site.ts e validação de env (Zod)
 │   ├── constants/                 # Constantes de layout, breakpoints e animações
-│   ├── contexts/                  # Contextos globais (EditorContext, LayoutContext, ThemeContext)
+│   ├── contexts/                  # Contextos globais (editor-context, layout-context, theme-context)
 │   ├── domain/                    # Contratos e entidades de domínio (Page, Language, Command, Review)
-│   ├── hooks/queries/             # Hooks TanStack Query (useHomeQuery, useCommandsQuery, useReviewsQuery)
+│   ├── hooks/queries/             # Hooks TanStack Query (use-home-query, use-commands-query, use-reviews-query)
 │   ├── i18n/                      # Inicialização do i18next e persistência/detecção de preferência de idioma
 │   ├── locales/                   # Dicionários de tradução (pt/translation.json e en/translation.json)
 │   ├── pages/                     # Conteúdo das páginas do portfólio em HTML/Markdown (pt/ e en/)
 │   ├── services/
-│   │   ├── api/                   # Cliente Axios, schemas Zod de fronteira e serviços (Home, Command, Review)
-│   │   ├── terminal/              # Sistema de arquivos virtual do terminal (projectFileSystem.ts)
-│   │   └── storageService.ts      # Persistência local segura e versionada no localStorage
-│   └── utils/                     # Barramento de eventos customizados (appEvents), sanitização e variantes Framer Motion
-└── tests/                         # Suíte de testes unitários e de integração espelhando a estrutura de src/
+│   │   ├── api/                   # Cliente Axios, schemas Zod de fronteira e serviços (home, command, review)
+│   │   ├── terminal/              # Sistema de arquivos virtual do terminal (project-file-system.ts)
+│   │   └── storage-service.ts     # Persistência local segura e versionada no localStorage
+│   └── utils/                     # Barramento de eventos customizados (app-events), sanitização e variantes Framer Motion
+└── tests/                         # Suíte de testes unitários e de integração em kebab-case espelhando src/
 ```
 
 ---
