@@ -11,13 +11,13 @@ jest.mock('src/theme.css');
 
 const MockApp = () => <div data-testid='app' />;
 MockApp.displayName = 'App';
-jest.mock('src/app/layout/App', () => MockApp);
+jest.mock('src/app/layout/app', () => MockApp);
 
 const MockThemeProvider = ({ children }: { children: React.ReactNode }) => (
 	<div data-testid='theme-provider'>{children}</div>
 );
 MockThemeProvider.displayName = 'ThemeProvider';
-jest.mock('src/contexts/ThemeContext', () => ({
+jest.mock('src/contexts/theme-context', () => ({
 	ThemeProvider: MockThemeProvider,
 }));
 

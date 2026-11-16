@@ -6,9 +6,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
-import App from './app/layout/App';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { queryClient } from './services/api/queryClient';
+import App from './app/layout/app';
+import { ThemeProvider } from './contexts/theme-context';
+import { queryClient } from './services/api/query-client';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
