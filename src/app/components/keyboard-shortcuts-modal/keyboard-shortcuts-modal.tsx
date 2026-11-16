@@ -1,0 +1,112 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { VscChromeClose, VscRecordKeys } from 'react-icons/vsc';
+import { onOpenShortcutsRequest } from '../../../utils/app-events';
+import { fadeInOut } from '../../../utils/motion-variants';
+import { useViewport } from '../../hooks/use-viewport';
+import Kbd from '../ui/kbd';
+import { KEYBOARD_SHORTCUTS } from './keyboard-shortcuts-config';
+import styles from './keyboard-shortcuts-modal.module.css';
+
+interface KeyboardShortcutsModalProps {
+	visible: boolean;
+}
+
+export default function KeyboardShortcutsModal({ visible }: KeyboardShortcutsModalProps) {
+	const [show, setShow] = useState(false);
+	const { isMobile } = useViewport();
+	const { t } = useTranslation();
+
+	useEffect(() => {
+		if (!visible) {
+			setShow(false);
+			return;
+		}
+
+		let hideTimeout: ReturnType<typeof setTimeout> | undefined;
+		const showTimeout = setTimeout(() => {
+			setShow(true);
+			hideTimeout = setTimeout(() => setShow(false), 5000);
+		}, 2500);
+
+		return () => {
+			clearTimeout(showTimeout);
+			if (hideTimeout) clearTimeout(hideTimeout);
+		};
+	}, [visible]);
+
+	useEffect(() => onOpenShortcutsRequest(() => setShow(true)), []);
+
+	useEffect(() => {
+		if (!show) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setShow(false);
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [show]);
+
+	if (!show || isMobile) return null;
+
+	return (
+		<AnimatePresence>
+			{show && (
+				<motion.div
+					className={styles.modalContainer}
+					variants={fadeInOut}
+					initial='initial'
+					animate='animate'
+					exit='exit'
+				>
+					<motion.div
+						className={styles.modal}
+						variants={{
+							initial: { scale: 0.95, opacity: 0 },
+							animate: { scale: 1, opacity: 1 },
+							exit: { scale: 0.95, opacity: 0 },
+						}}
+						transition={{ duration: 0.2, ease: 'easeInOut' }}
+					>
+						<div className={styles.modalHeader}>
+							<div className={styles.titleGroup}>
+								<VscRecordKeys className={styles.titleIcon} />
+								<h2 className={styles.title}>{t('shortcuts.title')}</h2>
+							</div>
+							<button
+								type='button'
+								className={styles.closeButton}
+								onClick={() => setShow(false)}
+								aria-label={t('shortcuts.close') || 'Close keyboard shortcuts modal'}
+							>
+								<VscChromeClose />
+							</button>
+						</div>
+
+						<div className={styles.modalContent}>
+							{KEYBOARD_SHORTCUTS.map((shortcut, index) => (
+								<motion.div
+									key={shortcut.id}
+									className={styles.shortcutItem}
+									initial={{ opacity: 0, y: 12 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: index * 0.05 }}
+								>
+									<div className={styles.shortcutInfo}>
+										<div className={styles.iconContainer} data-accent={shortcut.accent}>
+											<shortcut.Icon className={styles.icon} />
+										</div>
+										<span className={styles.shortcutLabel}>{t(shortcut.labelKey)}</span>
+									</div>
+									<Kbd keys={shortcut.keys} />
+								</motion.div>
+							))}
+						</div>
+					</motion.div>
+				</motion.div>
+			)}
+		</AnimatePresence>
+	);
+}

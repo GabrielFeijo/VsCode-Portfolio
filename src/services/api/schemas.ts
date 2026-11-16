@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ApiError, DEFAULT_ERROR_MESSAGE } from './apiError';
+import { ApiError, DEFAULT_ERROR_MESSAGE } from './api-error';
 
 const optionalText = z.string().optional().catch(undefined);
 

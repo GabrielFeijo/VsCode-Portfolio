@@ -1,4 +1,4 @@
-import type { Theme } from '../../contexts/ThemeContext';
+import type { Theme } from '../../contexts/theme-context';
 
 export const appPalette = {
 	dark: {
