@@ -13,33 +13,33 @@ const interactiveCoverage = {
 };
 
 const fullyCoveredModules = [
-	'src/app/components/KeyboardShortcutsModal/KeyboardShortcutsModal.tsx',
-	'src/app/components/MarkdownEditor.tsx',
-	'src/app/hooks/useAppKeyboardShortcuts.ts',
-	'src/app/pages/Home.tsx',
-	'src/services/api/axios-config/createApiClient.ts',
-	'src/services/api/review/ReviewService.ts',
-	'src/services/storageService.ts',
+	'src/app/components/keyboard-shortcuts-modal/keyboard-shortcuts-modal.tsx',
+	'src/app/components/markdown-editor.tsx',
+	'src/app/hooks/use-app-keyboard-shortcuts.ts',
+	'src/app/pages/home.tsx',
+	'src/services/api/axios-config/create-api-client.ts',
+	'src/services/api/review/review-service.ts',
+	'src/services/storage-service.ts',
 ];
 
 const interactiveModules = [
-	'src/app/components/MDContainer.tsx',
-	'src/app/components/MarkdownRenderer.tsx',
-	'src/app/components/Terminal/Cmd.tsx',
-	'src/app/components/Terminal/terminal/useTerminal.ts',
-	'src/app/layout/AppTree.tsx',
-	'src/app/layout/Sidebar.tsx',
+	'src/app/components/md-container.tsx',
+	'src/app/components/markdown-renderer.tsx',
+	'src/app/components/terminal/cmd.tsx',
+	'src/app/components/terminal/terminal/use-terminal.ts',
+	'src/app/layout/app-tree.tsx',
+	'src/app/layout/sidebar.tsx',
 ];
 
 module.exports = {
 	preset: 'ts-jest',
 	testEnvironment: 'jsdom',
-	setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
+	setupFilesAfterEnv: ['<rootDir>/tests/setup-tests.ts'],
 	roots: ['<rootDir>/tests', '<rootDir>/src'],
 	moduleNameMapper: {
-		'.*projectFilesGlob.*': '<rootDir>/tests/mocks/projectFilesGlob.ts',
-		'.*pageContentGlob.*': '<rootDir>/tests/mocks/pageContentGlob.ts',
-		'.*styleContentGlob.*': '<rootDir>/tests/mocks/styleContentGlob.ts',
+		'.*project-files-glob.*': '<rootDir>/tests/mocks/project-files-glob.ts',
+		'.*page-content-glob.*': '<rootDir>/tests/mocks/page-content-glob.ts',
+		'.*style-content-glob.*': '<rootDir>/tests/mocks/style-content-glob.ts',
 		'^@/(.*)$': '<rootDir>/src/$1',
 		'^@app/(.*)$': '<rootDir>/src/app/$1',
 		'^@components/(.*)$': '<rootDir>/src/app/components/$1',
@@ -54,8 +54,8 @@ module.exports = {
 		'^src/(.*)$': '<rootDir>/src/$1',
 		'^nanoid$': '<rootDir>/__mocks__/nanoid.js',
 		'^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
-		'^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
-		'^.+\\.(png|jpg|jpeg|webp|svg|gif)$': '<rootDir>/__mocks__/fileMock.js',
+		'^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/style-mock.js',
+		'^.+\\.(png|jpg|jpeg|webp|svg|gif)$': '<rootDir>/__mocks__/file-mock.js',
 	},
 	collectCoverage: true,
 	collectCoverageFrom: [
@@ -63,9 +63,9 @@ module.exports = {
 		'!src/**/index.tsx',
 		'!src/**/*.d.ts',
 		'!src/services/api/axios-config/index.ts',
-		'!src/services/terminal/projectFilesGlob.ts',
-		'!src/services/pageContentGlob.ts',
-		'!src/services/styleContentGlob.ts',
+		'!src/services/terminal/project-files-glob.ts',
+		'!src/services/page-content-glob.ts',
+		'!src/services/style-content-glob.ts',
 	],
 	coverageDirectory: 'coverage',
 	coverageThreshold: {
