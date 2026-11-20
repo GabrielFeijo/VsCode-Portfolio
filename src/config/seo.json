@@ -1,21 +1,21 @@
 {
 	"site": {
 		"author": "Gabriel Feijó",
-		"description": "Portfólio interativo de Gabriel Feijó, desenvolvedor Full Stack especializado em React, TypeScript, Node.js e arquiteturas modernas.",
+		"description": "Portfólio interativo de Gabriel Feijó, AI Engineer especializado em Agentic SDLC, agentes de IA, RAG, React, TypeScript e Node.js.",
 		"image": "/og-image.png",
 		"name": "Gabriel Feijó",
-		"title": "Gabriel Feijó | Desenvolvedor Full Stack",
+		"title": "Gabriel Feijó | AI Engineer e Engenheiro de Software",
 		"url": "https://www.gabrielfeijo.com.br",
 		"repoUrl": "https://github.com/GabrielFeijo/vscode-portfolio",
 		"githubUrl": "https://github.com/GabrielFeijo",
 		"linkedinUrl": "https://www.linkedin.com/in/gabriel-feijo/",
 		"jobTitle": {
-			"pt": "Desenvolvedor Full Stack",
-			"en": "Full Stack Developer"
+			"pt": "AI Engineer",
+			"en": "AI Engineer"
 		},
 		"imageAlt": {
-			"pt": "Gabriel Feijó — Desenvolvedor Full Stack",
-			"en": "Gabriel Feijó — Full Stack Developer"
+			"pt": "Gabriel Feijó — AI Engineer",
+			"en": "Gabriel Feijó — AI Engineer"
 		},
 		"twitterHandle": "@gabrielfeijo",
 		"themeColor": "#1e1e2e",
@@ -30,41 +30,44 @@
 			"Node.js",
 			"NestJS",
 			"Software Engineering",
-			"Full Stack Development"
+			"Full Stack Development",
+			"AI Engineering",
+			"Agentic SDLC",
+			"RAG"
 		]
 	},
 	"pages": [
 		{
 			"path": "/",
 			"pt": {
-				"title": "Gabriel Feijó | Desenvolvedor Full Stack",
-				"description": "Portfólio de Gabriel Feijó, desenvolvedor Full Stack em Recife. Conheça projetos, experiência e habilidades em React, TypeScript e Node.js."
+				"title": "Gabriel Feijó | AI Engineer e Engenheiro de Software",
+				"description": "Portfólio de Gabriel Feijó, AI Engineer em Recife. Conheça projetos, experiência e habilidades em Agentic SDLC, agentes de IA, React, TypeScript e Node.js."
 			},
 			"en": {
-				"title": "Gabriel Feijó | Full Stack Developer",
-				"description": "Portfolio of Gabriel Feijó, a Full Stack Developer based in Recife. Explore projects, experience, and skills in React, TypeScript, and Node.js."
+				"title": "Gabriel Feijó | AI Engineer",
+				"description": "Portfolio of Gabriel Feijó, an AI Engineer based in Recife. Explore projects, experience, and skills in Agentic SDLC, AI agents, React, TypeScript, and Node.js."
 			}
 		},
 		{
 			"path": "/about-me",
 			"pt": {
-				"title": "Sobre Gabriel Feijó | Desenvolvedor Full Stack",
-				"description": "Conheça a trajetória, formação e interesses profissionais de Gabriel Feijó, desenvolvedor Full Stack formado em Análise e Desenvolvimento de Sistemas."
+				"title": "Sobre Gabriel Feijó | AI Engineer",
+				"description": "Conheça a trajetória, formação e interesses profissionais de Gabriel Feijó, AI Engineer e engenheiro de software formado em Análise e Desenvolvimento de Sistemas."
 			},
 			"en": {
-				"title": "About Gabriel Feijó | Full Stack Developer",
-				"description": "Learn about Gabriel Feijó's background, education, and professional interests as a Full Stack Developer with a degree in Systems Analysis and Development."
+				"title": "About Gabriel Feijó | AI Engineer",
+				"description": "Learn about Gabriel Feijó's background, education, and professional interests as an AI Engineer and software engineer with a degree in Systems Analysis and Development."
 			}
 		},
 		{
 			"path": "/skills",
 			"pt": {
 				"title": "Habilidades técnicas | Gabriel Feijó",
-				"description": "Tecnologias e competências de Gabriel Feijó em frontend, backend, bancos de dados, cloud, DevOps e desenvolvimento de software Full Stack."
+				"description": "Tecnologias e competências de Gabriel Feijó em frontend, backend, bancos de dados, cloud, DevOps, engenharia de IA e desenvolvimento de software Full Stack."
 			},
 			"en": {
 				"title": "Technical skills | Gabriel Feijó",
-				"description": "Gabriel Feijó's skills across frontend, backend, databases, cloud, DevOps, and Full Stack software development."
+				"description": "Gabriel Feijó's skills across frontend, backend, databases, cloud, DevOps, AI engineering, and Full Stack software development."
 			}
 		},
 		{
@@ -82,11 +85,11 @@
 			"path": "/experience",
 			"pt": {
 				"title": "Experiência profissional | Gabriel Feijó",
-				"description": "Experiência profissional de Gabriel Feijó no desenvolvimento de produtos digitais, arquiteturas Full Stack, cloud, integrações e qualidade de software."
+				"description": "Experiência profissional de Gabriel Feijó como AI Engineer e Software Engineer: Agentic SDLC, agentes de IA, arquiteturas Full Stack, cloud, integrações e qualidade de software."
 			},
 			"en": {
 				"title": "Professional experience | Gabriel Feijó",
-				"description": "Gabriel Feijó's professional experience building digital products with Full Stack architectures, cloud services, integrations, and software quality practices."
+				"description": "Gabriel Feijó's professional experience as an AI Engineer and Software Engineer: Agentic SDLC, AI agents, Full Stack architectures, cloud services, integrations, and software quality."
 			}
 		},
 		{

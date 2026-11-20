@@ -19,7 +19,7 @@ describe('MetadataComponent', () => {
 		renderMetadata();
 
 		expect(document.querySelector('title')).toHaveTextContent(
-			'Gabriel Feijó | Desenvolvedor Full Stack',
+			'Gabriel Feijó | AI Engineer e Engenheiro de Software',
 		);
 		expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
 			'content',
